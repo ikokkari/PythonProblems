@@ -38,7 +38,7 @@ import os.path
 from math import sqrt
 
 # The release date of this version of the CCPS109 tester.
-version = "December 26, 2020"
+version = "March 7, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 seed = 12345
@@ -226,7 +226,7 @@ def test_all_functions(module, suite, recorder=None, known=None):
         if result >= 0:
             count += 1
     if recorder:
-        print(f"\nRecording complete.")
+        print(f"\nRecording model answers complete.")
     else:
         print(f"{count} out of {total} functions ", end="")
         print(f"of {len(suite)} possible work.")
@@ -309,7 +309,7 @@ def is_ascending_generator(seed):
         for j in range(10):
             items = [rng.randint(-(i+2), i+2)]
             for k in range(i + 1):
-                items.append(items[-1] + rng.randint(1, 20))
+                items.append(items[-1] + rng.randint(0, 2 * i + 1))
             yield (items,)
             if i > 2:
                 for k in range(rng.randint(0, 5)):
@@ -1193,7 +1193,7 @@ def taxi_zum_zum_generator(seed):
 
 def count_growlers_generator(seed):
     rng = random.Random(seed)
-    poss = ["cat", "tac", "dog", "god"]
+    poss = ['cat', 'tac', 'dog', 'god']
     animals = []
     goal, count = 5, 0
     for i in range(5000):
@@ -2477,7 +2477,7 @@ testcases = [
     (
      "is_ascending",
      is_ascending_generator(seed),
-     "0ec304f7cd0d1b7a4460570947b05af1756a2510a5ba5ba9f1"
+     "730a72241dc31c403fd3ca1b13959175a9ca666155fd01d63a"
     ),
     # Removed from problem set December 24, 2020
     # (
