@@ -38,7 +38,7 @@ import os.path
 from math import sqrt
 
 # The release date of this version of the CCPS109 tester.
-version = "March 7, 2021"
+version = "April 18, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 seed = 12345
@@ -211,11 +211,13 @@ def test_all_functions(module, suite, recorder=None, known=None):
     if recorder:
         print("RECORDING THE RESULTS OF INSTRUCTOR MODEL SOLUTIONS.")
         print("IF YOU ARE A STUDENT, YOU SHOULD NOT BE SEEING THIS")
-        print(f"MESSAGE! MAKE SURE THAT THE FILE {recordfile} FROM")
-        print("WHERE YOU DOWNLOADED THIS AUTOMATED TESTER IS ALSO")
-        print("IN THIS SAME WORKING DIRECTORY!")
+        print(f"MESSAGE!!! ENSURE THAT THE FILE {recordfile} FROM")
+        print("WHEREVER YOU DOWNLOADED THIS AUTOMATED TESTER IS")
+        print("ALSO IN THIS SAME WORKING DIRECTORY!!!")
         print()
     count, total = 0, 0
+    if recorder:
+        print(f"$$$${version}", file=recorder)
     for (fname, testcases, expected) in sort_by_source(suite):
         try:
             f = module.__dict__[fname]
@@ -2679,19 +2681,27 @@ print(f"109 Python Problems tester, {version}, Ilkka Kokkarinen.")
 try:
     exec(f"import {studentfile} as labs109")
     if os.path.exists(recordfile):
-        known, curr = dict(), ''
+        known, curr, verified = dict(), '', False
         with gzip.open(recordfile, 'rt') as rf:
             for line in rf:
                 line = line.strip()
                 if line.startswith('****'):
                     curr = line[4:]
                     known[curr] = []
+                elif line.startswith('$$$$'):
+                    if line[4:] != version:
+                        print(f'VERSION MISMATCH In {recordfile} !!!!!')
+                        print(f'REQUIRED: {version}')
+                        print(f'ACTUAL  : {line[4:]}')
+                        exit(0)
+                    else:
+                        verified = True
                 else:
                     known[curr].append(line)
-        # discrepancy(labs109.scylla_or_charybdis,
-        #             scylla_or_charybdis,
-        #             scylla_or_charybdis_generator(seed), False)
-        test_all_functions(labs109, testcases, known=known)
+        if not verified:
+            print(f"YOU ARE USING OBSOLETE VERSION OF {recordfile}. EXITING.")
+        else:
+            test_all_functions(labs109, testcases, known=known)
     else:
         with gzip.open(recordfile, 'wt') as rf:
             test_all_functions(labs109, testcases, recorder=rf)
