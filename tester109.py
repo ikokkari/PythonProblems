@@ -38,7 +38,7 @@ import os.path
 from math import sqrt
 
 # The release date of this version of the CCPS109 tester.
-version = "April 18, 2021"
+version = "April 22, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 seed = 12345
@@ -2682,7 +2682,7 @@ try:
     exec(f"import {studentfile} as labs109")
     if os.path.exists(recordfile):
         known, curr, verified = dict(), '', False
-        with gzip.open(recordfile, 'rt') as rf:
+        with gzip.open(recordfile, 'rt', encoding='utf-8') as rf:
             for line in rf:
                 line = line.strip()
                 if line.startswith('****'):
