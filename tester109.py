@@ -50,7 +50,7 @@ testcase_cutoff = 300
 recordfile = 'expected_answers'
 
 # Whether to use the expected correct answers when they exist.
-use_record = False
+use_record = True
 
 # Name of the module that contains the student solutions.
 studentfile = 'labs109'
