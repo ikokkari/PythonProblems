@@ -38,7 +38,7 @@ import os.path
 from math import sqrt
 
 # The release date of this version of the CCPS109 tester.
-version = "April 22, 2021"
+version = "June 2, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 seed = 12345
@@ -50,7 +50,7 @@ testcase_cutoff = 300
 recordfile = 'expected_answers'
 
 # Whether to use the expected correct answers when they exist.
-use_record = True
+use_record = False
 
 # Name of the module that contains the student solutions.
 studentfile = 'labs109'
@@ -144,7 +144,7 @@ def test_one_function(f, testcases, expected=None, recorder=None, known=None):
             result = f(*test)
         except Exception as e:  # catch any exception
             crashed = True
-            print(f"CRASH! {e}")
+            print(f"CRASH AT TEST CASE #{count}: {e}")
             break
         # If the result is a set or dictionary, turn it into sorted list first.
         result = canonize(result)
@@ -727,7 +727,7 @@ __names = ["brad", "ben", "britain", "donald", "bill", "ronald",
            "nancy", "homer", "marge", "bart", "lisa", "maggie",
            "waylon", "montgomery", "california", "canada",
            "germany", "sheldon", "leonard", "rajesh", "howard",
-           "penny", "amy", "bernadette"]
+           "penny", "amy", "bernadette", "oumoumou"]
 
 
 def brangelina_generator():
@@ -1932,18 +1932,18 @@ __ir = ['añadir', 'abrir', 'aplaudir', 'asistir', 'compartir', 'consumir',
         'decidir', 'definir', 'describir', 'discutir', 'dividir', 'escribir',
         'imprimir', 'insistir', 'persistir', 'prohibir', 'recibir',
         'subir', 'vivir']
+__verbs = __ar + __er + __ir
+__subjects = ['yo', 'tú', 'él', 'ella', 'usted', 'nosotros', 'nosotras',
+                'vosotros', 'vosotras', 'ellos', 'ellas', 'ustedes']
+__tenses = ['presente', 'pretérito', 'imperfecto', 'futuro']
 
 
 def conjugate_regular_generator(seed):
     rng = random.Random(seed)
-    verbs = __ar + __er + __ir
-    subjects = ['yo', 'tú', 'él', 'ella', 'usted', 'nosotros', 'nosotras',
-                'vosotros', 'vosotras', 'ellos', 'ellas', 'ustedes']
-    tenses = ['presente', 'pretérito', 'imperfecto', 'futuro']
-    for i in range(2000):
-        verb = rng.choice(verbs)
-        subject = rng.choice(subjects)
-        tense = rng.choice(tenses)
+    for i in range(5000):
+        verb = rng.choice(__verbs)
+        subject = rng.choice(__subjects)
+        tense = rng.choice(__tenses)
         yield (verb, subject, tense)
 
 
@@ -2379,7 +2379,7 @@ testcases = [
     (
      "brangelina",
      brangelina_generator(),
-     "fdbbfd7aa2ebcb989862f4e23defc6cafd4aca55ce3235a463"
+     "5dc69582c97790ca0250beb872e80ffd4058b9bb7dda28e6d4"
     ),
     (
      "balanced_ternary",
@@ -2632,7 +2632,7 @@ testcases = [
     (
      "word_height",
      word_height_generator(seed),
-     "7d96c801d3a608d73c165d919e646d9e5a06efd6bf091ce5ba"
+     "b5454c6d98c944459ad0509a5648643feab90152f189922f36"
     ),
     (
      "mcculloch",
@@ -2672,7 +2672,7 @@ testcases = [
     (
      "conjugate_regular",
      conjugate_regular_generator(seed),
-     "47c2050686da89ca6b46e8f74aabd127dd5530bff468ad1fdf"
+     "aca26dc625f0f0ea10eae375e9929ed49d4ca5ea99ffb413be"
     )
 ]
 
