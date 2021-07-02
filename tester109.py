@@ -2,11 +2,14 @@
 # "109 Python Problems for CCPS 109" by Ilkka Kokkarinen.
 # Ilkka Kokkarinen, ilkka.kokkarinen@gmail.com
 
+# Requires Python 3.7+ to run all test cases correctly.
+
 # For instructors who want to add their own problems to this set:
 #
 # 1. Set the value of use_record to False.
-# 2. Write your private solution function to top of labs109.py file.
-# 3. Write your test case generator function in this script below.
+# 2. Write your private solution function to top of your private
+#    model solutions file labs109.py.
+# 3. Write your test case generator in this script below.
 # 4. Add the individual test into the list of testcases list below,
 #    using None as its expected checksum for the moment.
 # 5. Run this test script.
@@ -36,9 +39,10 @@ import random
 import gzip
 import os.path
 from math import sqrt
+from sys import version_info, exit
 
 # The release date of this version of the CCPS109 tester.
-version = "June 2, 2021"
+version = 'July 2, 2021'
 
 # Fixed seed used to generate pseudorandom numbers.
 seed = 12345
@@ -228,7 +232,7 @@ def test_all_functions(module, suite, recorder=None, known=None):
         if result >= 0:
             count += 1
     if recorder:
-        print(f"\nRecording model answers complete.")
+        print("\nRecording model answers complete.")
     else:
         print(f"{count} out of {total} functions ", end="")
         print(f"of {len(suite)} possible work.")
@@ -325,26 +329,18 @@ def safe_squares_generator(seed):
     for i in range(1000):
         n = rng.randint(2, 3 + i // 50)
         pn = rng.randint(0, n * n - 3)
-        pieces = []
+        pieces = set()
         while len(pieces) < pn:
             px = rng.randint(0, n-1)
             py = rng.randint(0, n-1)
             if (px, py) not in pieces:
-                pieces.append((px, py))
-        yield (n, pieces)
+                pieces.add((px, py))
+        yield (n, list(pieces))
 
 
 def rooks_with_friends_generator(seed):
     rng = random.Random(seed)
-    for i in range(1000):
-        n = rng.randint(2, 3 + i // 50)
-        pn = rng.randint(0, 2 * n)
-        pieces = []
-        while len(pieces) < pn:
-            px = rng.randint(0, n-1)
-            py = rng.randint(0, n-1)
-            if (px, py) not in pieces:
-                pieces.append((px, py))
+    for (n, pieces) in safe_squares_generator(seed):
         fn = rng.randint(0, n)
         yield (n, pieces[:fn], pieces[fn:])
         yield (n, pieces[fn:], pieces[:fn])
@@ -470,7 +466,7 @@ def winning_card_generator(seed):
     rng = random.Random(seed)
     for i in range(10000):
         hand = rng.sample(deck, 4)
-        for trump in ["spades", "hearts", "diamonds", "clubs", None]:
+        for trump in suits + [None]:
             yield (hand[:], trump)
 
 
@@ -575,7 +571,7 @@ def expand_intervals_generator(seed):
                 curr += rng.randint(1, 10)
             else:
                 end = curr + rng.randint(1, 30)
-                result += str(curr) + '-' + str(end)
+                result += f"{curr}-{end}"
                 curr = end + rng.randint(1, 10)
         yield (result,)
 
@@ -583,8 +579,7 @@ def expand_intervals_generator(seed):
 def collapse_intervals_generator(seed):
     rng = random.Random(seed)
     for i in range(1000):
-        items = []
-        curr = 1
+        items, curr = [], 1
         n = rng.randint(1, i + 3)
         for j in range(n):
             m = rng.randint(1, 5)
@@ -730,10 +725,13 @@ __names = ["brad", "ben", "britain", "donald", "bill", "ronald",
            "penny", "amy", "bernadette", "oumoumou"]
 
 
-def brangelina_generator():
-    for n1 in __names:
-        for n2 in __names:
-            yield (n1, n2)
+def brangelina_generator(seed):
+    rng = random.Random(seed)
+    for _ in range(20000):
+        first = rng.choice(__names)
+        second = rng.choice(__names)
+        yield (first, second)
+        yield (second, first)
 
 
 def frequency_sort_generator(seed):
@@ -802,6 +800,9 @@ def count_divisibles_in_range_generator(seed):
     divs = it.islice(scale_random(seed, 2, 20), 1000)
     for (v, k) in zip(vals, divs):
         yield (prev, v, k)
+        yield (-prev, v, k)
+        yield (-v, -prev, k)
+        yield (-prev, -v, k)
         prev = v
 
 
@@ -881,7 +882,7 @@ def only_odd_digits_generator(seed):
         stop = False
         for j in range(1 + i // 10):
             yield (n,)
-            yield (n+p, )
+            yield (n+p,)
             p = p * 10
             if stop:
                 break
@@ -907,15 +908,13 @@ def lattice_paths_generator(seed):
     for i in range(1000):
         x = rng.randint(2, 3 + i // 40)
         y = rng.randint(2, 3 + i // 40)
-        tabu, tabus = [], set()
+        tabu = set()
         n = rng.randint(1, max(1, x*y // 10))
         while len(tabu) < n:
             xx = rng.randint(0, x)
             yy = rng.randint(0, y)
-            if (xx, yy) not in tabus:
-                tabu.append((xx, yy))
-                tabus.add((xx, yy))
-        yield (x, y, tabu)
+            tabu.add((xx, yy))
+        yield (x, y, list(tabu))
 
 
 def count_carries_generator(seed):
@@ -939,7 +938,7 @@ def count_squares_generator(seed):
             x = rng.randint(0, w)
             y = rng.randint(0, h)
             pts.add((x, y))
-        yield(list(pts), )
+        yield(list(pts),)
 
 
 def kempner_generator():
@@ -1010,7 +1009,7 @@ def ztalloc_generator(seed):
             pat = [('u' if (rng.randint(0, 99) < 50) else 'd')
                    for j in range(len_)]
             pat.extend(['d', 'd', 'd', 'd'])
-        yield (''.join(pat), )
+        yield (''.join(pat),)
 
 
 def sum_of_two_squares_generator(seed):
@@ -1130,7 +1129,7 @@ def extract_increasing_generator(seed):
     rng = random.Random(seed)
     for i in range(1000):
         n = rng.randint(i, i + 10)
-        digits = "".join([rng.choice("0123456789") for j in range(n)])
+        digits = "".join([rng.choice('0123456789') for j in range(n)])
         yield (digits,)
 
 
@@ -1934,7 +1933,7 @@ __ir = ['añadir', 'abrir', 'aplaudir', 'asistir', 'compartir', 'consumir',
         'subir', 'vivir']
 __verbs = __ar + __er + __ir
 __subjects = ['yo', 'tú', 'él', 'ella', 'usted', 'nosotros', 'nosotras',
-                'vosotros', 'vosotras', 'ellos', 'ellas', 'ustedes']
+              'vosotros', 'vosotras', 'ellos', 'ellas', 'ustedes']
 __tenses = ['presente', 'pretérito', 'imperfecto', 'futuro']
 
 
@@ -2256,7 +2255,7 @@ testcases = [
     (
      "rooks_with_friends",
      rooks_with_friends_generator(seed),
-     "4869b8e0b678d18b9ed120ccef8aeed978b6632dab4c91d1e1"
+     "3308bb7ef3f9e0e5e86165f516c408ca2ffa0cfa38d90070ee"
     ),
     (
      "safe_squares_rooks",
@@ -2336,7 +2335,7 @@ testcases = [
     (
      "count_divisibles_in_range",
      count_divisibles_in_range_generator(seed),
-     "4c3246091a84e8b3310c8c9bff017d2fab854e2248a05fab30"
+     "4cd757daabf5ec0107cfb74ba1d0576e9926dc7fb08f24f401"
     ),
     (
      "sort_by_digit_count",
@@ -2378,8 +2377,8 @@ testcases = [
     ),
     (
      "brangelina",
-     brangelina_generator(),
-     "5dc69582c97790ca0250beb872e80ffd4058b9bb7dda28e6d4"
+     brangelina_generator(seed),
+     "3fa0c1ed8a374cf10a2a163eafcb10b8cf20ee97e0cbaa4de4"
     ),
     (
      "balanced_ternary",
@@ -2495,7 +2494,7 @@ testcases = [
     (
      "winning_card",
      winning_card_generator(seed),
-     "521ef5920c74596498f231116663de8089b8fdbc1745e1219e"
+     "fefd8984c1559dfde64a3ecb0d3176f26e0cb4acc6ccc6f7ea"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -2679,6 +2678,9 @@ testcases = [
 
 print(f"109 Python Problems tester, {version}, Ilkka Kokkarinen.")
 try:
+    if version_info < (3, 7, 0):
+        print("THIS SCRIPT REQUIRES PYTHON 3.7.0 OR LATER. EXITING.")
+        exit(1)
     exec(f"import {studentfile} as labs109")
     if os.path.exists(recordfile):
         known, curr, verified = dict(), '', False
@@ -2693,7 +2695,7 @@ try:
                         print(f'VERSION MISMATCH In {recordfile} !!!!!')
                         print(f'REQUIRED: {version}')
                         print(f'ACTUAL  : {line[4:]}')
-                        exit(0)
+                        exit(2)
                     else:
                         verified = True
                 else:
@@ -2702,9 +2704,10 @@ try:
             print(f"YOU ARE USING OBSOLETE VERSION OF {recordfile}. EXITING.")
         else:
             test_all_functions(labs109, testcases, known=known)
-    else:
+    elif use_record:
         with gzip.open(recordfile, 'wt') as rf:
             test_all_functions(labs109, testcases, recorder=rf)
 except Exception as e:
-    print(f"ERROR: Unable to import {studentfile}.py. Exiting...")
-    print(f"{e}")
+    print(f"ERROR: UNABLE TO IMPORT {studentfile}.py. EXITING.")
+    print(f"ERROR MESSAGE RECEIVED: {e}")
+    exit(3)
