@@ -44,7 +44,7 @@ from sys import version_info, exit
 import labs109
 
 # The release date of this version of the CCPS 109 tester.
-version = 'July 14, 2021'
+version = 'July 15, 2021'
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -1378,14 +1378,14 @@ def forbidden_substrings_generator(seed):
 def count_dominators_generator(seed):
     rng = random.Random(seed)
     items = []
-    top, count, goal = 10000, 0, 10
+    top, count, goal = 100000, 0, 10
     for i in range(top):
         yield items[:],
         count += 1
         if count == goal:
             count, goal = 0, goal + 2
             items = []
-        items.append(rng.randint(1, 10 * (top - i)))
+        items.append(rng.randint(1, 10 + i // 10))
 
 
 def optimal_crag_score_generator(seed):
@@ -2004,7 +2004,7 @@ testcases = [
     (
      "count_dominators",
      count_dominators_generator(fixed_seed),
-     "d91c356110374a44de0343f9520caab861b5e81efe4b423649"
+     "2f379a6a2b9dbc122333882e547a8441198d85e82d4919a1a8"
     ),
     (
      "forbidden_substrings",
@@ -2705,6 +2705,5 @@ def run_all():
         print(f"ERROR: UNABLE TO IMPORT labs109.py. EXITING.")
         print(f"ERROR MESSAGE RECEIVED: {e}")
         exit(3)
-
 
 run_all()
