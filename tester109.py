@@ -44,7 +44,7 @@ from sys import version_info, exit
 import labs109
 
 # The release date of this version of the CCPS 109 tester.
-version = 'July 21, 2021'
+version = 'July 21, 2021 (b)'
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -1482,11 +1482,11 @@ def manhattan_skyline_generator(seed):
         w = i * i + 5
         max_area = w * w // 10
         for k in range(3 + i // 10):
-            s = rng.randint(1, w) * scale
-            e = s + rng.randint(1, 3 * i + 1) * scale
+            s = rng.randint(1, w)
+            e = s + rng.randint(1, 3 * i + 1)
             max_height = 1 + max_area // (e - s)
-            h = rng.randint(1, max_height) * scale
-            towers.append((s, e, h))
+            h = rng.randint(1, max_height)
+            towers.append((s * scale, e * scale, h * scale))
         yield towers,
         if i % 100 == 0:
             scale *= rng.randint(3, 6)
@@ -2045,7 +2045,7 @@ testcases = [
     (
      "manhattan_skyline",
      manhattan_skyline_generator(fixed_seed),
-     "06138d5a892de4109ae97b88abb2468f5ffcb0de88ff7cd91e"
+     "1e6740f53203b620e88ee42fb81b3dae5f7148cc79a1ae12d1"
     ),
     (
      "bulgarian_solitaire",
