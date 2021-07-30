@@ -44,7 +44,7 @@ from sys import version_info, exit
 import labs109
 
 # The release date of this version of the CCPS 109 tester.
-version = 'July 21, 2021 (b)'
+version = "July 30, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -57,6 +57,11 @@ recordfile = 'expected_answers'
 
 # Whether to use the expected correct answers when they exist.
 use_record = True
+
+# Markers used to separate the parts of the expected answers file.
+# These should never appear as the prefix of any expected answer.
+version_prefix = '<$$$$>'
+function_prefix = '<****>'
 
 
 # Convert a dictionary or set result to a list sorted by keys to
@@ -72,7 +77,7 @@ def canonize(result):
     return result
 
 
-# When reporting an error, do not flood the user console.
+# When reporting an error, try not to flood the user console.
 
 def emit_args(args, cutoff=100):
     for (i, a) in enumerate(args):
@@ -139,7 +144,7 @@ def test_one_function(f, test_cases, expected=None, recorder=None, known=None):
     fname, recorded = f.__name__, None
     print(f"{fname}: ", end="", flush=True)
     if recorder:
-        print(f"****{fname}", file=recorder)
+        print(f"{function_prefix}{fname}", file=recorder)
     if known:
         recorded = known.get(fname, None)
     chk, start_time, crashed = sha256(), time(), False
@@ -221,7 +226,7 @@ def test_all_functions(module, suite, recorder=None, known=None):
         print()
     count, total = 0, 0
     if recorder:
-        print(f"$$$${version}", file=recorder)
+        print(f"{version_prefix}{version}", file=recorder)
     for (fname, test_cases, expected) in sort_by_source(suite):
         try:
             f = module.__dict__[fname]
@@ -271,11 +276,10 @@ def random_text_generator(seed, n=70):
     alpha = lows
     alpha += alpha.upper()
     punct = '.,!?'
-    for i in range(10000):
+    for _ in range(10000):
         line = ""
         while len(line) < n:
-            word = "".join([rng.choice(alpha)
-                            for _ in range(rng.randint(1, 20))])
+            word = "".join([rng.choice(alpha) for _ in range(rng.randint(1, 20))])
             line += " " if len(line) > 0 else ""
             line += word
             if rng.randint(0, 99) < 20:
@@ -287,7 +291,7 @@ def random_text_generator(seed, n=70):
 
 def random_string(alphabet, n, rng):
     result = ''
-    for i in range(n):
+    for _ in range(n):
         result += rng.choice(alphabet)
     return result
 
@@ -431,16 +435,16 @@ def longest_palindrome_generator(seed):
 def reverse_ascending_sublists_generator(seed):
     rng = random.Random(seed)
     for i in range(1000):
-        for j in range(5):
+        for _ in range(5):
             yield [rng.randint(0, 2*i + k) for k in range(i + 1)],
 
 
 def give_change_generator(seed):
     rng = random.Random(seed)
     coins = [1]
-    for i in range(10):
+    for _ in range(10):
         coins.append(coins[-1] + rng.randint(1, 1 + coins[-1]))
-    for i in range(1000):
+    for _ in range(1000):
         for j in range(1, 10):
             use = rng.sample(coins, j)
             use.sort(reverse=True)
@@ -490,11 +494,11 @@ def hand_shape_distribution_generator(seed):
 
 def milton_work_point_count_generator(seed):
     rng = random.Random(seed)
-    strains = suits + ['notrump']
-    for i in range(10000):
+    for _ in range(10000):
         hand = rng.sample(deck, 13)
-        for strain in strains:
-            yield hand, strain
+        for suit in suits:
+            yield hand, suit
+        yield hand, 'notrump'
 
 
 def sort_by_typing_handedness_generator():
@@ -505,9 +509,8 @@ def sort_by_typing_handedness_generator():
 
 
 def possible_words_generator(seed):
-    f = open('words_sorted.txt', 'r', encoding='utf-8')
-    words = [x.strip() for x in f]
-    f.close()
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [x.strip() for x in f]
     rng = random.Random(seed)
     n = 0
     while n < 100:
@@ -557,9 +560,8 @@ def reverse_reversed_generator(seed):
 
 def scrabble_value_generator(seed):
     rng = random.Random(seed)
-    f = open('words_sorted.txt', 'r', encoding='utf-8')
-    words = [x.strip() for x in f]
-    f.close()
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [x.strip() for x in f]
     for word in words:
         multipliers = [rng.randint(1, 3) for _ in range(len(word))]
         yield word, multipliers if rng.randint(0, 99) < 50 else None
@@ -573,7 +575,7 @@ def expand_intervals_generator(seed):
         result = ''
         first = True
         n = rng.randint(1, 3 + j // 50)
-        for i in range(n):
+        for _ in range(n):
             if not first:
                 result += ','
             first = False
@@ -620,7 +622,7 @@ def __no_repeated_digits(n, allowed):
 
 def bulls_and_cows_generator(seed):
     rng = random.Random(seed)
-    for i in range(100):
+    for _ in range(100):
         result = []
         n = rng.randint(1, 4)
         allowed = rng.sample('123456789', 6)
@@ -638,7 +640,7 @@ def bulls_and_cows_generator(seed):
 def contains_bingo_generator(seed):
     rng = random.Random(seed)
     nums = range(1, 99)
-    for i in range(10000):
+    for _ in range(10000):
         card = rng.sample(nums, 25)
         card = [card[i:i+5] for i in range(0, 25, 5)]
         m = rng.randint(20, 80)
@@ -698,9 +700,8 @@ def fibonacci_word_generator(seed):
 
 
 def all_cyclic_shifts_generator():
-    f = open('words_sorted.txt', 'r', encoding='utf-8')
-    words = [x.strip() for x in f]
-    f.close()
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [x.strip() for x in f]
     for word in words:
         yield word,
 
@@ -779,14 +780,6 @@ def detab_generator(seed):
         yield line, n, ' '
 
 
-def running_median_of_three_generator(seed):
-    rng = random.Random(seed)
-    yield [],
-    yield [42],
-    for i in range(500):
-        yield [rng.randint(1, i + 2) for _ in range(n)],
-
-
 def iterated_remove_pairs_generator(seed):
     rng = random.Random(seed)
     for k in range(1000):
@@ -833,7 +826,7 @@ __players = ['anita', 'suzanne', 'suzy', 'tom', 'steve',
 
 def highest_n_scores_generator(seed):
     rng = random.Random(seed)
-    for i in range(10000):
+    for _ in range(10000):
         scores = [(name, rng.randint(1, 100)) for name in __players for _ in range(rng.randint(0, 20))]
         n = rng.randint(1, 10)
         yield scores, n
@@ -871,9 +864,8 @@ def riffle_generator(seed):
 
 def words_with_given_shape_generator(seed):
     rng = random.Random(seed)
-    f = open('words_sorted.txt', 'r', encoding='utf-8')
-    words = [x.strip() for x in f]
-    f.close()
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [x.strip() for x in f]
     for _ in range(100):
         n = rng.randint(5, 10)
         pattern = [rng.randint(-1, 1) for _ in range(n)]
@@ -916,10 +908,9 @@ def only_odd_digits_generator(seed):
 
 def pancake_scramble_generator(seed):
     rng = random.Random(seed)
-    f = open('words_sorted.txt', 'r', encoding='utf-8')
-    words = [x.strip() for x in f]
-    f.close()
-    for i in range(10000):
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [x.strip() for x in f]
+    for _ in range(10000):
         yield rng.choice(words),
 
 
@@ -976,7 +967,7 @@ def tribonacci_generator():
 def is_permutation_generator(seed):
     rng = random.Random(seed)
     for n in range(1, 1000):
-        items = rng.sample([i for i in range(1, n + 1)], n)
+        items = rng.sample(list(range(1, n+1)), n)
         yield items[:], n
         m = rng.randint(1, 5)
         for _ in range(m):
@@ -1090,9 +1081,8 @@ def __key_dist():
 
 
 def autocorrect_word_generator(seed):
-    f = open('words_sorted.txt', 'r', encoding='utf-8')
-    words = [x.strip() for x in f]
-    f.close()
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [x.strip() for x in f]
     dist = __key_dist()
     rng = random.Random(seed)
 
@@ -1135,9 +1125,8 @@ def is_cyclops_generator(seed):
 
 def words_with_letters_generator(seed):
     rng = random.Random(seed)
-    f = open('words_sorted.txt', 'r', encoding='utf-8')
-    words = [x.strip() for x in f]
-    f.close()
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [x.strip() for x in f]
     count = 0
     while count < 30:
         word = rng.choice(words)
@@ -1163,7 +1152,7 @@ def square_follows_generator(seed):
         rng = random.Random(seed)
         curr = 1
         step = 3
-        for i in range(10**6):
+        for _ in range(10**6):
             yield curr
             curr += rng.randint(2, step)
             step += 1
@@ -1209,7 +1198,7 @@ def taxi_zum_zum_generator(seed):
     poss = ['L', 'R', 'F']
     moves = []
     goal, count = 5, 0
-    for i in range(3000):
+    for _ in range(3000):
         count += 1
         if count == goal:
             count, goal = 0, goal + 2
@@ -1224,7 +1213,7 @@ def count_growlers_generator(seed):
     poss = ['cat', 'tac', 'dog', 'god']
     animals = []
     goal, count = 5, 0
-    for i in range(5000):
+    for _ in range(5000):
         count += 1
         if count == goal:
             count, goal = 0, goal + 2
@@ -1248,17 +1237,6 @@ def tukeys_ninthers_generator(seed):
                 c += rng.randint(1, r)
                 items.append(c)
         rng.shuffle(items)
-
-
-def minimize_sum_generator(seed):
-    rng = random.Random(seed)
-    for i in range(1000):
-        n = 1 + i % 20
-        s = ''
-        for _ in range(n):
-            s += rng.choice("0123456789")
-        for _ in range(1, n + 1):
-            yield s, k
 
 
 def bridge_score_generator():
@@ -1301,15 +1279,20 @@ def collatzy_distance_generator():
 
 def nearest_smaller_generator(seed):
     rng = random.Random(seed)
-    count, goal = 0, 1
+    count, goal, scale = 0, 1, 1
     items = []
-    for i in range(5000):
-        r = 3 + i * i * i
+    for i in range(4000):
+        r = 3 + i * i * scale
         count += 1
         if count == goal:
             count, goal = 0, goal + 2
+            scale += 2
             items = [rng.randint(-r, r) for _ in range(1 + i // 10)]
         items.append(rng.randint(-r, r))
+        j = rng.randint(0, len(items) - 1)
+        items[j], items[-1] = items[-1], items[j]
+        if rng.randint(0, 99) < 20:
+            items[rng.randint(0, len(items) - 1)] = items[-1]
         yield items[:],
 
 
@@ -1343,7 +1326,7 @@ def domino_cycle_generator(seed):
 
 def van_eck_generator():
     curr = 1
-    for i in range(23):
+    for _ in range(23):
         yield curr,
         curr = 2 * curr
 
@@ -1351,16 +1334,15 @@ def van_eck_generator():
 def suppressed_digit_sum_generator(seed):
     rng = random.Random(seed)
     curr = 1
-    for i in range(500):
+    for _ in range(500):
         yield curr,
         curr = 10 * curr + rng.randint(0, 9)
 
 
 def unscramble_generator(seed):
     rng = random.Random(seed)
-    f = open('words_sorted.txt', 'r', encoding='utf-8')
-    words = [x.strip() for x in f]
-    f.close()
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [x.strip() for x in f]
     count = 0
     while count < 500:
         w = rng.choice(words)
@@ -1395,11 +1377,10 @@ def midnight_generator(seed):
 
 def substitution_words_generator(seed):
     rng = random.Random(seed)
-    f = open('words_sorted.txt', 'r', encoding='utf-8')
-    words = [x.strip() for x in f]
-    f.close()
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [x.strip() for x in f]
     yield 'ABCD', words
-    for i in range(100):
+    for _ in range(100):
         pat = ''
         ll = int(sqrt(rng.randint(3*3, 10*10)))
         n = rng.randint(1, ll)
@@ -1410,7 +1391,7 @@ def substitution_words_generator(seed):
 
 def forbidden_substrings_generator(seed):
     rng = random.Random(seed)
-    for i in range(100):
+    for _ in range(100):
         tabu = set()
         n = rng.randint(3, 7)
         nn = rng.randint(2, n)
@@ -1427,7 +1408,7 @@ def count_dominators_generator(seed):
     rng = random.Random(seed)
     items = []
     count, goal = 0, 10
-    for i in range(100000):
+    for _ in range(100000):
         yield items[:],
         count += 1
         if count == goal:
@@ -1441,7 +1422,7 @@ def optimal_crag_score_generator(seed):
     rng = random.Random(seed)
     for i in range(30):
         rolls = []
-        for j in range(2 + (i % 7)):
+        for _ in range(2 + (i % 7)):
             dice = tuple([rng.randint(1, 6) for _ in range(3)])
             rolls.append(dice)
         yield rolls,
@@ -1536,9 +1517,9 @@ def scylla_or_charybdis_generator(seed):
 def fractional_fit_generator(seed):
     rng = random.Random(seed+1)
     for n in range(3, 12):
-        for j in range(n*n):
+        for _ in range(n*n):
             fs = []
-            for i in range(n + 1):
+            for _ in range(n + 1):
                 a = rng.randint(0, n*n)
                 b = rng.randint(a + 1, n*n + 3)
                 fs.append((a, b))
@@ -1581,7 +1562,7 @@ def arithmetic_progression_generator(seed):
     m = 5
     for i in range(300):
         elems = set()
-        for j in range(m):
+        for _ in range(m):
             start = rng.randint(1, i*i + 3)
             step = rng.randint(1, 100)
             n = rng.randint(1, 10)
@@ -1631,7 +1612,7 @@ def eliminate_neighbours_generator(seed):
         if count == goal:
             count, goal = 0, goal + 3
             m = 2 + i // 100
-            items = [j for j in range(1, m)]
+            items = list(range(1, m))
         items.append(m)
         m += 1
         j = rng.randint(0, len(items) - 1)
@@ -1641,7 +1622,7 @@ def eliminate_neighbours_generator(seed):
 def counting_series_generator(seed):
     rng = random.Random(seed)
     curr, step = 0, 2
-    for i in range(1000):
+    for _ in range(1000):
         yield curr,
         curr += rng.randint(1, step)
         step = step * 2
@@ -1650,7 +1631,7 @@ def counting_series_generator(seed):
 def __zigzag(rng, len_, prob):
     curr = rng.randint(1, 8)
     d = rng.choice([+1, -1])
-    for k in range(len_):
+    for _ in range(len_):
         last = curr % 10
         dd = d if rng.randint(1, 100) < prob else -d
         if dd == +1 and last > 0:
@@ -1666,7 +1647,7 @@ def __zigzag(rng, len_, prob):
 
 def is_zigzag_generator(seed):
     rng = random.Random(seed)
-    for i in range(100):
+    for _ in range(100):
         for j in range(20):
             curr = __zigzag(rng, j, 10)
             yield curr,
@@ -1674,7 +1655,7 @@ def is_zigzag_generator(seed):
 
 def next_zigzag_generator(seed):
     rng = random.Random(seed)
-    for k in range(100):
+    for _ in range(100):
         for i in range(100):
             curr = rng.randint(1, 8)
             d = rng.choice([+1, -1])
@@ -1711,7 +1692,7 @@ def md_generator(seed):
 def wythoff_array_generator(seed):
     rng = random.Random(seed)
     curr, step = 1, 1
-    for i in range(300):
+    for _ in range(300):
         yield curr,
         curr += rng.randint(1, 2 * step)
         step += 1
@@ -1719,7 +1700,7 @@ def wythoff_array_generator(seed):
 
 def hourglass_flips_generator(seed):
     rng = random.Random(seed)
-    for i in range(30):
+    for _ in range(30):
         glasses, curr = [], rng.randint(3, 20)
         n = rng.randint(2, 5)
         for j in range(n):
@@ -1771,7 +1752,7 @@ def frog_collision_time_generator(seed):
 def spread_the_coins_generator(seed):
     rng = random.Random(seed)
     for i in range(2, 500):
-        n = 10 + rng.randint(1, 2 + 2**(i//25))
+        n = 10 + rng.randint(1, 2 + 2 ** (i // 25))
         piles, nn = [], n
         while nn > 1:
             c = rng.randint(nn // 3, nn)
@@ -1828,7 +1809,7 @@ def subtract_square_generator(seed):
 def perimeter_limit_split_generator(seed):
     rng = random.Random(seed)
     for a in range(10, 100):
-        for i in range(5):
+        for _ in range(5):
             b = rng.randint(1, a)
             p = rng.randint(5, 3 * a)
             yield (a, b, p) if rng.randint(0, 1) else (b, a, p)
@@ -1853,15 +1834,13 @@ def duplicate_digit_bonus_generator(seed):
 
 
 def count_word_dominators_generator(seed):
-    f = open('words_sorted.txt', 'r', encoding='utf-8')
-    words = [x.strip() for x in f]
-    f.close()
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [x.strip() for x in f]
     m = 1
     wls = [[w for w in words if len(w) == n] for n in range(3, 6)]
     rng = random.Random(seed)
     for i in range(1000):
-        wl = rng.choice(wls)
-        result = rng.sample(wl, m)
+        result = rng.sample(rng.choice(wls), m)
         yield result,
         result.sort(reverse=True)
         yield result,
@@ -1880,7 +1859,7 @@ def permutation_cycles_generator(seed):
     yield [0],
     for i in range(200):
         n = 2 + i // 10
-        for j in range(3 * i):
+        for _ in range(3 * i):
             perm = list(range(n))
             rng.shuffle(perm)
             yield perm,
@@ -1890,20 +1869,20 @@ def word_height_generator(seed):
     rng = random.Random(seed)
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
         words = [x.strip() for x in f]
-    for i in range(5000):
+    for _ in range(5000):
         idx = rng.randint(0, len(words) - 1)
         yield words, words[idx]
 
 
 def mcculloch_generator(seed):
     rng = random.Random(seed)
-    for i in range(5000):
+    for _ in range(5000):
         n = []
         # Produce only digit strings whose evaluation terminates.
-        for j in range(rng.randint(0, 7)):
+        for _ in range(rng.randint(0, 7)):
             n.append(rng.choice('345'))
         n.append('2')
-        for j in range(rng.randint(1, 7)):
+        for _ in range(rng.randint(1, 7)):
             n.append(rng.choice('123456789'))
         yield "".join(n),
 
@@ -1914,7 +1893,7 @@ def trips_fill_generator(seed):
         words3 = [word.strip() for word in f if len(word) == 4]
     for i in range(200):
         n, pat, c = 3 + i // 20, '', 0
-        for j in range(n):
+        for _ in range(n):
             if rng.randint(0, 99) < 100 - 15 * (c + 2):
                 pat += '*'
                 c += 1
@@ -1977,6 +1956,8 @@ def oware_move_generator(seed):
             goal = goal * 10
             k += 1
 
+
+# Adapted from https://www.lawlessspanish.com
 
 __ar = ['amar', 'ayudar', 'bailar', 'cambiar', 'caminar', 'cantar',
         'contestar', 'dejar', 'entrar', 'escuchar', 'esperar', 'expresar',
@@ -2126,7 +2107,7 @@ testcases = [
     (
      "nearest_smaller",
      nearest_smaller_generator(fixed_seed),
-     "1865a8c53406d081915eb1b4fcb6b5a1da93dbe8a1776bb209"
+     "df87936a73650de0c707284f0dd23ec904c1f008caf46decb6"
     ),
     (
      "collatzy_distance",
@@ -2738,38 +2719,49 @@ testcases = [
 
 def run_all():
     print(f"109 Python Problems tester, {version}, Ilkka Kokkarinen.")
+    known = None
     try:
         if version_info < (3, 7, 0):
             print("THIS SCRIPT REQUIRES PYTHON 3.7.0 OR LATER. EXITING.")
             exit(1)
-        if os.path.exists(recordfile):
-            known, curr, verified = dict(), '', False
-            with gzip.open(recordfile, 'rt', encoding='utf-8') as rf:
-                for line in rf:
-                    line = line.strip()
-                    if line.startswith('****'):
-                        curr = line[4:]
-                        known[curr] = []
-                    elif line.startswith('$$$$'):
-                        if line[4:] != version:
-                            print(f'VERSION MISMATCH In {recordfile} !!!!!')
-                            print(f'REQUIRED: {version}')
-                            print(f'ACTUAL  : {line[4:]}')
-                            exit(2)
+        if use_record:
+            # If record file exists, read the expected answers from it.
+            if os.path.exists(recordfile):
+                known, curr, verified = dict(), '', False
+                with gzip.open(recordfile, 'rt', encoding='utf-8') as rf:
+                    for line in rf:
+                        line = line.strip()
+                        # Special marker to indicate start of new function.
+                        if line.startswith(function_prefix):
+                            curr = line[len(function_prefix):]
+                            known[curr] = []
+                        # Special marker used to code the version information.
+                        elif line.startswith(version_prefix):
+                            if line[len(version_prefix):] != version:
+                                print(f'VERSION MISMATCH In {recordfile} !!!!!')
+                                print(f'REQUIRED: {version}')
+                                print(f'ACTUAL  : {line[len(version_prefix):]}')
+                                exit(2)
+                            else:
+                                verified = True
                         else:
-                            verified = True
-                    else:
-                        known[curr].append(line)
-            if not verified:
-                print(f"YOU ARE USING OBSOLETE VERSION OF {recordfile}. EXITING.")
+                            known[curr].append(line)
+                if not verified:
+                    print(f"YOU ARE USING A VERY OBSOLETE VERSION OF {recordfile}. EXITING.")
+                    exit(3)
+                else:
+                    print(f"Finished reading expected answers.")
+                    test_all_functions(labs109, testcases, known=known)
             else:
-                test_all_functions(labs109, testcases, known=known)
-        elif use_record:
-            with gzip.open(recordfile, 'wt') as rf:
-                test_all_functions(labs109, testcases, recorder=rf)
+                # If the record file doesn't exist, record the model answers.
+                with gzip.open(recordfile, 'wt') as rf:
+                    test_all_functions(labs109, testcases, recorder=rf)
+        else:
+            print("Testing functions without the recorded expected answers.")
+            test_all_functions(labs109, testcases, known=None)
     except Exception as e:
-        print(f"ERROR MESSAGE RECEIVED: {e}")
-        exit(3)
+        print(f"TESTER CRASHED WITH ERROR: {e}")
+        exit(4)
 
 
 run_all()
