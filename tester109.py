@@ -33,7 +33,7 @@ from sys import version_info, exit
 import labs109
 
 # The release date of this version of the CCPS 109 tester.
-version = "August 9, 2021"
+version = "August 10, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -52,7 +52,7 @@ use_record = True
 version_prefix = '<$$$$>'
 function_prefix = '<****>'
 
-# Timeout until the test for a function is terminated as too slow.
+# Timeout cutoff for individual function tests, in seconds.
 timeout_cutoff = 20
 
 # Convert a dictionary or set result to a list sorted by keys to
@@ -1973,6 +1973,31 @@ def conjugate_regular_generator(seed):
         yield verb, subject, tense
 
 
+def reach_corner_generator(seed):
+    yield 0, 2, 5, 5, []
+    yield 4, 4, 9, 9, [(0, 0), (0, 8), (8, 0), (8, 8)]
+    yield 1, 1, 1000, 2, [(0, 0), (0, 1), (999, 0)]
+    yield 1, 1, 1000, 2, [(0, 0), (0, 1), (999, 1)]
+    rng = random.Random(seed)
+    count, goal, nn, aliens = 0, 1, 7, []
+    for _ in range(1500):
+        count += 1
+        if count == goal:
+            count, goal, nn, aliens = 0, goal + 1, nn + 1, []
+            n = rng.randint(4, nn - 3)
+            m = rng.randint(nn - n + 2, nn)
+        for _ in range(1):
+            ex = rng.randint(0, n - 1)
+            ey = rng.randint(0, m - 1)
+            if (ex, ey) not in aliens:
+                aliens.append((ex, ey))
+        x, y = ex, ey
+        while (x, y) in aliens:
+            x = rng.randint(0, n - 1)
+            y = rng.randint(0, m - 1)
+        yield x, y, n, m, aliens[:]
+
+
 # List of test cases for the 109 functions recognized here.
 
 testcases = [
@@ -2085,11 +2110,12 @@ testcases = [
      domino_cycle_generator(fixed_seed),
      "a584eae620badb493239fd0bebbfa7c8c17c12b3bc0f53f873"
     ),
-    (
-     "double_trouble",
-     double_trouble_generator(fixed_seed),
-     "49f103a7ad2c26d800d61e8645f967408a18c37cc6303a9dfc"
-    ),
+    # Removed from problem set August 10, 2021
+    # (
+    # "double_trouble",
+    #  double_trouble_generator(fixed_seed),
+    # "49f103a7ad2c26d800d61e8645f967408a18c37cc6303a9dfc"
+    # ),
     (
      "nearest_smaller",
      nearest_smaller_generator(fixed_seed),
@@ -2699,6 +2725,14 @@ testcases = [
      "conjugate_regular",
      conjugate_regular_generator(fixed_seed),
      "aca26dc625f0f0ea10eae375e9929ed49d4ca5ea99ffb413be"
+    ),
+
+    # New additions to the problem set in 2021.
+
+    (
+     "reach_corner",
+     reach_corner_generator(fixed_seed),
+     "d1b5d1bacecfb21994a2912e4c59679cd0fa4a637d498034d2"
     )
 ]
 
