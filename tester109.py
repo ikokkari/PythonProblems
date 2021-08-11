@@ -30,10 +30,11 @@ import random
 import gzip
 import os.path
 from sys import version_info, exit
+from collections import deque
 import labs109
 
-# The release date of this version of the CCPS 109 tester.
-version = "August 10, 2021"
+# The release date of this version of the tester.
+version = "August 11, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -54,6 +55,7 @@ function_prefix = '<****>'
 
 # Timeout cutoff for individual function tests, in seconds.
 timeout_cutoff = 20
+
 
 # Convert a dictionary or set result to a list sorted by keys to
 # guarantee that such results are identical in all environments.
@@ -205,7 +207,7 @@ def sort_by_source(suite):
             if line.startswith("def "):
                 fname = line[4:line.find('(')].strip()
                 if fname in funcs:
-                    print(f"Warning: multiple definition for {fname}")
+                    print(f"WARNING: MULTIPLE DEFINITION FOR {fname}")
                 funcs[fname] = lineno
         suite.sort(key=lambda x: funcs.get(x[0], 9999999))
     return suite
@@ -1097,6 +1099,7 @@ def autocorrect_word_generator():
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
         words = [x.strip() for x in f]
     dist = __qwerty_dist()
+
     def df(c1, c2):
         return dist[(c1, c2)]
 
@@ -1148,12 +1151,22 @@ def extract_increasing_generator(seed):
 def square_follows_generator(seed):
     def emit():
         rng = random.Random(seed)
-        curr = 1
-        step = 3
+        ob, obs = None, deque()
+        curr, step, count, goal = 2, 3, 0, 2
         for _ in range(10**6):
+            if ob is not None and ob <= curr:
+                curr = ob
+                ob = None if len(obs) == 0 else obs.popleft()
             yield curr
             curr += rng.randint(2, step)
-            step += 1
+            if rng.randint(0, 99) < 50:
+                if ob is None:
+                    ob = curr * curr
+                else:
+                    obs.append(curr * curr)
+            count += 1
+            if count == goal:
+                count, goal, step = 0, goal + 3, step + 1
     yield emit()
 
 
@@ -1986,16 +1999,32 @@ def reach_corner_generator(seed):
             count, goal, nn, aliens = 0, goal + 1, nn + 1, []
             n = rng.randint(4, nn - 3)
             m = rng.randint(nn - n + 2, nn)
-        for _ in range(1):
-            ex = rng.randint(0, n - 1)
-            ey = rng.randint(0, m - 1)
-            if (ex, ey) not in aliens:
-                aliens.append((ex, ey))
+        ex = rng.randint(0, n - 1)
+        ey = rng.randint(0, m - 1)
+        if (ex, ey) not in aliens:
+            aliens.append((ex, ey))
         x, y = ex, ey
         while (x, y) in aliens:
             x = rng.randint(0, n - 1)
             y = rng.randint(0, m - 1)
         yield x, y, n, m, aliens[:]
+
+
+def bulgarian_cycle_generator(seed):
+    rng = random.Random(seed)
+    count, goal, n, piles = 0, 2, 5, []
+    for _ in range(300):
+        piles.append(rng.randint(1, n))
+        piles.append(rng.randint(1, n))
+        pos = rng.randint(0, len(piles) - 1)
+        piles[-1] += piles[pos]
+        del piles[pos]
+        yield piles[:]
+        count += 1
+        if count == goal:
+            count, goal, n, piles = 0, goal + 2, n + 1, []
+    for n in range(10, 30):
+        yield [(i-1)*(i-2) for i in range(n)]
 
 
 # List of test cases for the 109 functions recognized here.
@@ -2178,7 +2207,7 @@ testcases = [
     (
      "square_follows",
      square_follows_generator(fixed_seed),
-     "7b42ad97e654f023efeb0174c76d3f02f42a69615e90af31a3"
+     "e571beecc69a7ac9235ba8911deef92b367e1badb9cff87f58"
     ),
     (
      "extract_increasing",
@@ -2364,11 +2393,12 @@ testcases = [
      fibonacci_sum_generator(fixed_seed),
      "bb13f872b52611a389234d48ad1a19ddea88bedb01ddb08a43"
     ),
-    (
-     "factoring_factorial",
-     factoring_factorial_generator(fixed_seed),
-     "be5d5249b396c259bde5338de73ae4d29831314d6c0fb9e369"
-    ),
+    # Removed from the problem set August 10, 2021
+    # (
+    #  "factoring_factorial",
+    #  factoring_factorial_generator(fixed_seed),
+    #  "be5d5249b396c259bde5338de73ae4d29831314d6c0fb9e369"
+    #  ),
     (
      "bridge_hand_shorthand",
      bridge_hand_shorthand_generator(fixed_seed),
@@ -2733,6 +2763,11 @@ testcases = [
      "reach_corner",
      reach_corner_generator(fixed_seed),
      "d1b5d1bacecfb21994a2912e4c59679cd0fa4a637d498034d2"
+    ),
+    (
+     "bulgarian_cycle",
+     bulgarian_cycle_generator(fixed_seed),
+     "59be2b964195790855c6028c7296c9c894e90420677d3f065a"
     )
 ]
 
