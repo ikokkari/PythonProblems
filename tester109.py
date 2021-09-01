@@ -32,6 +32,7 @@ import os.path
 from sys import version_info, exit
 from collections import deque
 import labs109
+from fractions import Fraction
 
 # The release date of this version of the tester.
 version = "September 1, 2021"
@@ -308,6 +309,28 @@ def random_string(alphabet, n, rng):
 
 
 # The test case generators for the individual functions.
+
+def leibniz_generator(seed):
+    yield [1, -1, 1, -1, 1], [0, 1, 2, 3, 4]
+    rng = random.Random(seed)
+    n, count, goal, heads = 5, 0, 10, [1]
+    for _ in range(1500):
+        if goal < 30 or rng.randint(0, 99) < 50:
+            e = rng.randint(-n, n)
+        else:
+            den = rng.randint(2, n)
+            num = rng.randint(1, den - 1)
+            sign = rng.choice([-1, 1])
+            e = Fraction(sign * num, den)
+        heads.append(e)
+        if len(heads) > 3:
+            p = rng.randint(1, min(10, len(heads) // 2))
+            pos = rng.sample(range(len(heads)), p)
+            yield heads, pos
+        count += 1
+        if count == goal:
+            count, goal, n, heads = 0, goal + 1, n + 1, []
+
 
 def prominences_generator(seed):
     yield [42]
@@ -2515,11 +2538,12 @@ testcases = [
      fibonacci_word_generator(fixed_seed),
      "b6385c1cb1a88f2392f507cae3bc302c468d5747af8802e410"
     ),
-    (
-     "create_zigzag",
-     create_zigzag_generator(fixed_seed),
-     "6495896d5e3f0ed9c7f924b9f8c5c99a78700b1a5a1a6f8f98"
-    ),
+    # Removed from problem set September 1, 2021
+    # (
+    # "create_zigzag",
+    # create_zigzag_generator(fixed_seed),
+    # "6495896d5e3f0ed9c7f924b9f8c5c99a78700b1a5a1a6f8f98"
+    # ),
     (
      "calkin_wilf",
      calkin_wilf_generator(),
@@ -2799,6 +2823,11 @@ testcases = [
      "prominences",
      prominences_generator(fixed_seed),
      "042676cf6354dc89dbe09b750fb76b1c41c621c9529b723a84"
+    ),
+    (
+     "leibniz",
+     leibniz_generator(fixed_seed),
+     "ef3258160b68e07f3b5af2d6560d68221be321c040293d4c54"
     )
 ]
 
