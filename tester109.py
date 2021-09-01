@@ -34,7 +34,7 @@ from collections import deque
 import labs109
 
 # The release date of this version of the tester.
-version = "August 11, 2021"
+version = "September 1, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -308,6 +308,31 @@ def random_string(alphabet, n, rng):
 
 
 # The test case generators for the individual functions.
+
+def prominences_generator(seed):
+    yield [42]
+    yield [0]
+    yield [1, 3, 1]
+    yield [3, 1, 4]
+    yield [1, 10, 5, 20, 6, 10, 4]
+    yield [3, 10, 9, 8, 7, 6, 5, 4, 3, 11, 1]
+    rng = random.Random(seed)
+    scale, n, count, goal = 3, 7, 0, 10
+    for _ in range(5000):
+        height, change = [rng.randint(1, scale)], +1
+        while len(height) < n:
+            if rng.randint(0, 99) < 40:
+                change = -change
+            ee = max(1, height[-1] + change * rng.randint(1, scale))
+            ee = ee if ee != height[-1] else ee + 1
+            height.append(ee)
+        while height[-1] > scale:
+            height.append(height[-1] - rng.randint(1, scale))
+        yield height
+        count += 1
+        if count == goal:
+            count, goal, scale, n = 0, goal + 4, scale + 2, n + 1
+
 
 def brussels_choice_step_generator(seed):
     rng = random.Random(seed)
@@ -1992,8 +2017,8 @@ def reach_corner_generator(seed):
     yield 1, 1, 1000, 2, [(0, 0), (0, 1), (999, 0)]
     yield 1, 1, 1000, 2, [(0, 0), (0, 1), (999, 1)]
     rng = random.Random(seed)
-    count, goal, nn, aliens = 0, 1, 7, []
-    for _ in range(1500):
+    count, goal, nn, aliens, n, m = 0, 1, 7, [], 0, 0
+    for _ in range(5000):
         count += 1
         if count == goal:
             count, goal, nn, aliens = 0, goal + 1, nn + 1, []
@@ -2536,11 +2561,12 @@ testcases = [
      reverse_ascending_sublists_generator(fixed_seed),
      "99877453684bc3ba3448bb939239949ffab95500fdf6c50f22"
     ),
-    (
-     "reverse_reversed",
-     reverse_reversed_generator(fixed_seed),
-     "d111344cdd8503a913181ffc7e46551b62a3dc2558a4b0fcbe"
-    ),
+    # Removed from problem set September 1, 2021
+    # (
+    # "reverse_reversed",
+    # reverse_reversed_generator(fixed_seed),
+    # "d111344cdd8503a913181ffc7e46551b62a3dc2558a4b0fcbe"
+    # ),
     # Removed from problem set December 26, 2020
     # (
     #  "longest_palindrome",
@@ -2762,12 +2788,17 @@ testcases = [
     (
      "reach_corner",
      reach_corner_generator(fixed_seed),
-     "d1b5d1bacecfb21994a2912e4c59679cd0fa4a637d498034d2"
+     "d3a0a5a7a19e015cbafb69e9073e811f97cdbd08fa91ea653e"
     ),
     (
      "bulgarian_cycle",
      bulgarian_cycle_generator(fixed_seed),
      "59be2b964195790855c6028c7296c9c894e90420677d3f065a"
+    ),
+    (
+     "prominences",
+     prominences_generator(fixed_seed),
+     "042676cf6354dc89dbe09b750fb76b1c41c621c9529b723a84"
     )
 ]
 
