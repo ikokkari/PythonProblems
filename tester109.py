@@ -2,7 +2,7 @@
 # "109 Python Problems for CCPS 109" by Ilkka Kokkarinen.
 # Ilkka Kokkarinen, ilkka.kokkarinen@gmail.com
 
-# Requires Python 3.7+ and the guarantee to iterate collections
+# Requires Python 3.7+ for the guarantee to iterate collections
 # in the insertion order to run all test cases correctly.
 
 # For instructors who want to add their own problems to this set:
@@ -35,7 +35,7 @@ import labs109
 from fractions import Fraction
 
 # The release date of this version of the tester.
-version = "September 1, 2021"
+version = "September 30, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -309,6 +309,33 @@ def random_string(alphabet, n, rng):
 
 
 # The test case generators for the individual functions.
+
+def reverse_110_generator(seed):
+    rng = random.Random(seed)
+    n, count, goal = 4, 0, 5
+    for _ in range(1500):
+        yield [rng.randint(0, 1) for _ in range(n)]
+        count += 1
+        if count == goal:
+            count, goal, n = 0, goal + 4, n + 1
+
+
+def candy_share_generator(seed):
+    yield from ([1], [1, 0], [0, 1], [1, 0, 1], [2, 0, 0], [0, 3, 0, 0])
+    rng = random.Random(seed)
+    n, count, goal = 4, 0, 2
+    for _ in range(2000):
+        candies = [0 for _ in range(n)]
+        remain = rng.randint(3, n-1)
+        while remain > 0:
+            c = rng.randint(1, remain)
+            candies[rng.randint(0, n-1)] += c
+            remain -= c
+        yield candies[:]
+        count += 1
+        if count == goal:
+            count, goal, n = 0, goal + 3, n + 1
+
 
 def leibniz_generator(seed):
     yield [1, -1, 1, -1, 1], [0, 1, 2, 3, 4]
@@ -2746,11 +2773,12 @@ testcases = [
      duplicate_digit_bonus_generator(fixed_seed),
      "7ad86f9210f78edbc645b2f9373f8f3f2cad9d2eaaa08fc088"
     ),
-    (
-     "count_word_dominators",
-     count_word_dominators_generator(fixed_seed),
-     "ade953572b3bf2540d892ae5d6c8912cd691305a494e3d009b"
-    ),
+    # Removed from problem set September 30, 2021
+    # (
+    #  "count_word_dominators",
+    #  count_word_dominators_generator(fixed_seed),
+    #  "ade953572b3bf2540d892ae5d6c8912cd691305a494e3d009b"
+    # ),
     (
      "hitting_integer_powers",
      hitting_integer_powers_generator(),
@@ -2828,6 +2856,16 @@ testcases = [
      "leibniz",
      leibniz_generator(fixed_seed),
      "ef3258160b68e07f3b5af2d6560d68221be321c040293d4c54"
+    ),
+    (
+     "candy_share",
+     candy_share_generator(fixed_seed),
+     "e2de63482c3d567b48bbf33d1ec6b6814fa9a0ca12d449e2ff"
+    ),
+    (
+     "reverse_110",
+     reverse_110_generator(fixed_seed),
+     "52883da9877e7796e9f62f496e17de82e4b787bcda34da9d2b"
     )
 ]
 
