@@ -35,7 +35,7 @@ import labs109
 from fractions import Fraction
 
 # The release date of this version of the tester.
-version = "September 30, 2021"
+version = "October 2, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -961,10 +961,10 @@ def squares_intersect_generator(seed):
         r = 5 + i // 100
         x1 = rng.randint(-r, r)
         y1 = rng.randint(-r, r)
-        d1 = rng.randint(-r, r)
+        d1 = rng.randint(1, r)
         x2 = rng.randint(-r, r)
         y2 = rng.randint(-r, r)
-        d2 = rng.randint(-r, r)
+        d2 = rng.randint(1, r)
         b = rng.randint(2, 11)
         s = b ** rng.randint(1, 2 + i // 10000)
         yield (s * x1, s * y1, s * d1), (s * x2, s * y2, s * d2)
@@ -2407,7 +2407,7 @@ testcases = [
     (
      "squares_intersect",
      squares_intersect_generator(fixed_seed),
-     "6411da34d00387082aaab1845e176ccdd0558ca073f1450223"
+     "840b079dea2a395b66472f611de152c9c80cf94cb7009b7235"
     ),
     (
      "rooks_with_friends",
