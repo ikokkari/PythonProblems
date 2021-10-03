@@ -35,7 +35,7 @@ import labs109
 from fractions import Fraction
 
 # The release date of this version of the tester.
-version = "October 2, 2021"
+version = "October 3, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -1758,7 +1758,7 @@ def next_zigzag_generator(seed):
             elif d == +1 and last == 9:
                 n = rng.randint(1, 10)
                 curr = int(str(curr) + ("89" * n))
-            yield curr
+            yield (curr,)
 
 
 __primes = [2, 3, 5, 7, 11, 13]
@@ -2100,6 +2100,19 @@ def bulgarian_cycle_generator(seed):
             count, goal, n, piles = 0, goal + 2, n + 1, []
     for n in range(10, 30):
         yield [(i-1)*(i-2) for i in range(n)]
+
+
+def colour_trio_generator(seed):
+    rng = random.Random(seed)
+    count, goal, n, items = 0, 5, 5, ''
+    for _ in range(10000):
+        items += rng.choice('ryb')
+        yield items
+        if len(items) == n:
+            items = ''
+        count += 1
+        if count == goal:
+            count, goal, n = 0, goal + 3, n + 1
 
 
 # List of test cases for the 109 functions recognized here.
@@ -2706,11 +2719,12 @@ testcases = [
      is_zigzag_generator(fixed_seed),
      "fe5e03401a32bc5ca989759708d10a7f9d2cbd9e4821566b91"
     ),
-    (
-     "next_zigzag",
-     next_zigzag_generator(fixed_seed),
-     "52d66db24fc831dd08657f36e2e7b49ab788e6c86e8a25d3c5"
-    ),
+    # Removed from problem set October 3, 2021
+    # (
+    # "next_zigzag",
+    # next_zigzag_generator(fixed_seed),
+    # "52d66db24fc831dd08657f36e2e7b49ab788e6c86e8a25d3c5"
+    # ),
     # Removed from problem set December 17, 2020
     # (
     #  "md",
@@ -2866,6 +2880,11 @@ testcases = [
      "reverse_110",
      reverse_110_generator(fixed_seed),
      "52883da9877e7796e9f62f496e17de82e4b787bcda34da9d2b"
+    ),
+    (
+     "colour_trio",
+     colour_trio_generator(fixed_seed),
+     "a8f612c999543cc1cd0d2673c693bde700c624aea3a8f832aa"
     )
 ]
 
