@@ -96,6 +96,7 @@ def emit_args(args, cutoff=100):
 def discrepancy(teacher, student, test_cases, stop_at_first=False):
     shortest, d1, d2, disc, cases = None, None, None, 0, 0
     for n, elem in enumerate(test_cases):
+        elem = tuple(elem)
         elem2 = elem[:]  # In case student function messes up elem...
         cases += 1
         try:
