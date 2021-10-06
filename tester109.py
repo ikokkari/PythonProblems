@@ -35,7 +35,7 @@ import labs109
 from fractions import Fraction
 
 # The release date of this version of the tester.
-version = "October 3, 2021"
+version = "October 6, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -224,7 +224,7 @@ def test_all_functions(module, suite, recorder=None, known=None):
         print("IF YOU ARE A STUDENT, YOU SHOULD NOT BE SEEING THIS")
         print(f"MESSAGE!!! ENSURE THAT THE FILE {recordfile} FROM")
         print("WHEREVER YOU DOWNLOADED THIS AUTOMATED TESTER IS ALSO")
-        print("IN THIS SAME WORKING DIRECTORY!!!")
+        print("PROPERLY PLACED IN THIS VERY SAME WORKING DIRECTORY!!!")
         print()
     count, total = 0, 0
     if recorder:
@@ -310,6 +310,25 @@ def random_string(alphabet, n, rng):
 
 
 # The test case generators for the individual functions.
+
+def wordomino_generator():
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [x.strip() for x in f]
+    words = [w for w in words if len(w) == 4]
+    for word in [
+        'oat', 'lub', 'moon', 'tao', 'rep', 'wink', 'coo', 'camp', 'trip',
+        'meas', 'tone', 'mart', 'perp', 'rearn', 'slateds', 'dunes', 'lovery',
+        'bassin', 'tropens', 'maabaagaahaataazaadaaraa', 'computersci',
+        'nominotabo', 'dareaditalitelevalef', 'damahabetashagingairana',
+        'belanatedamahabetas', 'hanonanasakalanamalodeleveraller', 'roncemon'
+        'roomfulofpeople', 'hagingairanaleaditalitensechobolamarak',
+        'sheradsta', 'omethangairedeaditalitelaneten', 'preturnation'
+        'oamoisellienamalopedamenoloredeaditalane', 'mauflakcatcher',
+        'warandpeace', 'princuple', 'jollardan', 'zyxinhabonite',
+        'natedamahabetashagingairanaleaditalleudalechobolamalode'
+    ]:
+        yield word, words
+
 
 def reverse_110_generator(seed):
     rng = random.Random(seed)
@@ -817,23 +836,23 @@ def balanced_ternary_generator(seed):
         yield -v
 
 
-__names = ["brad", "ben", "britain", "donald", "bill", "ronald",
-           "george", "laura", "barbara", "barack", "angelina",
-           "jennifer", "ross", "rachel", "monica", "phoebe",
-           "joey", "chandler", "hillary", "michelle", "melania",
-           "nancy", "homer", "marge", "bart", "lisa", "maggie",
-           "waylon", "montgomery", "california", "canada",
-           "germany", "sheldon", "leonard", "rajesh", "howard",
-           "penny", "amy", "bernadette", "oumoumou"]
+__names = [
+    "ross", "rachel", "monica", "phoebe", "joey", "chandler",
+    "johndorian", "elliot", "turk", "carla", "perry", "bob",
+    "eddie", "joy", "jeff", "steph", "allison", "doug",
+    "jules", "ellie", "laurie", "travis", "grayson", "andy",
+    "donald", "melania", "hillary", "barack", "bill", "kamala",
+    "mxuzptlk", "ouagadougou", "oumoumou", "auervaara",
+    "britain", "germany", "france", "canada", "exit",
+    "urban", "zuauaua", "aueiosh", "knickerbocker"
+]
 
-
-def brangelina_generator(seed):
-    rng = random.Random(seed)
-    for _ in range(20000):
-        first = rng.choice(__names)
-        second = rng.choice(__names)
+def brangelina_generator():
+    n = len(__names)
+    for i in range((n * (n-1)) // 2):
+        first = __names[i % n]
+        second = __names[(i + i // n + 1) % n]
         yield first, second
-        yield second, first
 
 
 def frequency_sort_generator(seed):
@@ -2549,8 +2568,8 @@ testcases = [
     ),
     (
      "brangelina",
-     brangelina_generator(fixed_seed),
-     "3fa0c1ed8a374cf10a2a163eafcb10b8cf20ee97e0cbaa4de4"
+     brangelina_generator(),
+     "f5a50e1e1b6575206063b60e8ac587efc3725d036b4d73d696"
     ),
     (
      "balanced_ternary",
@@ -2886,6 +2905,11 @@ testcases = [
      "colour_trio",
      colour_trio_generator(fixed_seed),
      "a8f612c999543cc1cd0d2673c693bde700c624aea3a8f832aa"
+    ),
+    (
+     "wordomino",
+     wordomino_generator(),
+     "474c9b44ae2c212008129dc7e93be7ca072989ec2319d302b4"
     )
 ]
 
