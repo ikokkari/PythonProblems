@@ -25,7 +25,7 @@
 
 from hashlib import sha256
 from time import time
-from itertools import islice
+from itertools import islice, permutations
 import random
 import gzip
 import os.path
@@ -35,7 +35,7 @@ import labs109
 from fractions import Fraction
 
 # The release date of this version of the tester.
-version = "October 6, 2021"
+version = "October 7, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -279,27 +279,6 @@ def random_int(rng, n, prob=70):
     return r
 
 
-# This function replaced warandpeace.txt as the source of text data.
-# Since none of the problems using that file were linguistic, it
-# was pointless to use real text to test them, helping us shed
-# a few megs of dead weight from this project folder.
-
-def random_text_generator(seed, n=70):
-    rng = random.Random(seed)
-    alpha = lows
-    alpha += alpha.upper()
-    punct = '.,!?'
-    for _ in range(10000):
-        line = ""
-        while len(line) < n:
-            word = "".join([rng.choice(alpha) for _ in range(rng.randint(1, 20))])
-            line += " " if len(line) > 0 else ""
-            line += word
-            if rng.randint(0, 99) < 20:
-                line += rng.choice(punct)
-        yield line
-
-
 # Create a random n-character string from the given alphabet.
 
 def random_string(alphabet, n, rng):
@@ -313,19 +292,15 @@ def random_string(alphabet, n, rng):
 
 def wordomino_generator():
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
-        words = [x.strip() for x in f]
-    words = [w for w in words if len(w) == 4]
+        words = [w.strip() for w in f if len(w) == 5]  # 4 chars + newline
+
+    # Bunch of states whose minimax search tree depth is around 12+.
     for word in [
-        'oat', 'lub', 'moon', 'tao', 'rep', 'wink', 'coo', 'camp', 'trip',
-        'meas', 'tone', 'mart', 'perp', 'rearn', 'slateds', 'dunes', 'lovery',
-        'bassin', 'tropens', 'maabaagaahaataazaadaaraa', 'computersci',
-        'nominotabo', 'dareaditalitelevalef', 'damahabetashagingairana',
-        'belanatedamahabetas', 'hanonanasakalanamalodeleveraller', 'roncemon'
-        'roomfulofpeople', 'hagingairanaleaditalitensechobolamarak',
-        'sheradsta', 'omethangairedeaditalitelaneten', 'preturnation'
-        'oamoisellienamalopedamenoloredeaditalane', 'mauflakcatcher',
-        'warandpeace', 'princuple', 'jollardan', 'zyxinhabonite',
-        'natedamahabetashagingairanaleaditalleudalechobolamalode'
+        'demi', 'rapedam', 'modoras', 'cima', 'gras', 'vagen', 'heben',
+        'cima', 'burichobol', 'sheras', 'basemi', 'talasak', 'plim',
+        'bloc', 'alaidemi', 'ranamas', 'bleasemi', 'lastabiridemi', 'floc',
+        'agra', 'tauranalen', 'fadoras', 'seasemi', 'zemi', 'burgen', 'blas',
+        'ridemi', 'mrem', 'haescaryaleasemi', 'kavideasemi'
     ]:
         yield word, words
 
@@ -341,7 +316,7 @@ def reverse_110_generator(seed):
 
 
 def candy_share_generator(seed):
-    yield from ([1], [1, 0], [0, 1], [1, 0, 1], [2, 0, 0], [0, 3, 0, 0])
+    yield from [[1], [1, 0], [0, 1], [1, 0, 1], [2, 0, 0], [0, 3, 0, 0]]
     rng = random.Random(seed)
     n, count, goal = 4, 0, 2
     for _ in range(2000):
@@ -847,6 +822,7 @@ __names = [
     "urban", "zuauaua", "aueiosh", "knickerbocker"
 ]
 
+
 def brangelina_generator():
     n = len(__names)
     for i in range((n * (n-1)) // 2):
@@ -874,14 +850,6 @@ def frequency_sort_generator(seed):
 def count_consecutive_summers_generator():
     for i in range(1, 1000):
         yield i
-
-
-def detab_generator(seed):
-    rng = random.Random(seed)
-    for (line,) in random_text_generator(seed):
-        line = line.replace(' ', '\t')
-        n = rng.randint(1, 7)
-        yield line, n, ' '
 
 
 def iterated_remove_pairs_generator(seed):
@@ -1707,6 +1675,9 @@ def cookie_generator(seed):
 
 
 def eliminate_neighbours_generator(seed):
+    for n in range(1, 7):
+        for p in permutations(range(1, n + 1)):
+            yield list(p)
     rng = random.Random(seed)
     count, goal = 0, 1
     items, m = [1], 1
@@ -1715,7 +1686,7 @@ def eliminate_neighbours_generator(seed):
         count += 1
         if count == goal:
             count, goal = 0, goal + 3
-            m = 2 + i // 100
+            m = 8 + i // 100
             items = list(range(1, m))
         items.append(m)
         m += 1
@@ -1778,7 +1749,7 @@ def next_zigzag_generator(seed):
             elif d == +1 and last == 9:
                 n = rng.randint(1, 10)
                 curr = int(str(curr) + ("89" * n))
-            yield (curr,)
+            yield curr,
 
 
 __primes = [2, 3, 5, 7, 11, 13]
@@ -1949,10 +1920,14 @@ def hitting_integer_powers_generator():
 
 
 def permutation_cycles_generator(seed):
+    # All permutations up to length 5
+    for n in range(1, 6):
+        for p in permutations(range(n)):
+            yield list(p)
+    # Fuzz more random longer permutations
     rng = random.Random(seed)
-    yield [0]
     for i in range(200):
-        n = 2 + i // 10
+        n = 6 + i // 10
         for _ in range(3 * i):
             perm = list(range(n))
             rng.shuffle(perm)
@@ -2133,6 +2108,34 @@ def colour_trio_generator(seed):
         count += 1
         if count == goal:
             count, goal, n = 0, goal + 3, n + 1
+
+
+def schmalz_generator():
+    yield "Spread love everywhere you go. Let no one ever come to you without leaving happier.",
+    yield "When you reach the end of your rope, tie a knot in it and hang on.",
+    yield "Always remember that you are absolutely unique. Just like everyone else.",
+    yield "Don't judge each day by the harvest you reap but by the seeds that you plant.",
+    yield "The future belongs to those who believe in the beauty of their dreams.",
+    yield "Tell me and I forget. Teach me and I remember. Involve me and I learn.",
+    yield "The best and most beautiful things in the world cannot be seen or even touched " +\
+          "— they must be felt with the heart."
+    yield "It is during our darkest moments that we must focus to see the light.",
+    yield "Whoever is happy will make others happy too.",
+    yield "Do not go where the path may lead, go instead where there is no path and leave a trail.",
+    yield "You will face many defeats in life, but never let yourself be defeated.",
+    yield "The greatest glory in living lies not in never falling, but in rising every time we fall.",
+    yield "In the end, it's not the years in your life that count. It's the life in your years.",
+    yield "Never let the fear of striking out keep you from playing the game.",
+    yield "Life is either a daring adventure or nothing at all.",
+    yield "Many of life's failures are people who did not realize how close they were to success when they gave up.",
+    yield "You have brains in your head. You have feet in your shoes. You can steer yourself any direction you choose.",
+    yield "Life is a succession of lessons which must be lived to be understood.",
+    yield "Never let the fear of striking out keep you from playing the game.",
+    yield "The only impossible journey is the one you never begin.",
+    yield "Life is what happens when you're busy making other plans.",
+    yield "Success usually comes to those who are too busy to be looking for it.",
+    yield "The only limit to our realization of tomorrow will be our doubts of today.",
+    yield "It is better to fail in originality than to succeed in imitation.",
 
 
 # List of test cases for the 109 functions recognized here.
@@ -2366,8 +2369,8 @@ testcases = [
     # ),
     (
      "reverse_vowels",
-     random_text_generator(fixed_seed),
-     "06f67d9ccd7f91b25b023d9fccd4d0622195f15f1375da16dc"
+     schmalz_generator(),
+     "a8b98f50a54e60a13ab4b1968df2766e0e0ee4e30636345f6b"
     ),
     (
      "riffle",
@@ -2543,12 +2546,6 @@ testcases = [
     # "iterated_remove_pairs",
     # iterated_remove_pairs_generator(seed),
     # "f3d6588ec3c251abfc024698c2a7371dcc7e175af1e41bb0aa"
-    # ),
-    # Removed from problem set August 10, 2020
-    # (
-    #  "detab",
-    #  detab_generator(seed),
-    #  "7e1453906bc31dfb59159a377dcb7dbb8451e464b88bfd04b4"
     # ),
     # Removed from problem set November 30, 2020
     # (
@@ -2727,7 +2724,7 @@ testcases = [
     (
      "eliminate_neighbours",
      eliminate_neighbours_generator(fixed_seed),
-     "c4ba32a3b61f74bf6d516fe419b8b036e0983451699ce6c9c7"
+     "1f5f4a748524a8f0ee5afe78a3e8d94f556c94d456a13daaed"
     ),
     (
      "counting_series",
@@ -2821,7 +2818,7 @@ testcases = [
     (
      "permutation_cycles",
      permutation_cycles_generator(fixed_seed),
-     "45ecf7be3ff5dbfa46a97ce660ee0484fc99baac36f55c8ad5"
+     "1bc3f0d21b8d90632f3765225d6a1c545ec08c8bf765cf1030"
     ),
     (
      "word_height",
@@ -2909,7 +2906,7 @@ testcases = [
     (
      "wordomino",
      wordomino_generator(),
-     "474c9b44ae2c212008129dc7e93be7ca072989ec2319d302b4"
+     "5b081cc381ec8ddaa382d8450def04b53255ee62b67356f690"
     )
 ]
 
@@ -2958,6 +2955,7 @@ def run_all():
     except Exception as e:
         print(f"TESTER CRASHED WITH ERROR: {e}")
         exit(4)
+
 
 # Uncomment and edit this line to look at some test cases.
 # print(list(islice(remove_after_kth_generator(fixed_seed), 50)))
