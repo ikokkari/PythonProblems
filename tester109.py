@@ -5,24 +5,6 @@
 # Requires Python 3.7+ for the guarantee to iterate collections
 # in the insertion order to run all test cases correctly.
 
-# For instructors who want to add their own problems to this set:
-#
-# 1. Set the value of use_record to False.
-# 2. Write your private solution function to top of your private
-#    model solutions file labs109.py.
-# 3. Write your test case generator in this script below.
-# 4. Add the individual test into the list of testcases list below,
-#    using None as its expected checksum for the moment.
-# 5. Run this test script.
-# 6. Replace None in the test case with the printed checksum.
-# 7. Run this test script again to make sure the test passes.
-# 8. Once you have done the above for all the functions that you
-#    want to add, set the value of use_record back to True.
-# 9. Delete the expected_answers file from the same folder that
-#    this script is located in.
-# 10. Run this test script to generate the new expected answers file.
-# 11. Release the new version of tester and record to students.
-
 from hashlib import sha256
 from time import time
 from itertools import islice, permutations
@@ -35,7 +17,7 @@ import labs109
 from fractions import Fraction
 
 # The release date of this version of the tester.
-version = "October 7, 2021"
+version = "October 17, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -56,6 +38,24 @@ function_prefix = '<****>'
 
 # Timeout cutoff for individual function tests, in seconds.
 timeout_cutoff = 20
+
+# For instructors who want to add their own problems to this set:
+#
+# 1. Set the value of use_record to False.
+# 2. Write your private solution function to top of your private
+#    model solutions file labs109.py.
+# 3. Write your test case generator in this script below.
+# 4. Add the individual test into the list of testcases list below,
+#    using None as its expected checksum for the moment.
+# 5. Run this test script.
+# 6. Replace None in the test case with the printed checksum.
+# 7. Run this test script again to make sure the test passes.
+# 8. Once you have done the above for all the functions that you
+#    want to add, set the value of use_record back to True.
+# 9. Delete the expected_answers file from the same folder that
+#    this script is located in.
+# 10. Run this test script to generate the new expected answers file.
+# 11. Release the new version of tester and record to students.
 
 
 # Convert a dictionary or set result to a list sorted by keys to
@@ -355,12 +355,20 @@ def leibniz_generator(seed):
 
 
 def prominences_generator(seed):
+
     yield [42]
     yield [0]
     yield [1, 3, 1]
     yield [3, 1, 4]
     yield [1, 10, 5, 20, 6, 10, 4]
     yield [3, 10, 9, 8, 7, 6, 5, 4, 3, 11, 1]
+
+    # Permutations up to length 6 should root out bunch of logic errors.
+    for k in range(1, 7):
+        for p in permutations(range(1, k + 1)):
+            yield list(p)
+
+    # If not, move on to pseudorandom fuzz testing.
     rng = random.Random(seed)
     scale, n, count, goal = 3, 7, 0, 10
     for _ in range(5000):
@@ -2057,10 +2065,14 @@ def conjugate_regular_generator(seed):
 
 
 def reach_corner_generator(seed):
+    yield 1, 1, 3, 3, []
+    yield 1, 1, 4, 5, [(0, 4), (3, 4), (3, 0)]
+    yield 1, 0, 4, 4, []
     yield 0, 2, 5, 5, []
     yield 4, 4, 9, 9, [(0, 0), (0, 8), (8, 0), (8, 8)]
     yield 1, 1, 1000, 2, [(0, 0), (0, 1), (999, 0)]
     yield 1, 1, 1000, 2, [(0, 0), (0, 1), (999, 1)]
+
     rng = random.Random(seed)
     count, goal, nn, aliens, n, m = 0, 1, 7, [], 0, 0
     for _ in range(5000):
@@ -2069,6 +2081,8 @@ def reach_corner_generator(seed):
             count, goal, nn, aliens = 0, goal + 1, nn + 1, []
             n = rng.randint(4, nn - 3)
             m = rng.randint(nn - n + 2, nn)
+            if n % 2 == 0 and m % 2 == 0:
+                m += 1
         ex = rng.randint(0, n - 1)
         ey = rng.randint(0, m - 1)
         if (ex, ey) not in aliens:
@@ -2871,7 +2885,7 @@ testcases = [
     (
      "reach_corner",
      reach_corner_generator(fixed_seed),
-     "d3a0a5a7a19e015cbafb69e9073e811f97cdbd08fa91ea653e"
+     "0a2d92c28752b47538140f4cf1007ae5aec53b54e8cdfe73d3"
     ),
     (
      "bulgarian_cycle",
@@ -2881,7 +2895,7 @@ testcases = [
     (
      "prominences",
      prominences_generator(fixed_seed),
-     "042676cf6354dc89dbe09b750fb76b1c41c621c9529b723a84"
+     "e762bc4e666e335d700dea39e375b87c9827f4593e504e2dec"
     ),
     (
      "leibniz",
