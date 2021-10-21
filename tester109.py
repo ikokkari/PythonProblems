@@ -17,7 +17,7 @@ import labs109
 from fractions import Fraction
 
 # The release date of this version of the tester.
-version = "October 17, 2021"
+version = "October 21, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -136,7 +136,7 @@ def discrepancy(teacher, student, test_cases, stop_at_first=False):
 # arguments and expected result into the recorder.
 
 def test_one_function(f, test_cases, expected=None, recorder=None, known=None):
-    fname, recorded = f.__name__, None
+    fname, recorded, output_len = f.__name__, None, 0
     print(f"{fname}: ", end="", flush=True)
     if recorder:
         print(f"{function_prefix}{fname}", file=recorder)
@@ -158,16 +158,14 @@ def test_one_function(f, test_cases, expected=None, recorder=None, known=None):
         sr = str(result)
         chk.update(sr.encode('utf-8'))
         if recorder:
-            print(sr.strip()[:300], file=recorder)
+            output = sr.strip()
+            print(output, file=recorder)
+            output_len += len(output) + 1
             if count >= testcase_cutoff:
                 break
         if use_record and known and count < testcase_cutoff and recorded:
             should_be = recorded[count]
-            if len(should_be) < 295:
-                ok = sr.strip() == should_be
-            else:
-                ok = sr.strip().startswith(should_be)
-            if not ok:
+            if sr.strip() != should_be:
                 crashed = True
                 print(f"DISCREPANCY AT TEST CASE #{count}: ")
                 print("ARGUMENTS: ", end="")
@@ -196,6 +194,7 @@ def test_one_function(f, test_cases, expected=None, recorder=None, known=None):
             print("CHECKSUM MISMATCH: AT LEAST ONE RETURNED ANSWER WAS WRONG.")
             return -1
     else:
+        print(f"({output_len}) ", end='')
         return 0
 
 
@@ -389,12 +388,12 @@ def prominences_generator(seed):
 
 def brussels_choice_step_generator(seed):
     rng = random.Random(seed)
-    for (i, n) in enumerate(islice(scale_random(seed, 2, 10), 2000)):
+    for (i, n) in enumerate(islice(scale_random(seed, 2, 10), 600)):
         n += 10
         nn = len(str(n))
         a = rng.randint(1, nn)
         b = rng.randint(1, nn)
-        yield n, min(a, b), max(a, b)
+        yield n, min(a, b), min(max(a, b), 3 + min(a, b))
 
 
 def ryerson_letter_grade_generator():
@@ -523,9 +522,22 @@ def longest_palindrome_generator(seed):
 
 def reverse_ascending_sublists_generator(seed):
     rng = random.Random(seed)
-    for i in range(1000):
-        for _ in range(5):
-            yield [rng.randint(0, 2*i + k) for k in range(i + 1)]
+    count, goal, n = 0, 5, 3
+    for i in range(400):
+        curr = rng.randint(0, 5 + 2 * i)
+        dir =  rng.choice([-1, +1])
+        time = rng.randint(1, 4 + i // 5)
+        items = [curr]
+        for _ in range(n):
+            time -= 1
+            if time == 0:
+                time, dir = rng.randint(1, 4 + i // 5) , -dir
+            curr = curr + dir * rng.randint(0, 10 + i // 6)
+            items.append(curr)
+        yield items
+        count += 1
+        if count == goal:
+            count, goal, n = 0, goal + 2, n + 1
 
 
 def give_change_generator(seed):
@@ -562,7 +574,7 @@ def hand_is_badugi_generator(seed):
 
 def bridge_hand_shape_generator(seed):
     rng = random.Random(seed)
-    for _ in range(20000):
+    for _ in range(2000):
         yield rng.sample(deck, 13)
 
 
@@ -577,7 +589,7 @@ def winning_card_generator(seed):
 
 def hand_shape_distribution_generator(seed):
     rng = random.Random(seed)
-    for i in range(2, 71):
+    for i in range(2, 50):
         hands = [rng.sample(deck, 13) for _ in range(i * i)]
         yield hands
 
@@ -602,16 +614,18 @@ def possible_words_generator(seed):
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
         words = [x.strip() for x in f]
     rng = random.Random(seed)
-    for n in range(40):
+    n = 0
+    while n < 80:
         patword = rng.choice(words)
-        letters = sorted(list(set(c for c in patword)))
+        letters = sorted(set(c for c in patword))
         if len(letters) > 3:
-            k = len(letters) - rng.randint(1, len(letters) - 3)
-            guessed = rng.sample(letters, k)
+            g = rng.randint(3, max(4, len(letters) - 3))
+            guessed = rng.sample(letters, g)
             pat = ''
             for ch in patword:
                 pat += ch if ch in guessed else '*'
             yield words, pat
+            n += 1
 
 
 def postfix_evaluate_generator(seed):
@@ -658,10 +672,8 @@ def scrabble_value_generator(seed):
 def expand_intervals_generator(seed):
     yield ''
     rng = random.Random(seed)
-    for j in range(2000):
-        curr = 0
-        result = ''
-        first = True
+    for j in range(200):
+        curr, result, first = 0, '', True
         n = rng.randint(1, 3 + j // 50)
         for _ in range(n):
             if not first:
@@ -680,21 +692,23 @@ def expand_intervals_generator(seed):
 def collapse_intervals_generator(seed):
     yield []
     rng = random.Random(seed)
-    for i in range(1000):
+    for i in range(250):
         items, curr = [], 1
-        n = rng.randint(1 + i // 2, i + 3)
+        n = rng.randint(1 + i // 30, 3 + i // 20)
         for j in range(n):
-            m = rng.randint(1, 4 + i // 50)
-            for k in range(m):
+            m = rng.randint(1, 4 + i // 20)
+            for _ in range(m):
                 items.append(curr)
                 curr += 1
-            curr += rng.randint(2, 10 + i * i)
+            curr += rng.randint(2, 10)
         yield items
 
 
-def recaman_generator():
-    for n in range(1, 6):
-        yield 10**n
+def recaman_item_generator():
+    for n in range(1, 4):
+        yield n,
+    for n in islice(scale_random(1234, 5, 10), 70):
+        yield n,
 
 
 def __no_repeated_digits(n, allowed):
@@ -769,8 +783,7 @@ def calkin_wilf_generator():
 
 
 def fibonacci_sum_generator(seed):
-    for v in islice(scale_random(seed, 2, 4), 1500):
-        yield v
+    yield from islice(scale_random(seed, 100, 2), 70)
 
 
 def create_zigzag_generator(seed):
@@ -802,14 +815,15 @@ def aliquot_sequence_generator():
 def josephus_generator(seed):
     rng = random.Random(seed)
     hop, skip = 1, 1
-    for n in range(2, 100):
-        for k in range(1, n):
-            if n > 20 and rng.randint(0, 99) < 5:
+    for n in range(4, 50):
+        for k in range(1, 2 + n // 4):
+            if n > 20 and rng.randint(0, 99) < 20:
                 yield hop, skip + rng.randint(2, 10) ** n
             else:
                 yield hop, skip
             skip += rng.randint(1, 2 + k)
         hop += rng.randint(1, 3 + n // 20)
+        skip = rng.randint(1, 5)
 
 
 def balanced_ternary_generator(seed):
@@ -936,7 +950,7 @@ def factoring_factorial_generator(seed):
 
 def riffle_generator(seed):
     rng = random.Random(seed)
-    for i in range(1000):
+    for i in range(50):
         items = [rng.randint(-i*i, i*i) for _ in range(2 * i)]
         yield items[:], True
         yield items, False
@@ -1207,16 +1221,19 @@ def is_cyclops_generator(seed):
 def words_with_letters_generator():
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
         words = [x.strip() for x in f]
-    for letters in ["smoom", "reflux", "yoam", "xxx", "abba", "ubu", "rentob", "whoa"]:
+    for letters in ["smoom", "reflux", "byoam", "xxx", "aboba", "ubsub", "rentob", "whoa"]:
         yield words, letters
 
 
 def extract_increasing_generator(seed):
     rng = random.Random(seed)
+    count, goal, n = 0, 4, 3
     for i in range(1000):
-        n = rng.randint(i, i + 10)
         digits = "".join([rng.choice('0123456789') for _ in range(n)])
         yield digits
+        count += 1
+        if count == goal:
+            count, goal, n = 0, goal + (1 if n % 5 == 0 else 0), n + 1
 
 
 def square_follows_generator(seed):
@@ -1365,13 +1382,13 @@ def nearest_smaller_generator(seed):
     rng = random.Random(seed)
     count, goal, scale = 0, 1, 1
     items = []
-    for i in range(4000):
+    for i in range(1000):
         r = 3 + i * i * scale
         count += 1
         if count == goal:
-            count, goal = 0, goal + 2
+            count, goal = 0, goal + 10
             scale += 2
-            items = [rng.randint(-r, r) for _ in range(1 + i // 10)]
+            items = [rng.randint(-r, r) for _ in range(1 + i // 50)]
         items.append(rng.randint(-r, r))
         j = rng.randint(0, len(items) - 1)
         items[j], items[-1] = items[-1], items[j]
@@ -1475,11 +1492,7 @@ def forbidden_substrings_generator():
     yield 'XABCD', 2, []
     yield 'REB', 6, ['RR', 'EE', 'BE', 'BRR']
     yield 'MOS', 5, ['SO', 'SM', 'SS']
-    yield 'ABC', 9, ['AB', 'BBB', 'AAAA', 'CC', 'ACAC', 'CBA', 'CA', 'BAC']
-    yield 'XYZ', 5, ['XY', 'YZ', 'ZX']
     yield 'ABCDEFG', 100, ['B', 'C', 'D', 'E', 'F', 'G']
-    yield 'MOA', 7, ['MOA', 'AOM', 'AMO', 'MAO']
-    yield 'ARB', 9, ['ABB', 'RRR', 'RAB', 'RARB']
 
 
 def count_dominators_generator(seed):
@@ -1555,20 +1568,18 @@ def manhattan_skyline_generator(seed):
 
 def fractran_generator(seed):
     rng = random.Random(seed)
-    conway = [(17, 91), (78, 85), (19, 51), (23, 38), (29, 33),
-              (77, 29), (95, 23), (77, 19), (1, 17), (11, 13),
-              (13, 11), (15, 2), (1, 7), (55, 1)]
-    for n in range(2, 100):
-        yield n, conway[:], 100
-    for i in range(10):
-        for j in range(10):
-            prog = []
-            for k in range(2, i + j):
-                num = rng.randint(1, 100)
-                den = rng.randint(1, 100)
-                prog.append((num, den))
-            n = rng.randint(2, 10)
-            yield n, prog, 30
+    count, goal, prog, n = 0, 5, [], 1
+    for i in range(500):
+        num = rng.randint(1, 10 + i)
+        den = rng.randint(1, 10 + i)
+        prog.append((num, den))
+        k = rng.randint(0, len(prog) - 1)
+        prog[k], prog[-1] = prog[-1], prog[k]
+        n = rng.randint(2, 10)
+        yield n, prog[:], 10
+        count += 1
+        if count == goal:
+            count, goal, prog = 0, goal + 1, []
 
 
 def scylla_or_charybdis_generator(seed):
@@ -1783,13 +1794,12 @@ def wythoff_array_generator(seed):
 
 def hourglass_flips_generator(seed):
     rng = random.Random(seed)
-    for _ in range(30):
-        glasses, curr = [], rng.randint(3, 20)
-        n = rng.randint(2, 5)
-        for j in range(n):
-            glasses.append((curr, 0))
+    for _ in range(200):
+        glasses, curr = [], rng.randint(3, 10)
+        for j in range(rng.randint(2, 4)):
+            glasses.append((curr, rng.randint(0, 4)))
             curr += rng.randint(1, 5)
-        t = rng.randint(curr + 1, 2 * curr)
+        t = rng.randint(curr + 2, 2 * curr)
         yield glasses, t
 
 
@@ -2057,7 +2067,7 @@ __tenses = ['presente', 'pretérito', 'imperfecto', 'futuro']
 
 def conjugate_regular_generator(seed):
     rng = random.Random(seed)
-    for i in range(5000):
+    for _ in range(5000):
         verb = rng.choice(__verbs)
         subject = rng.choice(__subjects)
         tense = rng.choice(__tenses)
@@ -2125,6 +2135,7 @@ def colour_trio_generator(seed):
 
 
 def schmalz_generator():
+    yield "Uncle Egg White and Obi-Wan Tsukenobi are the very best of the enterprising rear.",
     yield "Spread love everywhere you go. Let no one ever come to you without leaving happier.",
     yield "When you reach the end of your rope, tie a knot in it and hang on.",
     yield "Always remember that you are absolutely unique. Just like everyone else.",
@@ -2134,25 +2145,27 @@ def schmalz_generator():
     yield "The best and most beautiful things in the world cannot be seen or even touched " +\
           "— they must be felt with the heart."
     yield "It is during our darkest moments that we must focus to see the light.",
-    yield "Whoever is happy will make others happy too.",
-    yield "Do not go where the path may lead, go instead where there is no path and leave a trail.",
-    yield "You will face many defeats in life, but never let yourself be defeated.",
-    yield "The greatest glory in living lies not in never falling, but in rising every time we fall.",
-    yield "In the end, it's not the years in your life that count. It's the life in your years.",
-    yield "Never let the fear of striking out keep you from playing the game.",
-    yield "Life is either a daring adventure or nothing at all.",
-    yield "Many of life's failures are people who did not realize how close they were to success when they gave up.",
-    yield "You have brains in your head. You have feet in your shoes. You can steer yourself any direction you choose.",
-    yield "Life is a succession of lessons which must be lived to be understood.",
-    yield "Never let the fear of striking out keep you from playing the game.",
-    yield "The only impossible journey is the one you never begin.",
-    yield "Life is what happens when you're busy making other plans.",
-    yield "Success usually comes to those who are too busy to be looking for it.",
-    yield "The only limit to our realization of tomorrow will be our doubts of today.",
-    yield "It is better to fail in originality than to succeed in imitation.",
+    yield "What puny mortal can comprehend the Mighty Mind of Galactus?",
+    yield "To crush your enemies, to see them driven before you, and hear the lamentation of their women.",
+    yield "Everything that irritates us about others can lead us to an understanding of ourselves.",
+    yield "Trying to define yourself is like trying to bite your own teeth.",
+    yield "Inability to accept the mystic experience is more than an intellectual handicap. Lack of " +\
+          "awareness of the basic unity of organism and environment is a serious and dangerous hallucination."
+    yield '“Evil” read backwards is “live.” Demon est deus inversus.”'
+    yield "想像一下清晨的多維蜘蛛網，上面佈滿了露珠",
+    yield "Өндөг бол эго, шувуу бол чөлөөлөгдсөн Би юм.",
+    yield "Mỗi người trong chúng ta đều là một khẩu độ mà qua đó toàn bộ vũ trụ nhìn ra.",
+    yield "“Ukufuna chiyani? Nchiyani chimakupangitsa iwe kuyabwa? Kodi mukufuna mutakhala bwanji?”",
+    yield "Chīwit mī xyū̀ nı ch̀wng welā nī̂ thèānận læa nı k̄hṇa nī̂ k̆ mị̀mī thī̀ s̄îns̄ud læa pĕn ni rạn dr̒ s̄ảh̄rạb " +\
+          "ch̀wng welā pạccubạn nận lĕk māk k̀xn thī̀ reā ca wạd dị̂ mạn k̆ h̄āy pị tæ̀ k̆ yạng mī xyū̀ tlxd pị"
+    yield "Do not suppose, however, that we are merely a society of lotus-eaters, lolling on divans " +\
+          "and cuddling lovely women."
+    yield "Agus tuiscint lochtach ar fhéiniúlacht againn, gníomhaímid ar bhealach atá mí-oiriúnach dár " +\
+          "dtimpeallacht nádúrtha."
+    yield "Fa tsy misy fifaliana amin'ny faharetana mandrakizay. Irintsika fotsiny izany satria foana ny ankehitriny."
 
 
-# List of test cases for the 109 functions recognized here.
+# List of test cases for the 109 functions recognized in this tester.
 
 testcases = [
     # The original 109 problems. These are not in order.
@@ -2186,7 +2199,7 @@ testcases = [
     (
      "fractran",
      fractran_generator(fixed_seed),
-     "4a5b2e7dee7eec27bdfdfa6748a4df2e4a06343cef38dd4ef1"
+     "5ef5b21286fe7565e53230868d4240d41224a4543122ec0d5d"
     ),
     (
      "manhattan_skyline",
@@ -2221,7 +2234,7 @@ testcases = [
     (
      "forbidden_substrings",
      forbidden_substrings_generator(),
-     "e2e78d63b56b3b9233e48956f3aff080e38031200c06dd3ea4"
+     "6174fc0fd7c0c5b2a9bcb99a82799736ea3ab2f5f1525b8c10"
     ),
     (
      "substitution_words",
@@ -2273,7 +2286,7 @@ testcases = [
     (
      "nearest_smaller",
      nearest_smaller_generator(fixed_seed),
-     "df87936a73650de0c707284f0dd23ec904c1f008caf46decb6"
+     "42253b206683a7d57c978b16c81a1f537a111b949b5991b55e"
     ),
     (
      "collatzy_distance",
@@ -2311,7 +2324,7 @@ testcases = [
     (
      "words_with_letters",
      words_with_letters_generator(),
-     "66a778ba1d5501bef96499ca7794a8d61534bf6b29485a64a9"
+     "2bb1d006c2549038711d9d61b96d551865662872f58ffb58fe"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -2337,7 +2350,7 @@ testcases = [
     (
      "extract_increasing",
      extract_increasing_generator(fixed_seed),
-     "8f6ba301734d90b6a3685ae27b342ac481af80201ac35cd776"
+     "5d90c3ef3e0e053195ffbcc5eef3b7656b73b5c73be5019080"
     ),
     (
      "is_cyclops",
@@ -2384,12 +2397,12 @@ testcases = [
     (
      "reverse_vowels",
      schmalz_generator(),
-     "a8b98f50a54e60a13ab4b1968df2766e0e0ee4e30636345f6b"
+     "710c6fd22a900fd2153d51f334568ccdf29a2863c63b2651f8"
     ),
     (
      "riffle",
      riffle_generator(fixed_seed),
-     "3f5df69d458a0f72fee992fda34c18139891dcc3a63d2fe372"
+     "a4dc0ce811a97e4a1f66953f10c7b04ed339cba4273c3b5deb"
     ),
     (
      "ztalloc",
@@ -2516,7 +2529,7 @@ testcases = [
     (
      "fibonacci_sum",
      fibonacci_sum_generator(fixed_seed),
-     "bb13f872b52611a389234d48ad1a19ddea88bedb01ddb08a43"
+     "b328623c54d33b9ceab757dec2e91db52e4abf2d6a49bccfa4"
     ),
     # Removed from the problem set August 10, 2021
     # (
@@ -2590,7 +2603,7 @@ testcases = [
     (
      "josephus",
      josephus_generator(fixed_seed),
-     "8151ebedb3064df9721eb2a14da352beac13f0ada488998dfd"
+     "6c39a1339f51ec7b8a29cf0a27636b6ba6be7527b75e89bac9"
     ),
     # Removed from problem set December 17, 2020
     # (
@@ -2636,25 +2649,26 @@ testcases = [
      bulls_and_cows_generator(fixed_seed),
      "e00ca4cd1996a51ef5cd5588a7facd0a00f2e3f3946d5f4e96"
     ),
-    (
-     "recaman",
-     recaman_generator(),
-     "7005741d9d236f31ebd6cdbd61f06119703aae4f8b095d1657"
-    ),
+    # Removed from problem set October 21, 2021
+    # (
+    # "recaman",
+    # recaman_generator(),
+    # "05f94fe36b66db7c2164895d2b1dc5668fa35696cd6add7bf3"
+    #),
     (
      "collapse_intervals",
      collapse_intervals_generator(fixed_seed),
-     "e1cefd1fd979d8d50572254f8f7d7f7bbb0a0758036da2c70d"
+     "8f2cdf9a1ddf4b3602956e366228dee7f9ef21fd61c9cbd850"
     ),
     (
      "expand_intervals",
      expand_intervals_generator(fixed_seed),
-     "5c557393fec26c62c835c85b9abc5186d6791b7770571863e8"
+     "cc8131f1bff17c4345d3d19733479cde6a5d3f85193bed79fe"
     ),
     (
      "reverse_ascending_sublists",
      reverse_ascending_sublists_generator(fixed_seed),
-     "99877453684bc3ba3448bb939239949ffab95500fdf6c50f22"
+     "005d637e315c6ba8f56cb13e31ded57fbbb531c16d4453cc10"
     ),
     # Removed from problem set September 1, 2021
     # (
@@ -2709,12 +2723,12 @@ testcases = [
     (
      "bridge_hand_shape",
      bridge_hand_shape_generator(fixed_seed),
-     "61cfd31019c2838780311603caee80a9c57fae37d4f5b561ce"
+     "e1462e227e8d8c43140bd76c989bba16009ebc73d0a5a73d39"
     ),
     (
      "hand_shape_distribution",
      hand_shape_distribution_generator(fixed_seed),
-     "024a2e9247bc1954f922c8bbf5c6d1d2d6a549443fb86a9b0d"
+     "b9780dbc6fbe7a317c1e3b7a88acc599a85e5baaac692cb6cc"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -2725,7 +2739,7 @@ testcases = [
     (
      "possible_words",
      possible_words_generator(fixed_seed),
-     "f56529e27124a12b1dd52b17707a5c13fc4c8cb5c2a28bd8f5"
+     "89861067154b1b84d61ecbed94bb0a709aa54346c0eddd136b"
     ),
 
     # New additions to the problem set in 2020.
@@ -2770,7 +2784,7 @@ testcases = [
     (
      "hourglass_flips",
      hourglass_flips_generator(fixed_seed),
-     "dabc24b96ab339c979f71ce837bed001ae149f3377e44f68de"
+     "6b31e3bf6088e9b84f70fc15ceceae1358f529acda8b52a2d7"
     ),
     (
      "knight_jump",
@@ -2857,7 +2871,7 @@ testcases = [
     (
      "brussels_choice_step",
      brussels_choice_step_generator(fixed_seed),
-     "612cb030aeb94ef5d84d8cb973d203fccae59260e5ae4a8055"
+     "fb066bf5109a06f2c651b757f571100347212a9ccb7a4ac38c"
     ),
     (
      "balanced_centrifuge",
@@ -2921,7 +2935,12 @@ testcases = [
      "wordomino",
      wordomino_generator(),
      "5b081cc381ec8ddaa382d8450def04b53255ee62b67356f690"
-    )
+    ),
+    (
+     "recaman_item",
+     recaman_item_generator(),
+     "e36c779db6a77037f4e0c11363e4377a1dfe773cb0c7af8617"
+    ),
 ]
 
 
