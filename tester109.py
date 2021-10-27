@@ -17,13 +17,13 @@ import labs109
 from fractions import Fraction
 
 # The release date of this version of the tester.
-version = "October 21, 2021"
+version = "October 27, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
 
 # How many test cases to record in the file for each function.
-testcase_cutoff = 300
+testcase_cutoff = 400
 
 # Name of the file that contains the expected answers.
 recordfile = 'expected_answers'
@@ -38,6 +38,10 @@ function_prefix = '<****>'
 
 # Timeout cutoff for individual function tests, in seconds.
 timeout_cutoff = 20
+
+# During development, list of functions that should be tested first,
+# regardless of their position in the source code file.
+first_to_check = ["reach_corner"]
 
 # For instructors who want to add their own problems to this set:
 #
@@ -96,7 +100,8 @@ def emit_args(args, cutoff=100):
 def discrepancy(teacher, student, test_cases, stop_at_first=False):
     shortest, d1, d2, disc, cases = None, None, None, 0, 0
     for n, elem in enumerate(test_cases):
-        elem = tuple(elem)
+        if type(elem) != tuple:
+            elem = (elem,)
         elem2 = elem[:]  # In case student function messes up elem...
         cases += 1
         try:
@@ -135,7 +140,7 @@ def discrepancy(teacher, student, test_cases, stop_at_first=False):
 # the computed checksum instead. If recorder != None, print out the
 # arguments and expected result into the recorder.
 
-def test_one_function(f, test_cases, expected=None, recorder=None, known=None):
+def test_one_function(f, test_cases, expected_checksum=None, recorder=None, known=None):
     fname, recorded, output_len = f.__name__, None, 0
     print(f"{fname}: ", end="", flush=True)
     if recorder:
@@ -144,8 +149,10 @@ def test_one_function(f, test_cases, expected=None, recorder=None, known=None):
         recorded = known.get(fname, None)
     chk, start_time, crashed = sha256(), time(), False
     for (count, test) in enumerate(test_cases):
+        # Convert a singleton of any non-tuple into singleton tuple.
         if not isinstance(test, tuple):
             test = (test,)
+        # Call the function to be tested with the arguments from the test tuple.
         try:
             result = f(*test)
         except Exception as e:  # catch any exception
@@ -170,8 +177,7 @@ def test_one_function(f, test_cases, expected=None, recorder=None, known=None):
                 print(f"DISCREPANCY AT TEST CASE #{count}: ")
                 print("ARGUMENTS: ", end="")
                 emit_args(test)
-                trail = '...' if len(should_be) == 300 else ''
-                print(f"EXPECTED: {should_be} {trail}")
+                print(f"EXPECTED: {should_be}")
                 print(f"RETURNED: {sr}")
                 break
         total_time = time() - start_time
@@ -182,10 +188,10 @@ def test_one_function(f, test_cases, expected=None, recorder=None, known=None):
     if not recorder:
         total_time = time() - start_time
         digest = chk.hexdigest()
-        if not crashed and not expected:
+        if not crashed and not expected_checksum:
             print(digest[:50])  # Expected checksum for the instructor
             return total_time
-        elif not crashed and digest[:len(expected)] == expected:
+        elif not crashed and digest[:len(expected_checksum)] == expected_checksum:
             print(f"Success in {total_time:.3f} seconds.")
             return total_time
         elif crashed:
@@ -209,7 +215,7 @@ def sort_by_source(suite):
                 fname = line[4:line.find('(')].strip()
                 if fname in funcs:
                     print(f"WARNING: MULTIPLE DEFINITION FOR {fname}")
-                funcs[fname] = lineno
+                funcs[fname] = 0 if fname in first_to_check else lineno
         suite.sort(key=lambda x: funcs.get(x[0], 9999999))
     return suite
 
@@ -287,13 +293,26 @@ def random_string(alphabet, n, rng):
     return result
 
 
+# The pyramid series is handy for yielding test case lengths in the
+# manner of 1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, ...
+
+def pyramid(n=1, goal=5, inc=1):
+    count = 0
+    while True:
+        yield n
+        count += 1
+        if count == goal:
+            goal, count, n = goal + inc, 0, n + 1
+
+
 # The test case generators for the individual functions.
 
 def wordomino_generator():
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
         words = [w.strip() for w in f if len(w) == 5]  # 4 chars + newline
 
-    # Bunch of states whose minimax search tree depth is around 12+.
+    # Bunch of states whose minimax search tree depth is around 12+. Plenty
+    # of forced moves in the interim, fortunately.
     for word in [
         'demi', 'rapedam', 'modoras', 'cima', 'gras', 'vagen', 'heben',
         'cima', 'burichobol', 'sheras', 'basemi', 'talasak', 'plim',
@@ -306,29 +325,21 @@ def wordomino_generator():
 
 def reverse_110_generator(seed):
     rng = random.Random(seed)
-    n, count, goal = 4, 0, 5
-    for _ in range(1500):
+    for n in islice(pyramid(4, 5, 4), 1500):
         yield [rng.randint(0, 1) for _ in range(n)]
-        count += 1
-        if count == goal:
-            count, goal, n = 0, goal + 4, n + 1
 
 
 def candy_share_generator(seed):
     yield from [[1], [1, 0], [0, 1], [1, 0, 1], [2, 0, 0], [0, 3, 0, 0]]
     rng = random.Random(seed)
-    n, count, goal = 4, 0, 2
-    for _ in range(2000):
+    for n in islice(pyramid(4, 2, 3), 2000):
         candies = [0 for _ in range(n)]
         remain = rng.randint(3, n-1)
         while remain > 0:
             c = rng.randint(1, remain)
             candies[rng.randint(0, n-1)] += c
             remain -= c
-        yield candies[:]
-        count += 1
-        if count == goal:
-            count, goal, n = 0, goal + 3, n + 1
+        yield candies
 
 
 def leibniz_generator(seed):
@@ -459,8 +470,8 @@ def first_preceded_by_smaller_generator(seed):
     rng = random.Random(seed)
     count, goal = 0, 1
     items = []
-    for i in range(20000):
-        items.append(rng.randint(-3 - i, 3 + i))
+    for n in range(20000):
+        items.append(rng.randint(-3 - n, 3 + n))
         if len(items) > 3:
             j = rng.randint(0, len(items) - 1)
             items[-1], items[j] = items[j], items[-1]
@@ -468,7 +479,7 @@ def first_preceded_by_smaller_generator(seed):
         count += 1
         if count == goal:
             count, goal = 0, goal + 2
-            items = [rng.randint(-3 - i, 3 + i) for _ in range(1 + i // 100)]
+            items = [rng.randint(-3 - n, 3 + n) for _ in range(1 + n // 100)]
 
 
 def maximum_difference_sublist_generator(seed):
@@ -525,14 +536,14 @@ def reverse_ascending_sublists_generator(seed):
     count, goal, n = 0, 5, 3
     for i in range(400):
         curr = rng.randint(0, 5 + 2 * i)
-        dir =  rng.choice([-1, +1])
-        time = rng.randint(1, 4 + i // 5)
+        dir_ = rng.choice([-1, +1])
+        time_ = rng.randint(1, 4 + i // 5)
         items = [curr]
         for _ in range(n):
-            time -= 1
-            if time == 0:
-                time, dir = rng.randint(1, 4 + i // 5) , -dir
-            curr = curr + dir * rng.randint(0, 10 + i // 6)
+            time_ -= 1
+            if time_ == 0:
+                time_, dir_ = rng.randint(1, 4 + i//5), -dir_
+            curr = curr + dir_ * rng.randint(0, 10 + i // 6)
             items.append(curr)
         yield items
         count += 1
@@ -817,7 +828,7 @@ def josephus_generator(seed):
     hop, skip = 1, 1
     for n in range(4, 50):
         for k in range(1, 2 + n // 4):
-            if n > 20 and rng.randint(0, 99) < 20:
+            if n > 20 > rng.randint(0, 99):
                 yield hop, skip + rng.randint(2, 10) ** n
             else:
                 yield hop, skip
@@ -858,14 +869,14 @@ def frequency_sort_generator(seed):
     count, goal = 0, 1
     items = []
     for i in range(10000):
-        yield items[:]
         count += 1
         if count == goal:
-            count, goal = 0, goal + 2
+            yield items[:]
+            count, goal = 0, goal + 1
             items = []
         else:
             if len(items) < 3 or rng.randint(0, 99) < 30:
-                items.append(rng.randint(-3 - i*i*i, 3 + i*i*i))
+                items.append(rng.randint(-3 - i*i, 3 + i*i))
             items.append(rng.choice(items))
 
 
@@ -1144,8 +1155,7 @@ def count_distinct_sums_and_products_generator(seed):
 
 
 def seven_zero_generator():
-    for n in range(2, 501):
-        yield n
+    yield from range(2, 501)
 
 
 def remove_after_kth_generator(seed):
@@ -1188,8 +1198,8 @@ def autocorrect_word_generator():
     def df(c1, c2):
         return dist[(c1, c2)]
 
-    for word in ["entiyt", "mopp", "laval", "hellx", "sassage", "bumpxious",
-                 "sapeebe", "skekeron", "possobilities", "arvanat", "mossberg",
+    for word in ["dysotvsdr", "entiyt", "mopp", "laval", "hellx", "sassage",
+                 "bumpxious", "sapeebe", "skekeron", "ekareknyfw", "arvanat",
                  "intraducial", "tatafofomomo", "yare", "zombinos", "drezry"]:
         yield word, words, df
 
@@ -1206,8 +1216,7 @@ def is_cyclops_generator(seed):
     rng = random.Random(seed)
     for i in range(1000):
         d = rng.randint(1, i + 3)
-        m = d // 2
-        n = 0
+        m, n = d//2, 0
         for j in range(d):
             n = 10 * n
             if j == m:
@@ -1794,10 +1803,11 @@ def wythoff_array_generator(seed):
 
 def hourglass_flips_generator(seed):
     rng = random.Random(seed)
-    for _ in range(200):
-        glasses, curr = [], rng.randint(3, 10)
+    for _ in range(100):
+        glasses, curr = [], rng.randint(6, 11)
         for j in range(rng.randint(2, 4)):
-            glasses.append((curr, rng.randint(0, 4)))
+            low = 0 if rng.randint(0, 99) < 60 else rng.randint(5, max(6, curr // 2))
+            glasses.append((curr, low))
             curr += rng.randint(1, 5)
         t = rng.randint(curr + 2, 2 * curr)
         yield glasses, t
@@ -1942,7 +1952,7 @@ def permutation_cycles_generator(seed):
     for n in range(1, 6):
         for p in permutations(range(n)):
             yield list(p)
-    # Fuzz more random longer permutations
+    # Fuzz test some of the longer permutations
     rng = random.Random(seed)
     for i in range(200):
         n = 6 + i // 10
@@ -1968,7 +1978,7 @@ def mcculloch_generator(seed):
         # Produce only digit strings whose evaluation terminates.
         for _ in range(rng.randint(0, 7)):
             n.append(rng.choice('345'))
-        n.append('2')
+        n.append('2')  # Need to have one of these
         for _ in range(rng.randint(1, 7)):
             n.append(rng.choice('123456789'))
         yield "".join(n)
@@ -1995,12 +2005,7 @@ def is_left_handed_generator():
         for b in range(a + 1, 6):
             for c in range(b + 1, 7):
                 if a+b != 7 and a+c != 7 and b+c != 7:
-                    yield (a, b, c),
-                    yield (a, c, b),
-                    yield (b, a, c),
-                    yield (b, c, a),
-                    yield (c, a, b),
-                    yield (c, b, a),
+                    yield from ((p,) for p in permutations([a, b, c]))
 
 
 def balanced_centrifuge_generator(seed):
@@ -2067,11 +2072,12 @@ __tenses = ['presente', 'pretérito', 'imperfecto', 'futuro']
 
 def conjugate_regular_generator(seed):
     rng = random.Random(seed)
-    for _ in range(5000):
-        verb = rng.choice(__verbs)
-        subject = rng.choice(__subjects)
-        tense = rng.choice(__tenses)
-        yield verb, subject, tense
+    verbs = __verbs[:]
+    rng.shuffle(verbs)
+    for verb in verbs:
+        for subject in __subjects:
+            for tense in __tenses:
+                yield verb, subject, tense
 
 
 def reach_corner_generator(seed):
@@ -2165,7 +2171,7 @@ def schmalz_generator():
     yield "Fa tsy misy fifaliana amin'ny faharetana mandrakizay. Irintsika fotsiny izany satria foana ny ankehitriny."
 
 
-# List of test cases for the 109 functions recognized in this tester.
+# List of test case generators for the functions recognized by this tester version.
 
 testcases = [
     # The original 109 problems. These are not in order.
@@ -2365,7 +2371,7 @@ testcases = [
     (
      "autocorrect_word",
      autocorrect_word_generator(),
-     "29b0b30497897c0e39cca7dff294ea6b092a8b89611c2aaaeb"
+     "93742a7a15938b9184bf93cc493699b49ff8bfe07529e42d58"
     ),
     (
      "remove_after_kth",
@@ -2583,7 +2589,7 @@ testcases = [
     (
      "frequency_sort",
      frequency_sort_generator(fixed_seed),
-     "05801bf30a885839b6a2ecf760865506d1715f6461d5776f13"
+     "82628cf812d28c9181d4b69aa85b433d300feba2472bcca8b8"
     ),
     (
      "count_consecutive_summers",
@@ -2654,7 +2660,7 @@ testcases = [
     # "recaman",
     # recaman_generator(),
     # "05f94fe36b66db7c2164895d2b1dc5668fa35696cd6add7bf3"
-    #),
+    # ),
     (
      "collapse_intervals",
      collapse_intervals_generator(fixed_seed),
@@ -2784,7 +2790,7 @@ testcases = [
     (
      "hourglass_flips",
      hourglass_flips_generator(fixed_seed),
-     "6b31e3bf6088e9b84f70fc15ceceae1358f529acda8b52a2d7"
+     "d24e1ec31b5f2267295c828db41cda48a3ae66d1b17064fe33"
     ),
     (
      "knight_jump",
@@ -2891,7 +2897,7 @@ testcases = [
     (
      "conjugate_regular",
      conjugate_regular_generator(fixed_seed),
-     "aca26dc625f0f0ea10eae375e9929ed49d4ca5ea99ffb413be"
+     "5e05964abc8946923abe186f8b789541ea41c2876e4f868a44"
     ),
 
     # New additions to the problem set in 2021.
@@ -2899,7 +2905,7 @@ testcases = [
     (
      "reach_corner",
      reach_corner_generator(fixed_seed),
-     "0a2d92c28752b47538140f4cf1007ae5aec53b54e8cdfe73d3"
+     "0255ef6a81a2989825f1070f5b44ab9c0ccadcb796e34bffd0"
     ),
     (
      "bulgarian_cycle",
