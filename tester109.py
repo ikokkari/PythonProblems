@@ -7,7 +7,7 @@
 
 from hashlib import sha256
 from time import time
-from itertools import islice, permutations
+from itertools import islice, permutations, zip_longest
 import random
 import gzip
 import os.path
@@ -17,7 +17,7 @@ import labs109
 from fractions import Fraction
 
 # The release date of this version of the tester.
-version = "October 27, 2021"
+version = "October 29, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -41,7 +41,11 @@ timeout_cutoff = 20
 
 # During development, list of functions that should be tested first,
 # regardless of their position in the source code file.
-first_to_check = ["reach_corner"]
+first_to_check = []
+
+# During development, dictionary of functions whose calls and results we
+# want to see during the run.
+verbose = {}
 
 # For instructors who want to add their own problems to this set:
 #
@@ -143,24 +147,32 @@ def discrepancy(teacher, student, test_cases, stop_at_first=False):
 def test_one_function(f, test_cases, expected_checksum=None, recorder=None, known=None):
     fname, recorded, output_len = f.__name__, None, 0
     print(f"{fname}: ", end="", flush=True)
+    # How many results of function calls to print out.
+    verb_count = verbose.get(fname, 0)
     if recorder:
         print(f"{function_prefix}{fname}", file=recorder)
     if known:
         recorded = known.get(fname, None)
     chk, start_time, crashed = sha256(), time(), False
-    for (count, test) in enumerate(test_cases):
+    for (count, test_args) in enumerate(test_cases):
         # Convert a singleton of any non-tuple into singleton tuple.
-        if not isinstance(test, tuple):
-            test = (test,)
+        if not isinstance(test_args, tuple):
+            test_args = (test_args,)
         # Call the function to be tested with the arguments from the test tuple.
         try:
-            result = f(*test)
+            result = f(*test_args)
         except Exception as e:  # catch any exception
             crashed = True
             print(f"CRASH AT TEST CASE #{count}: {e}")
             break
         # If the result is a set or dictionary, turn it into sorted list first.
         result = canonize(result)
+        # Print out the argument and result, if in verbose mode.
+        if verb_count > 0:
+            verb_count -= 1
+            print(f"#{count}: ", end="")
+            emit_args(test_args, 100)
+            print(f"RESULT: {result}")
         # Update the checksum.
         sr = str(result)
         chk.update(sr.encode('utf-8'))
@@ -176,7 +188,7 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, know
                 crashed = True
                 print(f"DISCREPANCY AT TEST CASE #{count}: ")
                 print("ARGUMENTS: ", end="")
-                emit_args(test)
+                emit_args(test_args)
                 print(f"EXPECTED: {should_be}")
                 print(f"RETURNED: {sr}")
                 break
@@ -2070,14 +2082,13 @@ __subjects = ['yo', 'tú', 'él', 'ella', 'usted', 'nosotros', 'nosotras',
 __tenses = ['presente', 'pretérito', 'imperfecto', 'futuro']
 
 
-def conjugate_regular_generator(seed):
-    rng = random.Random(seed)
-    verbs = __verbs[:]
-    rng.shuffle(verbs)
-    for verb in verbs:
-        for subject in __subjects:
-            for tense in __tenses:
-                yield verb, subject, tense
+def conjugate_regular_generator():
+    for verbs in zip_longest(__ar, __er, __ir):
+        for verb in verbs:
+            if verb: # != None
+                for subject in __subjects:
+                    for tense in __tenses:
+                        yield verb, subject, tense
 
 
 def reach_corner_generator(seed):
@@ -2170,6 +2181,17 @@ def schmalz_generator():
           "dtimpeallacht nádúrtha."
     yield "Fa tsy misy fifaliana amin'ny faharetana mandrakizay. Irintsika fotsiny izany satria foana ny ankehitriny."
 
+
+def count_troikas_generator(seed):
+    yield from [[], [42], [42, 17], [17, 42], [-5, 0], [10**42]]
+    scale, rng, pct, pi = 4, random.Random(seed), [30, 50, 70], 0
+    for n in islice(pyramid(3, 2, 1), 6000):
+        items = [rng.randint(-scale, scale)]
+        for _ in range(n-1):
+            items.append(rng.choice(items) if rng.randint(0, 99) < pct[pi] else rng.randint(-scale, scale))
+        yield items
+        scale += 1
+        pi = (pi + 1) % len(pct)
 
 # List of test case generators for the functions recognized by this tester version.
 
@@ -2348,11 +2370,12 @@ testcases = [
      count_maximal_layers_generator(fixed_seed),
      "d4771768556561499dba30c0aac36a1de054dd8b424a407a93"
     ),
-    (
-     "square_follows",
-     square_follows_generator(fixed_seed),
-     "e571beecc69a7ac9235ba8911deef92b367e1badb9cff87f58"
-    ),
+    # Removed from problem set October 29, 2021
+    # (
+    # "square_follows",
+    # square_follows_generator(fixed_seed),
+    # "e571beecc69a7ac9235ba8911deef92b367e1badb9cff87f58"
+    # ),
     (
      "extract_increasing",
      extract_increasing_generator(fixed_seed),
@@ -2896,8 +2919,8 @@ testcases = [
     ),
     (
      "conjugate_regular",
-     conjugate_regular_generator(fixed_seed),
-     "5e05964abc8946923abe186f8b789541ea41c2876e4f868a44"
+     conjugate_regular_generator(),
+     "132c4df527db578df034041f0cfd63eda6c98f452b9d8eb460"
     ),
 
     # New additions to the problem set in 2021.
@@ -2947,6 +2970,11 @@ testcases = [
      recaman_item_generator(),
      "e36c779db6a77037f4e0c11363e4377a1dfe773cb0c7af8617"
     ),
+    (
+     "count_troikas",
+     count_troikas_generator(fixed_seed),
+     "9d593bfe53a18d6a6e8e355a27fa5c82efb999cf2198e60e79"
+    )
 ]
 
 
