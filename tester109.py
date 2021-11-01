@@ -16,8 +16,25 @@ from collections import deque
 import labs109
 from fractions import Fraction
 
+# During development, this dictionary contains the functions whose calls and
+# results you want to see during the test run. Make each entry "fname":N,
+# where N is how many test cases you want to see printed out. This also makes
+# the tester to run the tests for these functions first, regardless of their
+# position in labs109.py.
+
+# verbose_execution = {
+#   "function_one":100,         # Print first 100 test cases of function_one
+#   "function_two":500,         # Print first 500 test cases of function_two
+#   "function_three":0          # Be silent with function_three (but run early)
+#   }
+
+verbose_execution = {}
+
+# Whether to use the expected answers from the file when they exist.
+use_expected_answers = True
+
 # The release date of this version of the tester.
-version = "October 29, 2021"
+version = "November 1, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -26,10 +43,7 @@ fixed_seed = 12345
 testcase_cutoff = 400
 
 # Name of the file that contains the expected answers.
-recordfile = 'expected_answers'
-
-# Whether to use the expected correct answers when they exist.
-use_record = True
+expected_answers_file = 'expected_answers'
 
 # Markers used to separate the parts of the expected answers file.
 # These should never appear as the prefix of any expected answer.
@@ -38,14 +52,6 @@ function_prefix = '<****>'
 
 # Timeout cutoff for individual function tests, in seconds.
 timeout_cutoff = 20
-
-# During development, list of functions that should be tested first,
-# regardless of their position in the source code file.
-first_to_check = []
-
-# During development, dictionary of functions whose calls and results we
-# want to see during the run.
-verbose = {}
 
 # For instructors who want to add their own problems to this set:
 #
@@ -144,15 +150,15 @@ def discrepancy(teacher, student, test_cases, stop_at_first=False):
 # the computed checksum instead. If recorder != None, print out the
 # arguments and expected result into the recorder.
 
-def test_one_function(f, test_cases, expected_checksum=None, recorder=None, known=None):
+def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expected_answers=None):
     fname, recorded, output_len = f.__name__, None, 0
     print(f"{fname}: ", end="", flush=True)
     # How many results of function calls to print out.
-    verb_count = verbose.get(fname, 0)
+    verb_count = verbose_execution.get(fname, 0)
     if recorder:
         print(f"{function_prefix}{fname}", file=recorder)
-    if known:
-        recorded = known.get(fname, None)
+    if expected_answers:
+        recorded = expected_answers.get(fname, None)
     chk, start_time, crashed = sha256(), time(), False
     for (count, test_args) in enumerate(test_cases):
         # Convert a singleton of any non-tuple into singleton tuple.
@@ -170,9 +176,9 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, know
         # Print out the argument and result, if in verbose mode.
         if verb_count > 0:
             verb_count -= 1
-            print(f"#{count}: ", end="")
+            print(f"{fname} #{count}: ", end="")
             emit_args(test_args, 100)
-            print(f"RESULT: {result}")
+            print(f"{result}\n")
         # Update the checksum.
         sr = str(result)
         chk.update(sr.encode('utf-8'))
@@ -182,7 +188,7 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, know
             output_len += len(output) + 1
             if count >= testcase_cutoff:
                 break
-        if use_record and known and count < testcase_cutoff and recorded:
+        if use_expected_answers and expected_answers and count < testcase_cutoff and recorded:
             should_be = recorded[count]
             if sr.strip() != should_be:
                 crashed = True
@@ -201,7 +207,7 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, know
         total_time = time() - start_time
         digest = chk.hexdigest()
         if not crashed and not expected_checksum:
-            print(digest[:50])  # Expected checksum for the instructor
+            print(digest)  # Expected checksum for the instructor to copy-paste
             return total_time
         elif not crashed and digest[:len(expected_checksum)] == expected_checksum:
             print(f"Success in {total_time:.3f} seconds.")
@@ -210,6 +216,13 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, know
             return -1
         else:
             print("CHECKSUM MISMATCH: AT LEAST ONE RETURNED ANSWER WAS WRONG.")
+            print("YOUR FUNCTION HAS SOME EDGE CASE BUG THAT DID NOT MANIFEST")
+            print(f"IN THE FIRST {testcase_cutoff} TEST CASES. IF YOU CAN'T FIND THIS")
+            print("BUG AFTER SLEEPING OVER IT ONCE, PLEASE SEND YOUR FUNCTION")
+            print("TO ilkka.kokkarinen@gmail.com TO HELP IMPROVE THE QUALITY OF")
+            print(f"THESE AUTOMATED TEST CASES. MAKE SURE YOUR {fname} DOES NOT")
+            print("USE ANY FLOATING POINT CALCULATIONS WHOSE PRECISION RUNS OUT")
+            print("ONCE THE NUMBERS INVOLVED IN THE TEST GROW BIG ENOUGH.")
             return -1
     else:
         print(f"({output_len}) ", end='')
@@ -219,34 +232,35 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, know
 # Sort the suite of test cases according to the order in which
 # they appear in the student source code.
 
-def sort_by_source(suite):
-    funcs = dict()
+def sort_by_source(testcases_):
+    funcs, recognized = dict(), set(f for (f, _, _) in testcases_)
+    need_check = [f for (f, test, check) in testcases_ if check is None]
     with open('labs109.py', 'r', encoding='utf-8') as source:
-        for (lineno, line) in enumerate(source):
+        for (line_no, line) in enumerate(source):
             if line.startswith("def "):
                 fname = line[4:line.find('(')].strip()
                 if fname in funcs:
                     print(f"WARNING: MULTIPLE DEFINITION FOR {fname}")
-                funcs[fname] = 0 if fname in first_to_check else lineno
-        suite.sort(key=lambda x: funcs.get(x[0], 9999999))
-    return suite
+                if fname in recognized:
+                    funcs[fname] = 0 if fname in verbose_execution or fname in need_check else line_no
+        testcases_.sort(key=lambda x: funcs.get(x[0], 9999999))
+    return sorted(funcs.keys())
 
 
 # Runs the tests for all functions in the suite, returning the
 # count of how many of those were implemented and passed the test.
 
-def test_all_functions(module, suite, recorder=None, known=None):
+def test_all_functions(module, testcases_, recorder=None, known=None):
     if recorder:
-        print("RECORDING THE RESULTS OF INSTRUCTOR MODEL SOLUTIONS.")
+        print("\nRECORDING THE RESULTS OF INSTRUCTOR MODEL SOLUTIONS.")
         print("IF YOU ARE A STUDENT, YOU SHOULD NOT BE SEEING THIS")
-        print(f"MESSAGE!!! ENSURE THAT THE FILE {recordfile} FROM")
+        print(f"MESSAGE!!! ENSURE THAT THE FILE {expected_answers_file} FROM")
         print("WHEREVER YOU DOWNLOADED THIS AUTOMATED TESTER IS ALSO")
-        print("PROPERLY PLACED IN THIS VERY SAME WORKING DIRECTORY!!!")
-        print()
+        print("PROPERLY PLACED IN THIS VERY SAME WORKING DIRECTORY!!!\n")
     count, total = 0, 0
     if recorder:
         print(f"{version_prefix}{version}", file=recorder)
-    for (fname, test_cases, expected) in sort_by_source(suite):
+    for (fname, test_cases, expected) in testcases_:
         try:
             f = module.__dict__[fname]
         except KeyError:
@@ -259,7 +273,7 @@ def test_all_functions(module, suite, recorder=None, known=None):
         print("\nRecording model answers complete.")
     else:
         print(f"{count} out of {total} functions ", end="")
-        print(f"of {len(suite)} possible work.")
+        print(f"of {len(testcases_)} possible work.")
     return count
 
 
@@ -285,7 +299,7 @@ def scale_random(seed, scale, skip):
             count = 0
 
 
-# Produce a random n-digit integer with repeating digits.
+# Produce a random (n+1)-digit integer with adjustable repeating digits.
 
 def random_int(rng, n, prob=70):
     r, curr = 0, rng.randint(1, 9)
@@ -411,17 +425,16 @@ def prominences_generator(seed):
 
 def brussels_choice_step_generator(seed):
     rng = random.Random(seed)
-    for (i, n) in enumerate(islice(scale_random(seed, 2, 10), 600)):
-        n += 10
-        nn = len(str(n))
+    for n in islice(pyramid(1, 5, 10), 1000):
+        num = random_int(rng, n, 40)
+        nn = len(str(num))
         a = rng.randint(1, nn)
         b = rng.randint(1, nn)
-        yield n, min(a, b), min(max(a, b), 3 + min(a, b))
+        yield num, min(a, b), min(max(a, b), 2 + min(a, b))
 
 
 def ryerson_letter_grade_generator():
-    for i in range(0, 150):
-        yield i
+    yield from range(0, 150)
 
 
 def is_ascending_generator(seed):
@@ -491,7 +504,7 @@ def first_preceded_by_smaller_generator(seed):
         count += 1
         if count == goal:
             count, goal = 0, goal + 2
-            items = [rng.randint(-3 - n, 3 + n) for _ in range(1 + n // 100)]
+            items = [rng.randint(-3 - n, 3 + n) for _ in range(1 + n//100)]
 
 
 def maximum_difference_sublist_generator(seed):
@@ -505,13 +518,9 @@ def maximum_difference_sublist_generator(seed):
 
 def count_and_say_generator(seed):
     rng = random.Random(seed)
-    for i in range(3000):
-        bursts = rng.randint(1, 4 + i // 10)
-        digits = ''
-        for j in range(bursts):
-            n = rng.randint(1, min(20, j + 4))
-            digits += rng.choice('0123456789') * n
-        yield digits
+    for n in islice(pyramid(2, 3, 2), 2000):
+        for p in [30, 50, 90]:
+            yield str(random_int(rng, n, p))
 
 
 def group_equal_generator(seed):
@@ -654,8 +663,7 @@ def possible_words_generator(seed):
 def postfix_evaluate_generator(seed):
     rng = random.Random(seed)
     for _ in range(1000):
-        exp = []
-        count = 0
+        exp, count = [], 0
         while len(exp) < 5 or count != 1:
             if count > 1 and (count > 10 or rng.randint(0, 99) < 50):
                 exp.append(rng.choice(['+', '-', '*', '/']))
@@ -728,10 +736,8 @@ def collapse_intervals_generator(seed):
 
 
 def recaman_item_generator():
-    for n in range(1, 4):
-        yield n,
-    for n in islice(scale_random(1234, 5, 10), 70):
-        yield n,
+    yield from range(1, 4)
+    yield from islice(scale_random(1234, 5, 10), 70)
 
 
 def __no_repeated_digits(n, allowed):
@@ -801,12 +807,12 @@ def can_balance_generator(seed):
 
 
 def calkin_wilf_generator():
-    for v in [10, 42, 255, 987, 7654, 12356]:
-        yield v
+    yield from [10, 42, 255, 987, 7654, 12356]
 
 
 def fibonacci_sum_generator(seed):
-    yield from islice(scale_random(seed, 100, 2), 70)
+    yield from range(1, 130)
+    yield from islice(scale_random(seed, 100, 2), 0, 100, 2)
 
 
 def create_zigzag_generator(seed):
@@ -878,23 +884,23 @@ def brangelina_generator():
 
 def frequency_sort_generator(seed):
     rng = random.Random(seed)
-    count, goal = 0, 1
-    items = []
-    for i in range(10000):
-        count += 1
-        if count == goal:
-            yield items[:]
-            count, goal = 0, goal + 1
-            items = []
+    scale = 5
+    for n in islice(pyramid(1, 3, 2), 2000):
+        items = []
+        while len(items) < n:
+            if len(items) < 1 or rng.randint(0, 99) < 50:
+                items.append(rng.randint(-scale, scale))
+            else:
+                items.append(rng.choice(items))
+        if n < 30:
+            scale += 1
         else:
-            if len(items) < 3 or rng.randint(0, 99) < 30:
-                items.append(rng.randint(-3 - i*i, 3 + i*i))
-            items.append(rng.choice(items))
+            scale += rng.randint(1, scale // 2)
+        yield items
 
 
 def count_consecutive_summers_generator():
-    for i in range(1, 1000):
-        yield i
+    yield from range(1, 1000)
 
 
 def iterated_remove_pairs_generator(seed):
@@ -902,7 +908,7 @@ def iterated_remove_pairs_generator(seed):
     for k in range(1000):
         n = rng.randint(0, 100)
         vals = [rng.randint(1, 10000) for _ in range(7)]
-        yield [vals[rng.randint(0, 6)] for _ in range(n)],
+        yield [vals[rng.randint(0, 6)] for _ in range(n)]
 
 
 def is_perfect_power_generator(seed):
@@ -911,28 +917,26 @@ def is_perfect_power_generator(seed):
         base = rng.randint(2, 3 + k // 4)
         exp = rng.randint(2, 3 + k // 10)
         off = rng.randint(-1, +1)
-        yield base ** exp - off,
+        yield base ** exp - off
 
 
 def sort_by_digit_count_generator(seed):
-    yield [],
-    yield [42],
     rng = random.Random(seed)
-    count, goal, n = 0, 1, 1
-    for k in range(10000):
-        yield [rng.randint(1, 5 + n * n * n * n) for _ in range(n)],
-        count += 1
-        if count > goal:
-            count, goal, n = 0, goal + 10, n + 1
+    for n in islice(pyramid(1, 3, 1), 2000):
+        items = []
+        for _ in range(n):
+            d = rng.randint(1, n + 3)
+            items.append(random_int(rng, d, 50))
+        yield items
 
 
 def count_divisibles_in_range_generator(seed):
     prev = 0
     vals = islice(scale_random(seed, 2, 6), 1000)
     divs = islice(scale_random(seed, 2, 20), 1000)
-    for (v, k) in zip(vals, divs):
-        yield prev, v, k
-        yield -prev, v, k
+    for (v, d) in zip(vals, divs):
+        yield prev, v, d
+        yield -prev, v, d
         prev = v
 
 
@@ -962,13 +966,11 @@ def losing_trick_count_generator(seed):
 
 
 def prime_factors_generator(seed):
-    for v in islice(scale_random(seed, 2, 30), 500):
-        yield v
+    yield from islice(scale_random(seed, 2, 30), 500)
 
 
 def factoring_factorial_generator(seed):
-    for v in islice(scale_random(seed, 2, 10), 100):
-        yield v
+    yield from islice(scale_random(seed, 2, 10), 100)
 
 
 def riffle_generator(seed):
@@ -979,19 +981,40 @@ def riffle_generator(seed):
         yield items, False
 
 
-def words_with_given_shape_generator(seed):
-    rng = random.Random(seed)
+def words_with_given_shape_generator():
+    patterns = [  # Tactically chosen to give reasonably short answers
+        [1, 1, 1, 1, 1, -1, 1],
+        [-1, 1, 1, 1, 1, 1, -1],
+        [1, 1, -1, -1, 1, 1, 1, 1],
+        [1, 1, 1, -1, 1, 1, -1, -1, -1],
+        [-1, -1, -1, 1, -1, -1, 1, 1, 1],
+        [1, 1, -1, 1, 1, 1, 1],
+        [-1, 1, 1, 1, -1, -1, 1, -1, -1, 1, -1, 1, -1],
+        [1, -1, 1, -1, -1, 1, 1, -1, -1, 1, -1, -1],
+        [-1, -1, 1, -1, 1, 1, -1, 1, 1, -1, -1],
+        [-1, 1, 1, -1, -1, -1, 1, -1, 1, 1, -1, 1],
+        [1, 1, -1, 1, 1, -1, 1, -1, 1, 1, -1, 1],
+        [-1, 1, 1, 1, -1, 1, 1, 1, 1],
+        [1, -1, 1, 1, -1, -1, -1, 1, 1, -1, 1],
+        [1, 1, -1, 1, -1, 1, 1, 1, -1, -1, 1, -1, 1, -1],
+        [1, 1, -1, 1, 1, -1, 1, -1, 1, 1, -1, 1],
+        [-1, -1, 1, 1, -1, 1, 1, -1, -1, 1, -1, 1, 1],
+        [1, 1, 1, -1, 1, 1, 1],
+        [1, 1, 1, 1, 1, -1],
+        [1, 1, 1, 1, -1, -1, -1],
+        [-1, -1, -1, -1, 1, 1, -1]
+    ]
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
         words = [x.strip() for x in f]
-    for _ in range(30):
-        pattern = [rng.randint(-1, 1) for _ in range(rng.randint(5, 10))]
+
+    for pattern in patterns:
         yield words, pattern
 
 
 def squares_intersect_generator(seed):
     rng = random.Random(seed)
-    for i in range(100000):
-        r = 5 + i // 100
+    for i in range(10000):
+        r = 5 + i // 10
         x1 = rng.randint(-r, r)
         y1 = rng.randint(-r, r)
         d1 = rng.randint(1, r)
@@ -999,8 +1022,12 @@ def squares_intersect_generator(seed):
         y2 = rng.randint(-r, r)
         d2 = rng.randint(1, r)
         b = rng.randint(2, 11)
-        s = b ** rng.randint(1, 2 + i // 10000)
+        s = b ** rng.randint(1, 2 + i // 1000)
         yield (s * x1, s * y1, s * d1), (s * x2, s * y2, s * d2)
+        yield (x1, s * y1, s * d1), (2, s * y2, s * d2)
+        yield (s * x1, y1, s * d1), (s * x2, y2, s * d2)
+        yield (s * x1, s * y1, d1), (s * x2, s * y2, d2)
+        yield (y1, x1, s * d1), (y2, x2, s * d2)
 
 
 def only_odd_digits_generator(seed):
@@ -1226,17 +1253,12 @@ def pyramid_blocks_generator(seed):
 
 def is_cyclops_generator(seed):
     rng = random.Random(seed)
-    for i in range(1000):
-        d = rng.randint(1, i + 3)
-        m, n = d//2, 0
-        for j in range(d):
-            n = 10 * n
-            if j == m:
-                if rng.randint(0, 99) < 20:
-                    n += rng.randint(1, 9)
-            elif rng.randint(0, 99) < 99:
-                n += rng.randint(1, 9)
-        yield n
+    for n in islice(pyramid(1, 3, 1), 1000):
+        d = rng.randint(1, n + 2)
+        left = random_int(rng, d, 70)
+        right = random_int(rng, d, 70)
+        mid = rng.choice("00000000000123456789")
+        yield int(f"{left}{mid}{right}")
 
 
 def words_with_letters_generator():
@@ -1401,21 +1423,10 @@ def collatzy_distance_generator(seed):
 
 def nearest_smaller_generator(seed):
     rng = random.Random(seed)
-    count, goal, scale = 0, 1, 1
-    items = []
-    for i in range(1000):
-        r = 3 + i * i * scale
-        count += 1
-        if count == goal:
-            count, goal = 0, goal + 10
-            scale += 2
-            items = [rng.randint(-r, r) for _ in range(1 + i // 50)]
-        items.append(rng.randint(-r, r))
-        j = rng.randint(0, len(items) - 1)
-        items[j], items[-1] = items[-1], items[j]
-        if rng.randint(0, 99) < 20:
-            items[rng.randint(0, len(items) - 1)] = items[-1]
-        yield items[:]
+    scale = 3
+    for n in islice(pyramid(1, 2, 1), 2000):
+        yield [rng.randint(-scale, scale) for _ in range(n)]
+        scale += 1
 
 
 def double_trouble_generator(seed):
@@ -1572,19 +1583,20 @@ def bulgarian_solitaire_generator(seed):
 def manhattan_skyline_generator(seed):
     rng = random.Random(seed)
     scale = 1
-    for i in range(1000):
+    for (i, n) in enumerate(islice(pyramid(1, 3, 2), 3000)):
         towers = []
-        w = i * i + 5
+        w = n * n + 5
         max_area = w * w // 10
-        for k in range(3 + i // 10):
+        for k in range(n):
             s = rng.randint(1, w)
-            e = s + rng.randint(1, 3 * i + 1)
+            e = s + rng.randint(1, n + 1)
             max_height = 1 + max_area // (e - s)
             h = rng.randint(1, max_height)
-            towers.append((s * scale, e * scale, h * scale))
-        yield towers
-        if i % 100 == 0:
-            scale *= rng.randint(3, 6)
+            off = rng.randint(0, 2 + scale // 4)
+            towers.append((s * scale + off, e * scale + off, h * scale))
+        yield sorted(towers)
+        if i % 100 == 99:
+            scale *= rng.randint(2, 3)
 
 
 def fractran_generator(seed):
@@ -1677,10 +1689,9 @@ def arithmetic_progression_generator(seed):
         for _ in range(m):
             start = rng.randint(1, i*i + 3)
             step = rng.randint(1, 100)
-            n = rng.randint(1, 10)
-            for k in range(n):
+            for k in range(rng.randint(1, 10)):
                 elems.add(start + k * step)
-        yield sorted(list(elems))
+        yield sorted(elems)
         if i % 10 == 0:
             m += 1
 
@@ -2085,7 +2096,7 @@ __tenses = ['presente', 'pretérito', 'imperfecto', 'futuro']
 def conjugate_regular_generator():
     for verbs in zip_longest(__ar, __er, __ir):
         for verb in verbs:
-            if verb: # != None
+            if verb:  # != None
                 for subject in __subjects:
                     for tense in __tenses:
                         yield verb, subject, tense
@@ -2179,7 +2190,8 @@ def schmalz_generator():
           "and cuddling lovely women."
     yield "Agus tuiscint lochtach ar fhéiniúlacht againn, gníomhaímid ar bhealach atá mí-oiriúnach dár " +\
           "dtimpeallacht nádúrtha."
-    yield "Fa tsy misy fifaliana amin'ny faharetana mandrakizay. Irintsika fotsiny izany satria foana ny ankehitriny."
+    yield "Fa tsy misy fifaliana amin'ny faharetana mandrakizay. "\
+          + "Irintsika fotsiny izany satria foana ny ankehitriny."
 
 
 def count_troikas_generator(seed):
@@ -2192,6 +2204,29 @@ def count_troikas_generator(seed):
         yield items
         scale += 1
         pi = (pi + 1) % len(pct)
+
+
+def count_corners_generator(seed, slices=4000):
+    rng = random.Random(seed)
+    for n in islice(pyramid(3, 4, 3), slices):
+        points = set()
+        x = rng.randint(0, 2 + n // 5)
+        y = rng.randint(0, 2 + n // 5)
+        while len(points) < n:
+            if rng.randint(0, 99) < 30:
+                x = rng.randint(0, 2 + n // 5)
+                y = rng.randint(0, 2 + n // 5)
+            h = rng.randint(1, 2 + n // 2)
+            if rng.randint(0, 99) < 80:
+                points.add((x, y))
+            points.add((x + h, y))
+            points.add((x, y + h))
+            if rng.randint(0, 99) < 50:
+                x = x + h
+            else:
+                y = y + h
+        yield sorted(points)
+
 
 # List of test case generators for the functions recognized by this tester version.
 
@@ -2232,7 +2267,7 @@ testcases = [
     (
      "manhattan_skyline",
      manhattan_skyline_generator(fixed_seed),
-     "1e6740f53203b620e88ee42fb81b3dae5f7148cc79a1ae12d1"
+     "cfea0db5924def2f2ecf66a69ee11a079b4d6a59f15edbd3130a2c81e2477991"
     ),
     (
      "bulgarian_solitaire",
@@ -2259,11 +2294,12 @@ testcases = [
      count_dominators_generator(fixed_seed),
      "459d463b7699203fa1f38496b4ba9fe4f78136ea4dc90573c7"
     ),
-    (
-     "forbidden_substrings",
-     forbidden_substrings_generator(),
-     "6174fc0fd7c0c5b2a9bcb99a82799736ea3ab2f5f1525b8c10"
-    ),
+    # Removed from problem set October 30, 2021
+    # (
+    #  "forbidden_substrings",
+    #  forbidden_substrings_generator(),
+    #  "6174fc0fd7c0c5b2a9bcb99a82799736ea3ab2f5f1525b8c10"
+    # ),
     (
      "substitution_words",
      substitution_words_generator(),
@@ -2314,7 +2350,7 @@ testcases = [
     (
      "nearest_smaller",
      nearest_smaller_generator(fixed_seed),
-     "42253b206683a7d57c978b16c81a1f537a111b949b5991b55e"
+     "d259c1784dd83540886391a148a17f36a97742514d7ad7cdaf1168a44a798e91"
     ),
     (
      "collatzy_distance",
@@ -2384,7 +2420,7 @@ testcases = [
     (
      "is_cyclops",
      is_cyclops_generator(fixed_seed),
-     "5ced8d0e69d88367f1ee05f96bf6ea7fad6e1c522d0544b526"
+     "e66d296baa3ec9b7059161bce710d5a10140a1b1e6987a73c359a8289ffc1d36"
     ),
     (
      "pyramid_blocks",
@@ -2499,7 +2535,7 @@ testcases = [
     (
      "squares_intersect",
      squares_intersect_generator(fixed_seed),
-     "840b079dea2a395b66472f611de152c9c80cf94cb7009b7235"
+     "7d759853727790b75048801cff764ee5ca3f0de0e003b264e33862bb677ef743"
     ),
     (
      "rooks_with_friends",
@@ -2531,7 +2567,7 @@ testcases = [
     (
      "count_and_say",
      count_and_say_generator(fixed_seed),
-     "0f25a8ee2441e2c47ad5194eb4666f95fdc67d0e0fcac5b88d"
+     "c5f25cecc498f5cba0f944bb7a8c47be7d78a5cac4797d9d282ebba489482b18"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -2546,8 +2582,8 @@ testcases = [
     ),
     (
      "words_with_given_shape",
-     words_with_given_shape_generator(fixed_seed),
-     "bdb3be715d5c5884d7a33914d44a2880c227bdd8543c0d9260"
+     words_with_given_shape_generator(),
+     "ca32049370fa695f67ebed20a4a9c7dd72cde739b637cc38e71eb8c7c699fde4"
     ),
     # Removed from problem set August 10, 2020
     # (
@@ -2558,7 +2594,7 @@ testcases = [
     (
      "fibonacci_sum",
      fibonacci_sum_generator(fixed_seed),
-     "b328623c54d33b9ceab757dec2e91db52e4abf2d6a49bccfa4"
+     "889e6d6ac40e75ae44e8ef1a0b612802df7f8448943cb593339572bbea0c6012"
     ),
     # Removed from the problem set August 10, 2021
     # (
@@ -2590,7 +2626,7 @@ testcases = [
     (
      "sort_by_digit_count",
      sort_by_digit_count_generator(fixed_seed),
-     "e0545088966294c7048d86406e87c9ed5c5140eff279159563"
+     "fffc0299e12fc6fc074dfcab73b8384603ed4a7ad516346f8c6e8ab53633e6ad"
     ),
     (
      "is_perfect_power",
@@ -2612,7 +2648,7 @@ testcases = [
     (
      "frequency_sort",
      frequency_sort_generator(fixed_seed),
-     "82628cf812d28c9181d4b69aa85b433d300feba2472bcca8b8"
+     "7cf98bb630901b746d4765edaaea5d5d2ea011e1271c7214111a52c9725fe8fd"
     ),
     (
      "count_consecutive_summers",
@@ -2768,7 +2804,7 @@ testcases = [
     (
      "possible_words",
      possible_words_generator(fixed_seed),
-     "89861067154b1b84d61ecbed94bb0a709aa54346c0eddd136b"
+     "89861067154b1b84d61ecbed94bb0a709aa54346c0eddd136b8340e91f13b1bb"
     ),
 
     # New additions to the problem set in 2020.
@@ -2788,7 +2824,7 @@ testcases = [
      counting_series_generator(fixed_seed),
      "d7e9ef9de8cb71c901622aec367ff4b0eb96869cae7bbc8cd4"
     ),
-    (
+    ( # Temporarily carried on for Fall 2021 term, will be removed one second after
      "is_zigzag",
      is_zigzag_generator(fixed_seed),
      "fe5e03401a32bc5ca989759708d10a7f9d2cbd9e4821566b91"
@@ -2900,7 +2936,7 @@ testcases = [
     (
      "brussels_choice_step",
      brussels_choice_step_generator(fixed_seed),
-     "fb066bf5109a06f2c651b757f571100347212a9ccb7a4ac38c"
+     "30bf08918175513337d24274aa783820c4442617e8aa78969f0dcae32ae2206a"
     ),
     (
      "balanced_centrifuge",
@@ -2943,7 +2979,7 @@ testcases = [
     (
      "leibniz",
      leibniz_generator(fixed_seed),
-     "ef3258160b68e07f3b5af2d6560d68221be321c040293d4c54"
+     "ef3258160b68e07f3b5af2d6560d68221be321c040293d4c5493f1e6ee7e8a48"
     ),
     (
      "candy_share",
@@ -2974,6 +3010,16 @@ testcases = [
      "count_troikas",
      count_troikas_generator(fixed_seed),
      "9d593bfe53a18d6a6e8e355a27fa5c82efb999cf2198e60e79"
+    ),
+    (
+     "count_corners",
+     count_corners_generator(fixed_seed),
+     "d48250dd2102d522025cc1f7ae8db9ea645c274eb366ab0c64"
+    ),
+    (
+     "cut_corners",
+     count_corners_generator(fixed_seed, 1500),
+     "19cf15c0b8970c57145f2fdc4c4cad646a30d56c74c53857145310e2dddf6010"
     )
 ]
 
@@ -2984,37 +3030,41 @@ def run_all():
         if version_info < (3, 7, 0):
             print("THIS SCRIPT REQUIRES PYTHON 3.7.0 OR LATER. EXITING.")
             exit(1)
-        if use_record:
+        implemented = sort_by_source(testcases)
+        print(f"Student file labs109.py contains {len(implemented)} recognized functions.")
+        if use_expected_answers:
             # If record file exists, read the expected answers from it.
-            if os.path.exists(recordfile):
+            if os.path.exists(expected_answers_file):
                 known, curr, verified = dict(), '', False
-                with gzip.open(recordfile, 'rt', encoding='utf-8') as rf:
+                with gzip.open(expected_answers_file, 'rt', encoding='utf-8') as rf:
+                    storing = False
                     for line in rf:
                         line = line.strip()
                         # Special marker to indicate start of new function.
                         if line.startswith(function_prefix):
                             curr = line[len(function_prefix):]
+                            storing = curr in implemented
                             known[curr] = []
                         # Special marker used to code the version information.
                         elif line.startswith(version_prefix):
                             if line[len(version_prefix):] != version:
-                                print(f'VERSION MISMATCH In {recordfile} !!!!!')
+                                print(f'VERSION MISMATCH In {expected_answers_file} !!!!!')
                                 print(f'REQUIRED: {version}')
                                 print(f'ACTUAL  : {line[len(version_prefix):]}')
                                 exit(2)
                             else:
                                 verified = True
-                        else:
+                        elif storing:
                             known[curr].append(line)
                 if not verified:
-                    print(f"YOU ARE USING A VERY OBSOLETE VERSION OF {recordfile}. EXITING.")
+                    print(f"YOU ARE USING A VERY OBSOLETE VERSION OF {expected_answers_file}. EXITING.")
                     exit(3)
                 else:
                     print(f"Finished reading expected answers.")
                     test_all_functions(labs109, testcases, known=known)
             else:
                 # If the record file doesn't exist, record the model answers.
-                with gzip.open(recordfile, 'wt') as rf:
+                with gzip.open(expected_answers_file, 'wt') as rf:
                     test_all_functions(labs109, testcases, recorder=rf)
         else:
             print("Testing functions without using recorded expected answers.")
