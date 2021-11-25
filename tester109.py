@@ -3,7 +3,8 @@
 # Ilkka Kokkarinen, ilkka.kokkarinen@gmail.com
 
 # Requires Python 3.7+ for the guarantee to iterate collections
-# in the insertion order to run all test cases correctly.
+# in the insertion order, needed to run some test case generators
+# the exact same way in every platform and future Python version.
 
 from hashlib import sha256
 from time import time
@@ -19,7 +20,7 @@ from fractions import Fraction
 # results you want to see first during the test run. Make each entry "fname":N,
 # where N is how many test cases you want to see printed out. This also makes
 # the tester to run the tests for these functions first, regardless of their
-# position in labs109.py.
+# position in the labs109.py file.
 
 verbose_execution = {
     #   "function_one": 100,  # Print first 100 test cases of function_one
@@ -31,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "November 13, 2021"
+version = "November 25, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -212,14 +213,14 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
         elif crashed:
             return -1
         else:
-            print("CHECKSUM MISMATCH: AT LEAST ONE RETURNED ANSWER WAS WRONG.")
+            print("CHECKSUM MISMATCH: AT LEAST ONE ANSWER WAS WRONG.")
             print("YOUR FUNCTION HAS SOME EDGE CASE BUG THAT DID NOT MANIFEST")
             print(f"IN THE FIRST {testcase_cutoff} TEST CASES. IF YOU CAN'T FIND THIS")
             print("BUG AFTER SLEEPING OVER IT ONCE, PLEASE SEND YOUR FUNCTION")
             print("TO ilkka.kokkarinen@gmail.com TO HELP IMPROVE THE QUALITY OF")
-            print(f"THESE AUTOMATED TEST CASES. MAKE SURE YOUR {fname} DOES NOT")
-            print("USE ANY FLOATING POINT CALCULATIONS WHOSE PRECISION RUNS OUT")
-            print("ONCE THE NUMBERS INVOLVED IN THE TEST GROW BIG ENOUGH.")
+            print(f"THESE AUTOMATED TEST CASES. ENSURE THAT YOUR {fname}")
+            print("DOES NOT USE ANY FLOATING POINT CALCULATIONS WHOSE PRECISION")
+            print("RUNS OUT ONCE THE NUMBERS INVOLVED BECOME LARGE ENOUGH.")
             return -1
     else:
         print(f"({output_len}) ", end='')
@@ -335,12 +336,45 @@ def pyramid(n=1, goal=5, inc=1):
 
 # The test case generators for the individual functions.
 
+def domino_tile_generator(seed):
+    rng = random.Random(seed)
+    for n in range(2, 12, 2):
+        rows = [n for _ in range(n)]
+        yield rows[:]
+        if n > 2:
+            rows[0] += 1
+            rows[1] += 1
+            yield rows
+
+    for n in islice(pyramid(1, 2, 2), 70):
+        prev = curr = rng.randint(5, n + 5)
+        rows = []
+        for _ in range(n):
+            rows.append(curr)
+            next_shift = rng.choice([-1, -1, 0, 0, 0, 0, 0, +1])
+            if prev < curr and next_shift == -1:
+                next_shift = rng.choice([0, 1])
+            if prev > curr and next_shift == +1:
+                next_shift = rng.choice([-1, 0])
+            prev = curr
+            curr += next_shift
+            if curr < 2:
+                curr += 1
+
+        if sum(rows) % 2 == 1:
+            rows[0] += 1
+            if len(rows) > 2:
+                rows[1] += 1
+                rows[2] += 1
+        yield rows
+
+
 def wordomino_generator():
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
         words = [w.strip() for w in f if len(w) == 5]  # 4 chars + newline
 
-    # Bunch of states whose minimax search tree depth is around 12+. Plenty
-    # of forced moves in the interim, fortunately.
+    # Bunch of states whose minimax search tree depth is around 12+, without
+    # the alpha-beta pruning. Plenty of forced moves in the interim, fortunately.
     for word in [
         'demi', 'rapedam', 'modoras', 'cima', 'gras', 'vagen', 'heben',
         'cima', 'burichobol', 'sheras', 'basemi', 'talasak', 'plim',
@@ -364,7 +398,7 @@ def candy_share_generator(seed):
         candies = [0 for _ in range(n)]
         remain = rng.randint(3, n-1)
         while remain > 0:
-            c = rng.randint(1, remain)
+            c = min(remain, rng.randint(1, n//10 + 1))
             candies[rng.randint(0, n-1)] += c
             remain -= c
         yield candies
@@ -577,23 +611,24 @@ def possible_words_generator(seed):
     rng = random.Random(seed)
     n = 0
     while n < 80:
-        patword = rng.choice(words)
-        letters = sorted(set(c for c in patword))
+        pat_word = rng.choice(words)
+        letters = sorted(set(c for c in pat_word))
         if len(letters) > 3:
             g = rng.randint(3, max(4, len(letters) - 3))
             guessed = rng.sample(letters, g)
             pat = ''
-            for ch in patword:
+            for ch in pat_word:
                 pat += ch if ch in guessed else '*'
             yield words, pat
             n += 1
 
 
 def postfix_evaluate_generator(seed):
+    yield [42]
     rng = random.Random(seed)
-    for _ in range(1000):
+    for n in islice(pyramid(2, 10, 10), 1000):
         exp, count = [], 0
-        while len(exp) < 5 or count != 1:
+        while len(exp) < n or count != 1:
             if count > 1 and (count > 10 or rng.randint(0, 99) < 50):
                 exp.append(rng.choice(['+', '-', '*', '/']))
                 count -= 1
@@ -624,17 +659,17 @@ def expand_intervals_generator(seed):
 
 
 def collapse_intervals_generator(seed):
-    yield []
+    yield from [[], [42], [1, 2], [1, 3]]
     rng = random.Random(seed)
-    for i in range(250):
-        items, curr = [], 1
-        n = rng.randint(1 + i // 30, 3 + i // 20)
-        for j in range(n):
-            m = rng.randint(1, 4 + i // 20)
-            for _ in range(m):
-                items.append(curr)
+    for n in islice(pyramid(3, 3, 1), 1000):
+        curr = rng.randint(1, n)
+        items = []
+        for _ in range(n):
+            items.append(curr)
+            if rng.randint(0, 99) < max(5, 20 - n//2):
+                curr += rng.randint(2, n)
+            else:
                 curr += 1
-            curr += rng.randint(2, 10)
         yield items
 
 
@@ -665,8 +700,8 @@ def bulls_and_cows_generator(seed):
             if __no_repeated_digits(guess, allowed):
                 bulls = rng.randint(0, 3)
                 cows = rng.randint(0, 3)
-                cows = min(cows, 4 - bulls)
-                if not(bulls == 3 and cows == 1):
+                cows = min(cows, 4 - bulls)  # ensure bulls + cows <= 4
+                if not(bulls == 3 and cows == 1):  # impossible
                     result.append((guess, bulls, cows))
         yield result
 
@@ -851,19 +886,19 @@ def words_with_given_shape_generator():
 
 def squares_intersect_generator(seed):
     rng = random.Random(seed)
-    for i in range(10000):
-        r = 2 + i // 200
+    for r in islice(pyramid(5, 10, 10), 5000):
         x1 = rng.randint(-r, r)
         y1 = rng.randint(-r, r)
         d1 = rng.randint(1, r)
         x2 = rng.randint(-r, r)
         y2 = rng.randint(-r, r)
         d2 = rng.randint(1, r)
-        b = rng.randint(2, 11)
-        s = b ** rng.randint(1, 2 + i // 1000)
-        yield (s * x1, s * y1, s * d1), (s * x2, s * y2, s * d2)
-        yield (x1, s * y1, s * d1), (x2, s * y2, s * d2)
-        yield (s * x1, y1, s * d1), (s * x2, y2, s * d2)
+        for k in range(1, 3):
+            yield (x1, y1, k * d1), (x2, y2, k * d2)
+        if r > 10:
+            yield (r * x1, r * y1, r * d1), (r * x2, r * y2, r * d2)
+            yield (x1, r * y1, r * d1), (x2, r * y2, r * d2)
+            yield (r * x1, y1, r * d1), (r * x2, y2, r * d2)
 
 
 def only_odd_digits_generator(seed):
@@ -923,16 +958,19 @@ def count_carries_generator(seed):
 
 def count_squares_generator(seed):
     rng = random.Random(seed)
-    for i in range(1000):
+    for n in islice(pyramid(3, 5, 3), 500):
         pts = set()
-        w = rng.randint(3, 4 + i // 50)
-        h = rng.randint(3, 4 + i // 50)
-        n = rng.randint(1, (w * h) // 3)
-        while len(pts) < n:
-            x = rng.randint(0, w)
-            y = rng.randint(0, h)
+        while len(pts) < 2 * n:
+            x = rng.randint(0, n)
+            y = rng.randint(0, n)
             pts.add((x, y))
-        yield list(pts)
+            if rng.randint(0, 99) < 40:
+                dx = rng.randint(1, n)
+                dy = rng.randint(-3, n)
+                pts.add((x+dx, y+dy))
+                pts.add((x+dy, y-dx))
+                pts.add((x+dx+dy, y-dx+dy))
+        yield sorted(pts)
 
 
 def three_summers_generator(seed):
@@ -1084,8 +1122,7 @@ def line_with_most_points_generator(seed):
 
 def count_maximal_layers_generator(seed):
     rng = random.Random(seed)
-    for i in range(300):
-        n = 3 + i
+    for n in islice(pyramid(1, 1, 1), 2000):
         points = set()
         while len(points) < n:
             x = rng.randint(-3 - n, 3 + n)
@@ -1146,7 +1183,7 @@ def __checker_pos(n, rng):
     py = rng.randint(1, n - 2)
     if py % 2 != px % 2:
         py += -1 if py > 0 else +1
-    return (px, py)
+    return px, py
 
 
 def max_checkers_capture_generator(seed):
@@ -1395,13 +1432,13 @@ def arithmetic_progression_generator(seed):
     rng = random.Random(seed)
     m = 5
     for i in range(300):
-        elems = set()
+        elements = set()
         for _ in range(m):
             start = rng.randint(1, i*i + 3)
             step = rng.randint(1, 100)
             for k in range(rng.randint(1, 10)):
-                elems.add(start + k * step)
-        yield sorted(elems)
+                elements.add(start + k * step)
+        yield sorted(elements)
         if i % 10 == 0:
             m += 1
 
@@ -1421,18 +1458,25 @@ def eliminate_neighbours_generator(seed):
             yield list(p)
     rng = random.Random(seed)
     count, goal = 0, 1
-    items, m = [1], 1
-    for i in range(20000):
+    items, m = [1, 2, 3, 4, 5, 6, 7], 7
+    for i in range(10000):
         yield items[:]
         count += 1
         if count == goal:
             count, goal = 0, goal + 3
-            m = 8 + i // 100
+            m = 8 + i // 50
             items = list(range(1, m))
         items.append(m)
         m += 1
         j = rng.randint(0, len(items) - 1)
         items[j], items[-1] = items[-1], items[j]
+    for n in range(100, 1501):
+        items = [i for i in range(n)]
+        i1 = rng.randint(1, n//2)
+        i2 = rng.randint(1, n//2)
+        items[i1], items[i2] = items[i2], items[i1]
+        yield items[:]
+        yield list(reversed(items))
 
 
 def counting_series_generator(seed):
@@ -1540,20 +1584,20 @@ def spread_the_coins_generator(seed):
 
 def group_and_skip_generator(seed):
     rng = random.Random(seed)
-    for n in range(1, 2000):
-        b = rng.randint(1, 10)
-        a = 2 * b + rng.randint(1, 10)
-        yield n * n, a, b
+    for n in islice(scale_random(seed, 2, 10), 400):
+        b = rng.randint(1, max(2, n // 100))
+        a = rng.randint(b+1, 2*b+1)
+        yield n, a, b
 
 
 def nearest_polygonal_number_generator(seed):
     rng = random.Random(seed)
-    yield from [(1, 10), (1, 100), (1, 10**100)]
+    yield from [(7, 3), (7, 4), (8, 3), (10, 9), (12, 4), (15, 6), (19, 7)]
     curr = 20
     for i in range(250):
         for j in range(15):
             curr = curr + rng.randint(1, curr // 10)
-            s = rng.randint(3, min(curr // 3, 300))
+            s = rng.randint(3, i + 3)
             yield curr, s
         curr = curr * 2
 
@@ -1608,9 +1652,8 @@ def permutation_cycles_generator(seed):
             yield list(p)
     # Fuzz test some of the longer permutations
     rng = random.Random(seed)
-    for i in range(200):
-        n = 6 + i // 10
-        for _ in range(3 * i):
+    for n in islice(pyramid(6, 2, 3), 1000):
+        for _ in range(n//2):
             perm = list(range(n))
             rng.shuffle(perm)
             yield perm
@@ -1666,7 +1709,7 @@ def balanced_centrifuge_generator(seed):
     rng = random.Random(seed)
     for n in range(1, 1000):
         k = 0
-        while k < n:
+        while k <= n:
             yield n, k
             k += rng.randint(1, 3 + n // 30)
 
@@ -1718,7 +1761,6 @@ __ir = ['añadir', 'abrir', 'aplaudir', 'asistir', 'compartir', 'consumir',
         'decidir', 'definir', 'describir', 'discutir', 'dividir', 'escribir',
         'imprimir', 'insistir', 'persistir', 'prohibir', 'recibir',
         'subir', 'vivir']
-__verbs = __ar + __er + __ir
 __subjects = ['yo', 'tú', 'él', 'ella', 'usted', 'nosotros', 'nosotras',
               'vosotros', 'vosotras', 'ellos', 'ellas', 'ustedes']
 __tenses = ['presente', 'pretérito', 'imperfecto', 'futuro']
@@ -1782,15 +1824,12 @@ def bulgarian_cycle_generator(seed):
 
 def colour_trio_generator(seed):
     rng = random.Random(seed)
-    count, goal, n, items = 0, 5, 5, ''
-    for _ in range(10000):
+    items = ''
+    for n in islice(pyramid(3, 4, 1), 10000):
         items += rng.choice('ryb')
         yield items
         if len(items) == n:
-            items = ''
-        count += 1
-        if count == goal:
-            count, goal, n = 0, goal + 3, n + 1
+            items = rng.choice('ryb')
 
 
 def schmalz_generator():
@@ -2036,7 +2075,7 @@ testcases = [
     (
      "count_maximal_layers",
      count_maximal_layers_generator(fixed_seed),
-     "d4771768556561499dba30c0aac36a1de054dd8b424a407a93"
+     "950e939df6b497881a6a3dea3c2a92ac5362ff2aee2841801da38eb45867902c"
     ),
     # Removed from problem set October 29, 2021
     # (
@@ -2114,7 +2153,7 @@ testcases = [
     (
      "postfix_evaluate",
      postfix_evaluate_generator(fixed_seed),
-     "a9d473505f7a9c8458e6fbb7b3b75a56efabe1a0d3ced3d901"
+     "47fb1c90b9198315bd27fb26ab2a7b3ca99d8e94e05f12c93d9594aa68089dd6"
     ),
     (
      "three_summers",
@@ -2142,7 +2181,7 @@ testcases = [
     (
      "count_squares",
      count_squares_generator(fixed_seed),
-     "69c94bb56d9eff5bc9cdfc4890718606c0a8bdf242c3440d98"
+     "b62fcb3fb13715bc17476115dc7c696c80a25de38eb92b2235e9691ca13100ef"
     ),
     (
      "count_carries",
@@ -2167,7 +2206,7 @@ testcases = [
     (
      "squares_intersect",
      squares_intersect_generator(fixed_seed),
-     "522e63eb026afaea3c91319e91a4c9194123a42d4f5e509867e641c85dd58813"
+     "fb5f90845deddea1350fa81af5a228b18a2f4922f21ce36f725d54329b89c58f"
     ),
     (
      "rooks_with_friends",
@@ -2355,7 +2394,7 @@ testcases = [
     (
      "collapse_intervals",
      collapse_intervals_generator(fixed_seed),
-     "8f2cdf9a1ddf4b3602956e366228dee7f9ef21fd61c9cbd850"
+     "674bb82e2076379450296d830efa0337b4a3f9068a06ea0795d79662ea4f123f"
     ),
     (
      "expand_intervals",
@@ -2449,7 +2488,7 @@ testcases = [
     (
      "eliminate_neighbours",
      eliminate_neighbours_generator(fixed_seed),
-     "1f5f4a748524a8f0ee5afe78a3e8d94f556c94d456a13daaed"
+     "86b1068cdd7941a63d14bb8ecbac8c179c69ab1d8a9969bb9924986322f8fbad"
     ),
     (
      "counting_series",
@@ -2502,12 +2541,12 @@ testcases = [
     (
      "group_and_skip",
      group_and_skip_generator(fixed_seed),
-     "53ea5ca5bc8efee4d41805f0dd4c2629e780364f6891274896"
+     "d08b0f53bff20bc4904c534a41ca6a3c7e28519dcf9185553f3ad5e88d820bba"
     ),
     (
      "nearest_polygonal_number",
      nearest_polygonal_number_generator(fixed_seed),
-     "6813a79fcc5c8249e92e0bf4c1301fde4187df58d2207b23ca"
+     "3f4d94c36ae95bf184c292a197d42171344586d464c2e111028bda005f2286f6"
     ),
     # Removed from problem set July 8, 2020
     # (
@@ -2544,7 +2583,7 @@ testcases = [
     (
      "permutation_cycles",
      permutation_cycles_generator(fixed_seed),
-     "1bc3f0d21b8d90632f3765225d6a1c545ec08c8bf765cf1030"
+     "995c65239a22ee31d77c32a7269f8848b694461e5b18c8d5c1f6ea37d7d19a85"
     ),
     (
      "word_height",
@@ -2574,7 +2613,7 @@ testcases = [
     (
      "balanced_centrifuge",
      balanced_centrifuge_generator(fixed_seed),
-     "a37b22d810035d549fc617cfe6cf72761bf9e199ad67a05485"
+     "05b38d16cb91fd1e37a9ee9948010d5557611384a8098741d5bb20e0da042cda"
     ),
     (
      "lunar_multiply",
@@ -2607,7 +2646,7 @@ testcases = [
     (
      "prominences",
      prominences_generator(fixed_seed),
-     "e762bc4e666e335d700dea39e375b87c9827f4593e504e2dec"
+     "e762bc4e666e335d700dea39e375b87c9827f4593e504e2dec783f13a33884da"
     ),
     (
      "leibniz",
@@ -2617,7 +2656,7 @@ testcases = [
     (
      "candy_share",
      candy_share_generator(fixed_seed),
-     "e2de63482c3d567b48bbf33d1ec6b6814fa9a0ca12d449e2ff"
+     "5c83954002c783e3e283cf6d9a0b8500e179f15ba6a31eb4be4db1258daa4230"
     ),
     (
      "reverse_110",
@@ -2627,7 +2666,7 @@ testcases = [
     (
      "colour_trio",
      colour_trio_generator(fixed_seed),
-     "a8f612c999543cc1cd0d2673c693bde700c624aea3a8f832aa"
+     "0b9f0e3ce49d5eea0073721da2ee28654151a1e2653f9b64745b65e07bf25780"
     ),
     (
      "wordomino",
@@ -2653,6 +2692,11 @@ testcases = [
      "cut_corners",
      count_corners_generator(fixed_seed, 1500),
      "19cf15c0b8970c57145f2fdc4c4cad646a30d56c74c53857145310e2dddf6010"
+    ),
+    (
+     "domino_tile",
+     domino_tile_generator(fixed_seed),
+     "d995b963593be92f0e3068ae9f2286159b24d03a49efb416a8c288c95c93c6c2"
     )
 ]
 
@@ -2705,8 +2749,6 @@ def run_all():
     except Exception as e:
         print(f"TESTER CRASHED WITH ERROR: {e}")
         exit(4)
-
-
 
 
 run_all()
