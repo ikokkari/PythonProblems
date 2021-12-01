@@ -20,19 +20,19 @@ from fractions import Fraction
 # results you want to see first during the test run. Make each entry "fname":N,
 # where N is how many test cases you want to see printed out. This also makes
 # the tester to run the tests for these functions first, regardless of their
-# position in the labs109.py file.
+# position in the labs109.py file. Use the limit of -1 to say "all test cases".
 
 verbose_execution = {
-    #   "function_one": 100,  # Print first 100 test cases of function_one
-    #   "function_two": 50,   # Print first 50 test cases of function_two
-    #   "function_three": 0   # Be silent with function_three (but run early)
+    #   "function_one": 100,  # Print the first 100 test cases of function_one
+    #   "function_two": -1,   # Print all test cases of function_two, however many there are
+    #   "function_three": 0   # Be silent with function_three (but run it first)
 }
 
 # Whether to use the expected answers from the file when they exist.
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "November 25, 2021"
+version = "December 1, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -172,8 +172,8 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
         # If the result is a set or dictionary, turn it into sorted list first.
         result = canonize(result)
         # Print out the argument and result, if in verbose mode.
-        if verb_count > 0:
-            verb_count -= 1
+        if verb_count > 0 or verb_count == -1:
+            verb_count -= 1 if verb_count > 0 else 0
             print(f"{fname} #{count}: ", end="")
             emit_args(test_args, 100)
             print(f"RESULT: {result}")
@@ -335,6 +335,37 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # The test case generators for the individual functions.
+
+def cut_into_squares_generator(seed):
+    rng = random.Random(seed)
+    for a in range(1, 200):
+        b = 1
+        while b < a:
+            yield a, b
+            b += rng.randint(1, 5)
+
+
+def collect_numbers_generator(seed):
+    # Permutations up to length six should reveal logic errors.
+    for k in range(1, 7):
+        for p in permutations(range(k)):
+            yield list(p)
+    # The longer permutations with fuzz testing.
+    rng = random.Random(seed)
+    for n in islice(pyramid(7, 2, 3), 10000):
+        items = list(range(n))
+        rng.shuffle(items)
+        yield items
+    # Just to make sure that you are not being a Shlemiel.
+    for n in range(10**6, 0, -10**5):
+        perm = list(range(n))
+        perm.reverse()
+        for k in range(1000):
+            i1 = rng.randint(0, n-1)
+            i2 = rng.randint(0, n-1)
+            perm[i1], perm[i2] = perm[i2], perm[i1]
+        yield perm
+
 
 def domino_tile_generator(seed):
     rng = random.Random(seed)
@@ -1397,18 +1428,6 @@ def scylla_or_charybdis_generator(seed):
             yield result, n
 
 
-def fractional_fit_generator(seed):
-    rng = random.Random(seed+1)
-    for n in range(3, 12):
-        for _ in range(n*n):
-            fs = []
-            for _ in range(n + 1):
-                a = rng.randint(0, n*n)
-                b = rng.randint(a + 1, n*n + 3)
-                fs.append((a, b))
-            yield fs
-
-
 def count_overlapping_disks_generator(seed):
     rng = random.Random(seed)
     count, goal, max_r = 0, 5, 10
@@ -1471,9 +1490,9 @@ def eliminate_neighbours_generator(seed):
         j = rng.randint(0, len(items) - 1)
         items[j], items[-1] = items[-1], items[j]
     for n in range(100, 1501):
-        items = [i for i in range(n)]
-        i1 = rng.randint(1, n//2)
-        i2 = rng.randint(1, n//2)
+        items = [i+1 for i in range(n)]
+        i1 = rng.randint(0, n//2)
+        i2 = rng.randint(0, n//2)
         items[i1], items[i2] = items[i2], items[i1]
         yield items[:]
         yield list(reversed(items))
@@ -1902,8 +1921,6 @@ def count_corners_generator(seed, slices=4000):
 # List of test case generators for the functions recognized by this tester version.
 
 testcases = [
-    # The original 109 problems. These are not in order.
-
     # Removed from problem set April 20, 2020
     # (
     # "connected_islands",
@@ -1920,11 +1937,12 @@ testcases = [
      count_overlapping_disks_generator(fixed_seed),
      "58a6774be09fa37b858a375b36d5e9ce05d49eac25a5210105"
     ),
-    (
-     "fractional_fit",
-     fractional_fit_generator(fixed_seed),
-     "856627cc444098c9386367d5f250c0e2cddbf3ef0ecec3ba11"
-    ),
+    # Removed from problem set November 26, 2021
+    # (
+    # "fractional_fit",
+    # fractional_fit_generator(fixed_seed),
+    # "856627cc444098c9386367d5f250c0e2cddbf3ef0ecec3ba11"
+    # ),
     (
      "scylla_or_charybdis",
      scylla_or_charybdis_generator(fixed_seed),
@@ -2488,7 +2506,7 @@ testcases = [
     (
      "eliminate_neighbours",
      eliminate_neighbours_generator(fixed_seed),
-     "86b1068cdd7941a63d14bb8ecbac8c179c69ab1d8a9969bb9924986322f8fbad"
+     "1a2aead65abcb5d7f53813c2f7ae1aee7e7ce34b3c1cf810b8b091bffe2c27d7"
     ),
     (
      "counting_series",
@@ -2559,6 +2577,7 @@ testcases = [
      subtract_square_generator(fixed_seed),
      "8959f61972a8804d0b26e2ae92d30d4d3fb6f08f1bcf5e28b9"
     ),
+    # Temporarily carried over for Fall 2021 term, will be removed one second after
     (
      "perimeter_limit_split",
      perimeter_limit_split_generator(fixed_seed),
@@ -2697,6 +2716,16 @@ testcases = [
      "domino_tile",
      domino_tile_generator(fixed_seed),
      "d995b963593be92f0e3068ae9f2286159b24d03a49efb416a8c288c95c93c6c2"
+    ),
+    (
+     "collect_numbers",
+     collect_numbers_generator(fixed_seed),
+     "8315a77b5a6c85420c2a68aad9c3971b2a8e0acf06418afe97e733c85f9814f6"
+    ),
+    (
+     "cut_into_squares",
+     cut_into_squares_generator(fixed_seed),
+     "7e2d01d09a405bcdab3c2bab32f50ce950e590f36dd1f1b02f38c752932e0f7e"
     )
 ]
 
@@ -2708,7 +2737,7 @@ def run_all():
             print("THIS SCRIPT REQUIRES PYTHON 3.7.0 OR LATER. EXITING.")
             exit(1)
         implemented = sort_by_source(testcases)
-        print(f"Student file labs109.py contains {len(implemented)} functions to test.")
+        print(f"Student file labs109.py contains {len(implemented)} recognized functions to test.")
         if use_expected_answers:
             # If record file exists, read the expected answers from it.
             if os.path.exists(expected_answers_file):
