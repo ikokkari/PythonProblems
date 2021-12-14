@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "December 1, 2021"
+version = "December 14, 2021"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -83,22 +83,26 @@ def canonize(result):
     return result
 
 
-# When reporting an error, try not to flood the user console.
+# Convert the arguments given to the student function into a string for safekeeping,
+# just in case the student function messes up the contents of the argument objects.
+# This makes the discrepancy outputs accurate and less confusing to students. Also,
+# when arguments are long, we will try not to flood the user console.
 
-def emit_args(args, cutoff=600):
+def stringify_args(args, cutoff=600):
+    result = ""
     for (i, a) in enumerate(args):
         if i > 0:
-            print(", ", end='')
+            result += ", "
         if type(a) == list or type(a) == tuple:
             if len(a) < cutoff:
-                print(a, end='')
+                result += str(a)
             else:
                 left = ", ".join([str(x) for x in a[:5]])
                 right = ", ".join([str(x) for x in a[-5:]])
-                print(f"[{left}, <{len(a)-10} omitted...>, {right}]", end='')
+                result += f"[{left}, <{len(a)-10} omitted...>, {right}]"
         else:
-            print(repr(a) if len(repr(a)) < 100 else '[...]', end='')
-    print()
+            result += repr(a) if len(repr(a)) < 100 else '[...]'
+    return result
 
 
 # Given teacher and student implementations of the same function, run
@@ -106,47 +110,47 @@ def emit_args(args, cutoff=600):
 # test case for which these two implementations disagree.
 
 def discrepancy(teacher, student, test_cases, stop_at_first=False):
-    shortest, d1, d2, disc, cases = None, None, None, 0, 0
-    for n, elem in enumerate(test_cases):
-        if type(elem) != tuple:
-            elem = (elem,)
-        elem2 = elem[:]  # In case student function messes up elem...
+    shortest_args, disc_teacher, disc_student, disc, cases = None, None, None, 0, 0
+    for n, args in enumerate(test_cases):
+        # Turn the args into a tuple, if they aren't that already.
+        if type(args) != tuple:
+            args = (args,)
+        current_args = stringify_args(args)
         cases += 1
         try:
-            r1 = canonize(teacher(*elem))
+            result_teacher = canonize(teacher(*args))
         except Exception as e:
-            r1 = f"TEACHER CRASH! {e}"
+            result_teacher = f"TEACHER CRASH! {e}"
         try:
-            r2 = canonize(student(*elem))
+            result_student = canonize(student(*args))
         except Exception as e:
-            r2 = f"STUDENT CRASH! {e}"
-        if r1 != r2:
+            result_student = f"STUDENT CRASH! {e}"
+        if result_teacher != result_student:
             disc += 1
-            if (stop_at_first or shortest is None or
-                    len(str(elem2)) < len(shortest)):
-                shortest, d1, d2 = elem2, r1, r2
+            if stop_at_first or shortest_args is None or len(current_args) < len(shortest_args):
+                shortest_args, disc_teacher, disc_student = current_args, result_teacher, result_student
             if stop_at_first:
                 break
-    if shortest is None:
+    if shortest_args is None:
         print("Both functions returned the same answers.")
         return True
     else:
         if stop_at_first:
-            print("First discrepancy found.")
+            print("First discrepancy found. It was:")
         else:
             print(f"For {cases} test cases, found {disc} discrepancies.")
             print("Shortest discrepancy input was:")
-        emit_args(shortest)
-        print(f"Teacher: {repr(d1)}")
-        print(f"Student: {repr(d2)}")
+        print(shortest_args)
+        print(f"Teacher: {repr(disc_teacher)}")
+        print(f"Student: {repr(disc_student)}")
         return False
 
 
 # Runs the function f for its test cases, calculating SHA256 checksum
-# of the results. If the checksum matches the expected, return the
+# for the results. If the checksum matches the expected, return the
 # running time, otherwise return -1. If expected == None, print out
 # the computed checksum instead. If recorder != None, print out the
-# arguments and expected result into the recorder.
+# arguments and the result returned from function into the recorder.
 
 def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expected_answers=None):
     fname, recorded, output_len = f.__name__, None, 0
@@ -162,6 +166,8 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
         # Convert a singleton of any non-tuple into singleton tuple.
         if not isinstance(test_args, tuple):
             test_args = (test_args,)
+        # Convert arguments to a string for safekeeping in case of discrepancy.
+        test_args_string = stringify_args(test_args, 300)
         # Call the function to be tested with the arguments from the test tuple.
         try:
             result = f(*test_args)
@@ -175,11 +181,12 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
         if verb_count > 0 or verb_count == -1:
             verb_count -= 1 if verb_count > 0 else 0
             print(f"{fname} #{count}: ", end="")
-            emit_args(test_args, 100)
+            print(test_args_string)
             print(f"RESULT: {result}")
         # Update the checksum.
         sr = str(result)
         chk.update(sr.encode('utf-8'))
+        # When in recording mode, write the answer to the record file.
         if recorder:
             output = sr.strip()
             print(output, file=recorder)
@@ -187,18 +194,17 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
             if count >= testcase_cutoff:
                 break
         if use_expected_answers and expected_answers and count < testcase_cutoff and recorded:
-            should_be = recorded[count]
-            if sr.strip() != should_be:
+            if sr.strip() != recorded[count]:
                 crashed = True
                 print(f"DISCREPANCY AT TEST CASE #{count}: ")
                 print("ARGUMENTS: ", end="")
-                emit_args(test_args)
-                print(f"EXPECTED: {should_be}")
+                print(test_args_string)
+                print(f"EXPECTED: {recorded[count]}")
                 print(f"RETURNED: {sr}")
                 break
         total_time = time() - start_time
         if total_time > timeout_cutoff:
-            print(f"TIMEOUT AT TEST CASE #{count}. REJECTED AS TOO SLOW.")
+            print(f"TIMEOUT AT TEST CASE #{count}. FUNCTION REJECTED AS TOO SLOW.")
             crashed = True
             break
     if not recorder:
@@ -961,14 +967,18 @@ def pancake_scramble_generator(seed):
 
 def lattice_paths_generator(seed):
     rng = random.Random(seed)
-    for i in range(1000):
-        x = rng.randint(2, 3 + i // 40)
-        y = rng.randint(2, 3 + i // 40)
+    yield 2, 2, [(1, 0), (0, 1)]
+    yield 5, 5, [(4, 5), (5, 4)]
+    for n in islice(pyramid(2, 3, 2), 1000):
+        x = n + rng.randint(0, 3)
+        y = n + rng.randint(0, 3)
         tabu = set()
-        n = rng.randint(1, max(1, x*y // 10))
-        while len(tabu) < n:
-            xx = rng.randint(0, x)
-            yy = rng.randint(0, y)
+        m = rng.randint(n, 2*n)
+        while len(tabu) < m:
+            xx, yy = x, y
+            while (xx, yy) == (x, y) or (xx, yy) == (0, 0):
+                xx = rng.randint(0, x)
+                yy = rng.randint(0, y)
             tabu.add((xx, yy))
         yield x, y, list(tabu)
 
@@ -1589,16 +1599,18 @@ def frog_collision_time_generator(seed):
 
 def spread_the_coins_generator(seed):
     rng = random.Random(seed)
-    n, count, goal, piles = 5, 0, 3, []
-    for _ in range(100):
-        piles.append(rng.randint(n, n * n))
-        u = rng.randint(n * n // 4, n * n)
-        a = rng.randint(1, u - 1)
-        b = u - a
-        yield piles, a, b
-        count += 1
-        if count == goal:
-            count, goal, n, piles = 0, goal + 5, n + 1, []
+    for n in islice(pyramid(5, 3, 2), 500):
+        coins = [0 for _ in range(n)]
+        coins[-1] = 1
+        m = rng.randint(2*n, 3*n)
+        while m > 0:
+            c = rng.randint(1, 4)
+            i = rng.randint(0, n-1)
+            coins[i] += c
+            m -= c
+        u = rng.randint(2, 2 + max(coins) // 2)
+        left = rng.randint(1, u - 1)
+        yield coins, left, u-left
 
 
 def group_and_skip_generator(seed):
@@ -1983,12 +1995,12 @@ testcases = [
      count_dominators_generator(fixed_seed),
      "459d463b7699203fa1f38496b4ba9fe4f78136ea4dc90573c7"
     ),
-    # Temporarily carried over for Fall 2021 term, will be removed one second after
-    (
-      "forbidden_substrings",
-      forbidden_substrings_generator(),
-      "6174fc0fd7c0c5b2a9bcb99a82799736ea3ab2f5f1525b8c10"
-    ),
+    # Removed from problem set December 9, 2021
+    # (
+    #  "forbidden_substrings",
+    #  forbidden_substrings_generator(),
+    #  "6174fc0fd7c0c5b2a9bcb99a82799736ea3ab2f5f1525b8c10"
+    # ),
     (
      "substitution_words",
      substitution_words_generator(),
@@ -2209,7 +2221,7 @@ testcases = [
     (
      "lattice_paths",
      lattice_paths_generator(fixed_seed),
-     "dbca1d47adc5713b65fcb90dd9ddf1d747f521eccf341289a4"
+     "5aab78160181125a6944933dbe70acde133ae2a739798a0ce7abfb9596a28436"
     ),
     (
      "pancake_scramble",
@@ -2513,12 +2525,12 @@ testcases = [
      counting_series_generator(fixed_seed),
      "cc67f4cef01c34c136a902ffea23a9df4e21b1991c491964bf89dc940067f569"
     ),
-    # Temporarily carried over for Fall 2021 term, will be removed one second after
-    (
-     "is_zigzag",
-     is_zigzag_generator(fixed_seed),
-     "fe5e03401a32bc5ca989759708d10a7f9d2cbd9e4821566b91"
-    ),
+    # Removed from problem set December 9, 2021
+    # (
+    # "is_zigzag",
+    # is_zigzag_generator(fixed_seed),
+    # "fe5e03401a32bc5ca989759708d10a7f9d2cbd9e4821566b91"
+    # ),
     # Removed from problem set October 3, 2021
     # (
     # "next_zigzag",
@@ -2554,7 +2566,7 @@ testcases = [
     (
      "spread_the_coins",
      spread_the_coins_generator(fixed_seed),
-     "2bab761142be45af8a3a613fb553a21f227970057134ae2b22"
+     "5a1629f90f295d59d177cb99ea2b24e2c257f97b673ff77a67e286ae03b7279e"
     ),
     (
      "group_and_skip",
@@ -2577,12 +2589,12 @@ testcases = [
      subtract_square_generator(fixed_seed),
      "8959f61972a8804d0b26e2ae92d30d4d3fb6f08f1bcf5e28b9"
     ),
-    # Temporarily carried over for Fall 2021 term, will be removed one second after
-    (
-     "perimeter_limit_split",
-     perimeter_limit_split_generator(fixed_seed),
-     "151d96f12b67f953fae52a539f669a46b734c537ed19e3ad7b"
-    ),
+    # Removed from problem set December 9, 2021
+    # (
+    # "perimeter_limit_split",
+    # perimeter_limit_split_generator(fixed_seed),
+    # "151d96f12b67f953fae52a539f669a46b734c537ed19e3ad7b"
+    # ),
     (
      "duplicate_digit_bonus",
      duplicate_digit_bonus_generator(fixed_seed),
