@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "December 14, 2021"
+version = "January 7, 2022"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -53,10 +53,11 @@ timeout_cutoff = 20
 
 # For instructors who want to add their own problems to this set:
 #
-# 1. Set the value of use_record to False.
-# 2. Write your private solution function to top of your private
-#    model solutions file labs109.py.
-# 3. Write your test case generator in this script below.
+# 1. Set the value of use_record to False. Update the version info
+#    of this tester script in the above settings.
+# 2. Write your private solution function to your model solutions
+#    file labs109.py.
+# 3. Write the corresponding test case generator in this script below.
 # 4. Add the individual test into the list of testcases list below,
 #    using None as its expected checksum for the moment.
 # 5. Run this test script.
@@ -341,6 +342,22 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # The test case generators for the individual functions.
+
+def laser_aliens_generator(seed):
+    rng = random.Random(seed)
+    for n in islice(pyramid(3, 5, 1), 600):
+        aliens = set()
+        x = rng.randint(0, n-1)
+        y = rng.randint(0, n-1)
+        m = rng.randint(max(1, n // 3), 3*n)
+        while len(aliens) < m:
+            aliens.add((x, y))
+            if rng.randint(0, 1):
+                x = rng.randint(0, n-1)
+            else:
+                y = rng.randint(0, n-1)
+        yield n, sorted(aliens)
+
 
 def cut_into_squares_generator(seed):
     rng = random.Random(seed)
@@ -2738,6 +2755,14 @@ testcases = [
      "cut_into_squares",
      cut_into_squares_generator(fixed_seed),
      "7e2d01d09a405bcdab3c2bab32f50ce950e590f36dd1f1b02f38c752932e0f7e"
+    ),
+
+    # New additions to the problem set in 2022.
+
+    (
+     "laser_aliens",
+     laser_aliens_generator(fixed_seed),
+     "64186671716042ed9238ea75d0104cbb932a0e37e0275303f83d953a95534693"
     )
 ]
 
