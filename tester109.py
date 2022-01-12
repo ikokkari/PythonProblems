@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "January 7, 2022"
+version = "January 11, 2022"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -102,7 +102,7 @@ def stringify_args(args, cutoff=600):
                 right = ", ".join([str(x) for x in a[-5:]])
                 result += f"[{left}, <{len(a)-10} omitted...>, {right}]"
         else:
-            result += repr(a) if len(repr(a)) < 100 else '[...]'
+            result += repr(a) if len(repr(a)) < cutoff else '[...]'
     return result
 
 
@@ -168,7 +168,7 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
         if not isinstance(test_args, tuple):
             test_args = (test_args,)
         # Convert arguments to a string for safekeeping in case of discrepancy.
-        test_args_string = stringify_args(test_args, 300)
+        test_args_string = stringify_args(test_args)
         # Call the function to be tested with the arguments from the test tuple.
         try:
             result = f(*test_args)
@@ -343,6 +343,18 @@ def pyramid(n=1, goal=5, inc=1):
 
 # The test case generators for the individual functions.
 
+def stepping_stones_generator(seed):
+    rng = random.Random(seed)
+    for n in islice(pyramid(5, 5, 3), 1000):
+        m = rng.randint(2, n)
+        ones = set()
+        while len(ones) < m:
+            x = rng.randint(0, n-1)
+            y = rng.randint(0, n-1)
+            ones.add((x, y))
+        yield n, list(ones)
+
+
 def laser_aliens_generator(seed):
     rng = random.Random(seed)
     for n in islice(pyramid(3, 5, 1), 600):
@@ -486,7 +498,7 @@ def prominences_generator(seed):
 
     # Permutations up to length 6 ought to root out most logic errors.
     for k in range(1, 7):
-        for p in permutations(range(1, k + 1)):
+        for p in permutations(range(1, k+1)):
             yield list(p)
 
     # Okay, basic logic seems right, so on to pseudorandom fuzz testing.
@@ -1207,7 +1219,6 @@ def taxi_zum_zum_generator(seed):
 
 def count_growlers_generator(seed):
     rng = random.Random(seed)
-    poss = ['cat', 'tac', 'dog', 'god']
     animals = []
     goal, count = 5, 0
     for _ in range(5000):
@@ -1215,7 +1226,7 @@ def count_growlers_generator(seed):
         if count == goal:
             count, goal = 0, goal + 2
             animals = []
-        animals.append(rng.choice(poss))
+        animals.append(rng.choice(['cat', 'tac', 'dog', 'god']))
         yield animals[:]
 
 
@@ -1790,7 +1801,7 @@ def oware_move_generator(seed):
         board[tall] += 2 * k + rng.randint(2, 6 * k)
         yield board[:], tall
         if i == goal:
-            goal = goal * 10
+            goal = goal * 3
             k += 1
 
 
@@ -2671,7 +2682,7 @@ testcases = [
     (
      "oware_move",
      oware_move_generator(fixed_seed),
-     "f2059c85458029a78e570d44303a3255b312e49d15b68e8d2b"
+     "7bb8b1b98cc604baf4e71970520efacca01698de168f20628dda2aa48dd8ea5e"
     ),
     (
      "conjugate_regular",
@@ -2763,6 +2774,11 @@ testcases = [
      "laser_aliens",
      laser_aliens_generator(fixed_seed),
      "64186671716042ed9238ea75d0104cbb932a0e37e0275303f83d953a95534693"
+    ),
+    (
+     "stepping_stones",
+     stepping_stones_generator(fixed_seed),
+     "79bbcef6a8a1c9f614aeb98898903817a18000a15c608e1afcc4ee565362cd39"
     )
 ]
 
