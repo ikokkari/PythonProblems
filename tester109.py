@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "January 11, 2022"
+version = "January 12, 2022"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -345,12 +345,17 @@ def pyramid(n=1, goal=5, inc=1):
 
 def stepping_stones_generator(seed):
     rng = random.Random(seed)
-    for n in islice(pyramid(5, 5, 3), 1000):
+    for n in islice(pyramid(5, 5, 5), 50):
         m = rng.randint(2, n)
         ones = set()
+        x = n // 2 + rng.randint(-1, 1)
+        y = n // 2 + rng.randint(-1, 1)
         while len(ones) < m:
-            x = rng.randint(0, n-1)
-            y = rng.randint(0, n-1)
+            ones.add((x, y))
+            if rng.randint(0, 1):
+                x = (x + rng.randint(-3, 3)) % n
+            else:
+                y = (y + rng.randint(-3, 3)) % n
             ones.add((x, y))
         yield n, list(ones)
 
@@ -2778,7 +2783,7 @@ testcases = [
     (
      "stepping_stones",
      stepping_stones_generator(fixed_seed),
-     "79bbcef6a8a1c9f614aeb98898903817a18000a15c608e1afcc4ee565362cd39"
+     "0c569431eff15dfa6b5d320aff761843352f76ae4acf4f37906435855c8536ec"
     )
 ]
 
