@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "January 12, 2022"
+version = "February 22, 2022"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -342,6 +342,35 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # The test case generators for the individual functions.
+
+def recaman_item_generator():
+    yield from range(1, 4)
+    yield from islice(scale_random(1234, 5, 10), 70)
+
+
+def verify_betweenness_generator(seed):
+    rng = random.Random(seed)
+    for n in islice(pyramid(3, 3, 2), 2000):
+        perm = [i for i in range(n)]
+        rng.shuffle(perm)
+        m = rng.randint(1, n-1)
+        constraints = set()
+        while len(constraints) < m:
+            idx = sorted(rng.sample(range(n), 3))
+            if rng.randint(0, 99) < 50:
+                constraints.add((perm[idx[0]], perm[idx[1]], perm[idx[2]]))
+            else:
+                constraints.add((perm[idx[2]], perm[idx[1]], perm[idx[0]]))
+        constraints = list(constraints)
+        if rng.randint(0, 99) < 50:
+            ci = rng.randint(0, m-1)
+            con = constraints[ci]
+            if rng.randint(0, 99) < 50:
+                constraints[ci] = (con[1], con[0], con[2])
+            else:
+                constraints[ci] = (con[0], con[2], con[1])
+        yield (perm, constraints)
+
 
 def stepping_stones_generator(seed):
     rng = random.Random(seed)
@@ -742,11 +771,6 @@ def collapse_intervals_generator(seed):
             else:
                 curr += 1
         yield items
-
-
-def recaman_item_generator():
-    yield from range(1, 4)
-    yield from islice(scale_random(1234, 5, 10), 70)
 
 
 def __no_repeated_digits(n, allowed):
@@ -1361,22 +1385,11 @@ def substitution_words_generator():
         yield pattern, words
 
 
-def forbidden_substrings_generator():
-    yield 'ABCDE', 5, ['A', 'B', 'C', 'D']
-    yield 'ABCD', 3, ['AA', 'BB', 'CC']
-    yield 'FG', 4, ['FGG', 'GFF', 'FFF']
-    yield 'PQR', 2, ['PP', 'QR']
-    yield 'XABCD', 2, []
-    yield 'REB', 6, ['RR', 'EE', 'BE', 'BRR']
-    yield 'MOS', 5, ['SO', 'SM', 'SS']
-    yield 'ABCDEFG', 100, ['B', 'C', 'D', 'E', 'F', 'G']
-
-
 def count_dominators_generator(seed):
     rng = random.Random(seed)
     items = []
     count, goal = 0, 10
-    for _ in range(100000):
+    for _ in range(20000):
         yield items[:]
         count += 1
         if count == goal:
@@ -2026,7 +2039,7 @@ testcases = [
     (
      "count_dominators",
      count_dominators_generator(fixed_seed),
-     "459d463b7699203fa1f38496b4ba9fe4f78136ea4dc90573c7"
+     "59c803dd281b9230f6dab608d6d35b600b55cf11a084bff11f477970ea2b9fe6"
     ),
     # Removed from problem set December 9, 2021
     # (
@@ -2737,6 +2750,7 @@ testcases = [
      wordomino_generator(),
      "5b081cc381ec8ddaa382d8450def04b53255ee62b67356f690"
     ),
+    # Kept in the tester for the duration of Winter 2022 term, will be removed right after.
     (
      "recaman_item",
      recaman_item_generator(),
@@ -2784,6 +2798,11 @@ testcases = [
      "stepping_stones",
      stepping_stones_generator(fixed_seed),
      "0c569431eff15dfa6b5d320aff761843352f76ae4acf4f37906435855c8536ec"
+    ),
+    (
+     "verify_betweenness",
+     verify_betweenness_generator(fixed_seed),
+     "16b9176a15ffd0a8da7cbd5a125627fa68b6eca4ad01523515b95b0c8092f342"
     )
 ]
 
