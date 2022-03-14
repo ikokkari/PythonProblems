@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "February 22, 2022"
+version = "March 14, 2022"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -710,7 +710,7 @@ def possible_words_generator(seed):
         words = [x.strip() for x in f]
     rng = random.Random(seed)
     n = 0
-    while n < 80:
+    while n < 40:
         pat_word = rng.choice(words)
         letters = sorted(set(c for c in pat_word))
         if len(letters) > 3:
@@ -1534,7 +1534,7 @@ def eliminate_neighbours_generator(seed):
     rng = random.Random(seed)
     count, goal = 0, 1
     items, m = [1, 2, 3, 4, 5, 6, 7], 7
-    for i in range(10000):
+    for i in range(5000):
         yield items[:]
         count += 1
         if count == goal:
@@ -2551,7 +2551,7 @@ testcases = [
     (
      "possible_words",
      possible_words_generator(fixed_seed),
-     "89861067154b1b84d61ecbed94bb0a709aa54346c0eddd136b8340e91f13b1bb"
+     "9c618411b596d47d5ee1b462e7dfdb24ba77eb90bed90011f8b2c7eb0ac0b18f"
     ),
 
     # New additions to the problem set in 2020.
@@ -2564,7 +2564,7 @@ testcases = [
     (
      "eliminate_neighbours",
      eliminate_neighbours_generator(fixed_seed),
-     "1a2aead65abcb5d7f53813c2f7ae1aee7e7ce34b3c1cf810b8b091bffe2c27d7"
+     "2c03ea722ed7776cd2608f14f4493d0445b0bf8d86f2546aacf575ca2f29df7d"
     ),
     (
      "counting_series",
