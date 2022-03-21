@@ -19,3 +19,19 @@ def ryerson_letter_grade(n):
     else:
         adjust = ""
     return "DCB"[tens - 5] + adjust
+
+def is_ascending(items):
+   res=True
+   for i in range(1,len(items)):
+       if(items[i] <= items[i-1]): # if any item found not greater than previous item
+           res=False
+           break
+
+   return res
+
+print(is_ascending([])) # returns True
+print(is_ascending([-5,10,99,123456])) # returns True
+print(is_ascending([2,3,3,4,5])) # returns False
+print(is_ascending([-99])) # returns True
+print(is_ascending([4,5,6,7,3,7,9])) # returns False
+print(is_ascending([1,1,1,1])) # returns False
