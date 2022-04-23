@@ -25,14 +25,14 @@ from fractions import Fraction
 verbose_execution = {
     #   "function_one": 100,  # Print the first 100 test cases of function_one
     #   "function_two": -1,   # Print all test cases of function_two, however many there are
-    #   "function_three": 0   # Be silent with function_three (but run it first)
+    #   "function_three": 0   # Be silent with function_three (but run it early)
 }
 
 # Whether to use the expected answers from the file when they exist.
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "March 23, 2022"
+version = "April 23, 2022"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -375,7 +375,7 @@ def verify_betweenness_generator(seed):
 def stepping_stones_generator(seed):
     rng = random.Random(seed)
     for n in islice(pyramid(5, 5, 5), 50):
-        m = rng.randint(2, n)
+        m = rng.randint(2, n // 2 + 5)
         ones = set()
         x = n // 2 + rng.randint(-1, 1)
         y = n // 2 + rng.randint(-1, 1)
@@ -411,7 +411,7 @@ def cut_into_squares_generator(seed):
         b = 1
         while b < a:
             yield a, b
-            b += rng.randint(1, 5)
+            b += rng.randint(1, 30)
 
 
 def collect_numbers_generator(seed):
@@ -421,7 +421,7 @@ def collect_numbers_generator(seed):
             yield list(p)
     # The longer permutations with fuzz testing.
     rng = random.Random(seed)
-    for n in islice(pyramid(7, 2, 3), 10000):
+    for n in islice(pyramid(7, 2, 3), 5000):
         items = list(range(n))
         rng.shuffle(items)
         yield items
@@ -571,7 +571,7 @@ def ryerson_letter_grade_generator():
 def is_ascending_generator(seed):
     yield [1, 2, 2]    # Because students don't read instructions
     rng = random.Random(seed)
-    for i in range(500):
+    for i in range(200):
         for j in range(10):
             items = [rng.randint(-(i+2), i+2)]
             for k in range(i + 1):
@@ -710,7 +710,7 @@ def possible_words_generator(seed):
         words = [x.strip() for x in f]
     rng = random.Random(seed)
     n = 0
-    while n < 40:
+    while n < 30:
         pat_word = rng.choice(words)
         letters = sorted(set(c for c in pat_word))
         if len(letters) > 3:
@@ -831,7 +831,7 @@ def calkin_wilf_generator(seed):
 
 def fibonacci_sum_generator(seed):
     yield from range(1, 130)
-    yield from islice(scale_random(seed, 100, 2), 0, 100, 2)
+    yield from islice(scale_random(seed, 100, 2), 100)
 
 
 def fibonacci_word_generator(seed):
@@ -1057,7 +1057,7 @@ def count_carries_generator(seed):
 
 def count_squares_generator(seed):
     rng = random.Random(seed)
-    for n in islice(pyramid(3, 5, 3), 500):
+    for n in islice(pyramid(3, 5, 3), 300):
         pts = set()
         while len(pts) < 2 * n:
             x = rng.randint(0, n)
@@ -1087,12 +1087,16 @@ def three_summers_generator(seed):
                 goal = sum(rng.sample(items, 3))
                 goal += rng.randint(-5, 5)
                 yield items[:], goal
+    # To make sure that you are not being a Shlemiel.
+    for i in range(5):
+        items, goal = sorted(rng.sample(range(0, 2_000_000, 7), 1500)), 3_000_000
+        yield items, goal
 
 
 def ztalloc_generator(seed):
     yield from ['d', 'uuddd', 'ddd', 'udud', 'uduuudddd']
     rng = random.Random(seed)
-    for i in range(50000):
+    for i in range(15000):
         if rng.randint(0, 99) < 50:
             c = rng.randint(1, 2 + 10 * i)
             pat = []
@@ -1206,7 +1210,7 @@ def extract_increasing_generator(seed):
 
 def line_with_most_points_generator(seed):
     rng = random.Random(seed)
-    for n in islice(pyramid(6, 2, 3), 1000):
+    for n in islice(pyramid(6, 2, 3), 500):
         points = set()
         while len(points) < n:
             x = rng.randint(-n, n)
@@ -1309,7 +1313,6 @@ def collatzy_distance_generator(seed):
     for a in range(200):
         b = rng.randint(1, a + 5)
         yield a, b
-        yield b, a
 
 
 def nearest_smaller_generator(seed):
@@ -1346,7 +1349,7 @@ def unscramble_generator(seed):
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
         words = [x.strip() for x in f]
     count = 0
-    while count < 500:
+    while count < 250:
         w = rng.choice(words)
         if 2 < len(w) < 9:
             first, mid, last = w[0], list(w[1:-1]), w[-1]
@@ -1364,7 +1367,7 @@ def crag_score_generator():
 
 def midnight_generator(seed):
     rng = random.Random(seed)
-    for _ in range(100):
+    for _ in range(50):
         dice = []
         for _ in range(6):
             roll = []
@@ -1397,6 +1400,15 @@ def count_dominators_generator(seed):
             items = []
         r = (goal - count)**3
         items.append(rng.randint(-r, r))
+    # Just to make sure that you are not being a Shlemiel.
+    for n in range(10 ** 6, 0, -10 ** 5):
+        perm = list(range(n))
+        perm.reverse()
+        for k in range(50):
+            i1 = rng.randint(0, n - 1)
+            i2 = rng.randint(0, n - 1)
+            perm[i1], perm[i2] = perm[i2], perm[i1]
+        yield perm
 
 
 def optimal_crag_score_generator(seed):
@@ -1414,7 +1426,7 @@ def optimal_crag_score_generator(seed):
 def bulgarian_solitaire_generator(seed):
     rng = random.Random(seed)
     for k in range(2, 30):
-        for i in range(2 + 5 * k):
+        for i in range(2 + 2 * k):
             items, total = [], (k * (k + 1)) // 2
             while total > 0:
                 if total > 5 and (len(items) < k + i or rng.randint(0, 99) < 40):
@@ -1464,7 +1476,7 @@ def fractran_generator(seed):
 def scylla_or_charybdis_generator(seed):
     rng = random.Random(seed)
     for n in range(2, 40):
-        for i in range(2 * n):
+        for i in range(2, 2 * n, 2):
             pos, result, = 0, ''
             for j in range(n * i):
                 if pos == n - 1:
@@ -1506,7 +1518,7 @@ def count_overlapping_disks_generator(seed):
 def arithmetic_progression_generator(seed):
     rng = random.Random(seed)
     m = 5
-    for i in range(300):
+    for i in range(150):
         elements = set()
         for _ in range(m):
             start = rng.randint(1, i*i + 3)
@@ -1534,7 +1546,7 @@ def eliminate_neighbours_generator(seed):
     rng = random.Random(seed)
     count, goal = 0, 1
     items, m = [1, 2, 3, 4, 5, 6, 7], 7
-    for i in range(5000):
+    for i in range(2000):
         yield items[:]
         count += 1
         if count == goal:
@@ -1586,15 +1598,15 @@ def is_zigzag_generator(seed):
 def wythoff_array_generator(seed):
     rng = random.Random(seed)
     curr, step = 1, 1
-    for _ in range(300):
+    for _ in range(150):
         yield curr
-        curr += rng.randint(1, 2 * step)
+        curr += rng.randint(1, 4 * step)
         step += 1
 
 
 def hourglass_flips_generator(seed):
     rng = random.Random(seed)
-    for _ in range(100):
+    for _ in range(50):
         glasses, curr = [], rng.randint(6, 11)
         for j in range(rng.randint(2, 4)):
             low = 0 if rng.randint(0, 99) < 60 else rng.randint(5, max(6, curr // 2))
@@ -1684,9 +1696,9 @@ def subtract_square_generator(seed):
     for i in range(1, 9):
         curr = rng.randint(1, 10)
         query = []
-        for j in range(4 * i):
+        for j in range(2 * i):
             query.append(curr)
-            curr = (4 * curr) // 3 + rng.randint(1, max(3, curr // 5))
+            curr = (4 * curr) // 3 + rng.randint(1, max(3, curr // 3))
         yield query
 
 
@@ -1785,10 +1797,10 @@ def is_left_handed_generator():
 def balanced_centrifuge_generator(seed):
     rng = random.Random(seed)
     for n in range(1, 1000):
-        k = 0
+        k = 1
         while k <= n:
             yield n, k
-            k += rng.randint(1, 3 + n // 30)
+            k += rng.randint(1, 3 + n // 10)
 
 
 def lunar_multiply_generator(seed):
@@ -1988,7 +2000,7 @@ testcases = [
     (
      "arithmetic_progression",
      arithmetic_progression_generator(fixed_seed),
-     "aaab6fcefc56db92e43609036aa5bf92707f1070cdbcd96181"
+     "8c8a5c48d0e0f0f469e7e1e92c208cc927012815e3bfc1361479ec263bfe27eb"
     ),
     (
      "count_overlapping_disks",
@@ -2004,7 +2016,7 @@ testcases = [
     (
      "scylla_or_charybdis",
      scylla_or_charybdis_generator(fixed_seed),
-     "7d4accab714d3d2f539450f6fcb548f56352148244b0084c6d"
+     "b1536ef2e3dcfbd98ae4b1bb054358953a45702bb6767afc2bce3a28a229c54a"
     ),
     (
      "fractran",
@@ -2019,7 +2031,7 @@ testcases = [
     (
      "bulgarian_solitaire",
      bulgarian_solitaire_generator(fixed_seed),
-     "1e9743a0ef9d4cf6025e0a6c2f60321c477772f8f757cb1de9"
+     "819172713ddd3d5a8e596b249284a52b851b3f78d6a468b1672d10991c6d92af"
     ),
     (
      "sum_of_distinct_cubes",
@@ -2039,7 +2051,7 @@ testcases = [
     (
      "count_dominators",
      count_dominators_generator(fixed_seed),
-     "59c803dd281b9230f6dab608d6d35b600b55cf11a084bff11f477970ea2b9fe6"
+     "c9c7ad7be22449a5863277c28eb5bf0f85ecddbb76fac6d0f12a2cd65309dd67"
     ),
     # Removed from problem set December 9, 2021
     # (
@@ -2060,7 +2072,7 @@ testcases = [
     (
      "midnight",
      midnight_generator(fixed_seed),
-     "14de088dbcfa65b452a59e4c2c624f2e090d298b68707b3a72"
+     "92890d7f13631c829d087322d0b3e6764b81063256c026ab3f9a00ae9372f963"
     ),
     (
      "crag_score",
@@ -2070,7 +2082,7 @@ testcases = [
     (
      "unscramble",
      unscramble_generator(fixed_seed),
-     "5859988a905549959fd6905cc038e0ad214812a6444d702713"
+     "de2b7b1ddb8bd0c74243635ed26cfebc41d2870be2ed469043de23a7eb2dd557"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -2102,7 +2114,7 @@ testcases = [
     (
      "collatzy_distance",
      collatzy_distance_generator(fixed_seed),
-     "8401965221f0d0261e2afd74afb4dbadc10045c68a5a0d72c0"
+     "ff638c3269c9418841d6a7f0ecf0fadb0ed02677f3b56078e09ede7ec0384f63"
     ),
     (
      "max_checkers_capture",
@@ -2146,7 +2158,7 @@ testcases = [
     (
      "line_with_most_points",
      line_with_most_points_generator(fixed_seed),
-     "a8bd8f0d71df4a9ac247010549bc99159fe7eaef918a680a094fed4962da7f49"
+     "ac302ea22f9048a164250de421969fe32a19aeb7dbf730a86f2a6c3673f8896a"
     ),
     (
      "count_maximal_layers",
@@ -2219,7 +2231,7 @@ testcases = [
     (
      "ztalloc",
      ztalloc_generator(fixed_seed),
-     "72c4c5bdc3a6f810e73499bb6107ac4669e947a8b80d8715f4"
+     "b570cd16dec9233f324d34de8aa87084700f334c3e4cb17fe3660168ebdb0eff"
     ),
     (
      "losing_trick_count",
@@ -2234,7 +2246,7 @@ testcases = [
     (
      "three_summers",
      three_summers_generator(fixed_seed),
-     "07b0fa22fe8a9668072557471c92f363855f10744fb7b0b9b00971b55ced579c"
+     "94e6dc029d76368aae6979a3abbc18be5c1aff83ff8c753b65c47ec30e3cb89c"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -2257,7 +2269,7 @@ testcases = [
     (
      "count_squares",
      count_squares_generator(fixed_seed),
-     "b62fcb3fb13715bc17476115dc7c696c80a25de38eb92b2235e9691ca13100ef"
+     "cb1021c7a7e1cea05e4eb7b861df761e0d9fe94c03297f2b937726aa2f14f4d6"
     ),
     (
      "count_carries",
@@ -2341,7 +2353,7 @@ testcases = [
     (
      "fibonacci_sum",
      fibonacci_sum_generator(fixed_seed),
-     "889e6d6ac40e75ae44e8ef1a0b612802df7f8448943cb593339572bbea0c6012"
+     "e7058a191e5dbc3a8f69f302fa5f6180e8b4d4c688f6028792576010dcb3c16b"
     ),
     # Removed from the problem set August 10, 2021
     # (
@@ -2508,7 +2520,7 @@ testcases = [
     (
      "is_ascending",
      is_ascending_generator(fixed_seed),
-     "5169c5e2252b3de7d3950c8f8802d27636c56079cf883065cb"
+     "a58079cfe1caa6768c9b9a2afb5f6ec3cf3e55526ab06578af3885213c3b8648"
     ),
     # Removed from problem set December 24, 2020
     # (
@@ -2551,7 +2563,7 @@ testcases = [
     (
      "possible_words",
      possible_words_generator(fixed_seed),
-     "9c618411b596d47d5ee1b462e7dfdb24ba77eb90bed90011f8b2c7eb0ac0b18f"
+     "20d9ac2f97454ae01d482447057d4f2b2b5c001feefd781f7e02a532a694dbfb"
     ),
 
     # New additions to the problem set in 2020.
@@ -2564,7 +2576,7 @@ testcases = [
     (
      "eliminate_neighbours",
      eliminate_neighbours_generator(fixed_seed),
-     "2c03ea722ed7776cd2608f14f4493d0445b0bf8d86f2546aacf575ca2f29df7d"
+     "24333594d079471cf6696e8b660c11fc586029a178a9879c2349d154635c6aff"
     ),
     (
      "counting_series",
@@ -2592,12 +2604,12 @@ testcases = [
     (
      "wythoff_array",
      wythoff_array_generator(fixed_seed),
-     "3349a1a5d59d9df74a30a2e468d369ffb0850d5b0e993c6431"
+     "90014bbdb273428c0f62801d34f7b225aebd9ee5ee3fdf6b002b32898e4295cd"
     ),
     (
      "hourglass_flips",
      hourglass_flips_generator(fixed_seed),
-     "d24e1ec31b5f2267295c828db41cda48a3ae66d1b17064fe33"
+     "d80394444051437c406c3ec73bd58d15c47d7a58c20dab5351af07607fb8ac3c"
     ),
     (
      "knight_jump",
@@ -2633,7 +2645,7 @@ testcases = [
     (
      "subtract_square",
      subtract_square_generator(fixed_seed),
-     "8959f61972a8804d0b26e2ae92d30d4d3fb6f08f1bcf5e28b9e3e91aedc81410"
+     "4eedead71c2894be2e31e19bcf47a5a0786d70f6249a0274f2c2f14370b35990"
     ),
     # Removed from problem set December 9, 2021
     # (
@@ -2690,7 +2702,7 @@ testcases = [
     (
      "balanced_centrifuge",
      balanced_centrifuge_generator(fixed_seed),
-     "05b38d16cb91fd1e37a9ee9948010d5557611384a8098741d5bb20e0da042cda"
+     "35d0be2e2ce3bf4e648cc42e3410e42b4bdebbcb628925799fc478a0957c1d6b"
     ),
     (
      "lunar_multiply",
@@ -2750,12 +2762,12 @@ testcases = [
      wordomino_generator(),
      "5b081cc381ec8ddaa382d8450def04b53255ee62b67356f690"
     ),
-    # Kept in the tester for the duration of Winter 2022 term, will be removed right after.
-    (
-     "recaman_item",
-     recaman_item_generator(),
-     "e36c779db6a77037f4e0c11363e4377a1dfe773cb0c7af8617"
-    ),
+    # Removed from problem set April 18, 2022
+    # (
+    # "recaman_item",
+    # recaman_item_generator(),
+    # "e36c779db6a77037f4e0c11363e4377a1dfe773cb0c7af8617"
+    # ),
     (
      "count_troikas",
      count_troikas_generator(fixed_seed),
@@ -2779,12 +2791,12 @@ testcases = [
     (
      "collect_numbers",
      collect_numbers_generator(fixed_seed),
-     "8315a77b5a6c85420c2a68aad9c3971b2a8e0acf06418afe97e733c85f9814f6"
+     "99afb2b51423f6223f4b51c09914f81cf6a6d12ad536e8b08bf51309c80ca798"
     ),
     (
      "cut_into_squares",
      cut_into_squares_generator(fixed_seed),
-     "7e2d01d09a405bcdab3c2bab32f50ce950e590f36dd1f1b02f38c752932e0f7e"
+     "fb698d6bcd2422488b6ab1acb491740e4a56f0c20e61f6ccd4f69d65f0371529"
     ),
 
     # New additions to the problem set in 2022.
@@ -2797,7 +2809,7 @@ testcases = [
     (
      "stepping_stones",
      stepping_stones_generator(fixed_seed),
-     "0c569431eff15dfa6b5d320aff761843352f76ae4acf4f37906435855c8536ec"
+     "c4ac30082fa34bc0f947fc1ddf3964c92dce0acac4e7a945dec84237124d28a4"
     ),
     (
      "verify_betweenness",
