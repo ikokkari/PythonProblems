@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "April 23, 2022"
+version = "June 20, 2022"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -674,10 +674,20 @@ ranks = {'two': 2, 'three': 3, 'four': 4, 'five': 5,
 deck = [(rank, suit) for suit in suits for rank in ranks.keys()]
 
 
-def bridge_hand_shape_generator(seed):
+def bridge_hand_generator(seed):
     rng = random.Random(seed)
-    for _ in range(2000):
-        yield rng.sample(deck, 13)
+    ranks_list = [r for r in ranks]
+    for n in range(3000):
+        flip_prob = 10 + 10 * (n % 8)
+        hand = set()
+        suit = rng.choice(suits)
+        rank = rng.choice(ranks_list)
+        while len(hand) < 13:
+            hand.add((rank, suit))
+            if rng.randint(0, 99) < flip_prob:
+                suit = rng.choice(suits)
+            rank = rng.choice(ranks_list)
+        yield (list(hand),)
 
 
 def winning_card_generator(seed):
@@ -697,9 +707,8 @@ def hand_shape_distribution_generator(seed):
 
 
 def milton_work_point_count_generator(seed):
-    rng = random.Random(seed)
-    for _ in range(10000):
-        hand = rng.sample(deck, 13)
+    for hand in bridge_hand_generator(seed):
+        hand = hand[0]
         for suit in suits:
             yield hand, suit
         yield hand, 'notrump'
@@ -867,7 +876,9 @@ __names = [
     "donald", "melania", "hillary", "barack", "bill", "kamala",
     "mxuzptlk", "ouagadougou", "oumoumou", "auervaara",
     "britain", "germany", "france", "canada", "exit",
-    "urban", "zuauaua", "aueiosh", "knickerbocker"
+    "urban", "zuauaua", "aueiosh", "knickerbocker",
+    "keihanaikukauakahihuliheekahaunaele",
+    "llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch"
 ]
 
 
@@ -927,12 +938,6 @@ def count_divisibles_in_range_generator(seed):
         yield prev, v, d
         yield -prev, v, d
         prev = v
-
-
-def bridge_hand_shorthand_generator(seed):
-    rng = random.Random(seed)
-    for _ in range(10000):
-        yield rng.sample(deck, 13)
 
 
 def losing_trick_count_generator(seed):
@@ -1796,11 +1801,12 @@ def is_left_handed_generator():
 
 def balanced_centrifuge_generator(seed):
     rng = random.Random(seed)
-    for n in range(1, 1000):
+    for n in range(1, 500):
         k = 1
         while k <= n:
             yield n, k
-            k += rng.randint(1, 3 + n // 10)
+            step = 1 if n < 50 else rng.randint(1, 3 + n // 10)
+            k += step
 
 
 def lunar_multiply_generator(seed):
@@ -2363,13 +2369,13 @@ testcases = [
     #  ),
     (
      "bridge_hand_shorthand",
-     bridge_hand_shorthand_generator(fixed_seed),
-     "68459ff71e28b24e43df3f632706fabcda7403359d7d4d9255"
+     bridge_hand_generator(fixed_seed),
+     "c6beb2fd767be441a88b1869f7cdcbae9a6b232c07165e790483bf1fe57ac699"
     ),
     (
      "milton_work_point_count",
      milton_work_point_count_generator(fixed_seed),
-     "5694509170df1fef10bbb60641b7906e220d951b73d3072f7e"
+     "3ff47252837a5ba8078c64e07791759067a37f940270915bf423e550635e615a"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -2417,7 +2423,7 @@ testcases = [
     (
      "brangelina",
      brangelina_generator(),
-     "f5a50e1e1b6575206063b60e8ac587efc3725d036b4d73d696"
+     "410b06f6b409dcf0befdff3775bec547bce02e61fb9be8d1098fdd8e35578b85"
     ),
     (
      "balanced_ternary",
@@ -2546,8 +2552,8 @@ testcases = [
     # ),
     (
      "bridge_hand_shape",
-     bridge_hand_shape_generator(fixed_seed),
-     "e1462e227e8d8c43140bd76c989bba16009ebc73d0a5a73d39"
+     bridge_hand_generator(fixed_seed),
+     "29e963cc7715f89d9a7f133e2a620702502f8eb5583d119dda6d58be58266102"
     ),
     (
      "hand_shape_distribution",
@@ -2702,7 +2708,7 @@ testcases = [
     (
      "balanced_centrifuge",
      balanced_centrifuge_generator(fixed_seed),
-     "35d0be2e2ce3bf4e648cc42e3410e42b4bdebbcb628925799fc478a0957c1d6b"
+     "2c81e311e4547c8f797955107aa6d2ae9d862c15ca61eaaad0cf364776bba8b8"
     ),
     (
      "lunar_multiply",
