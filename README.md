@@ -10,6 +10,8 @@ In addition to the precomputed checksums that serve as definitive acceptance tes
 
 Everyone teaching or learning Python is welcome to use, adapt and distribute these problems and the associated acceptance tester for their own purposes as they see fit. The author welcomes feedback by email at `ilkka.kokkarinen@gmail.com` from computer science instructors who use these problems in their courses.
 
+Obfuscated model solutions are available in the file `obfuscated.txt`, to give students the idea of the length of instructor's private solutions.
+
 The lab specification document and the automated tester software `tester109.py` are released under the [GNU General Public License v3](https://www.gnu.org/licenses/gpl-3.0.txt), with no warranties implied by the author.
 
 Wordlist `words_sorted.txt` adapted from [dwyl/english-words](https://github.com/dwyl/english-words).
