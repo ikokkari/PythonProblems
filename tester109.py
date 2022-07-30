@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "June 20, 2022"
+version = "July 30, 2022"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -343,9 +343,20 @@ def pyramid(n=1, goal=5, inc=1):
 
 # The test case generators for the individual functions.
 
-def recaman_item_generator():
-    yield from range(1, 4)
-    yield from islice(scale_random(1234, 5, 10), 70)
+def illuminate_all_generator(seed):
+    yield [0, 0, 0, 0, 0],
+    yield [2, 0, 1, 0, 2],
+    yield [2, 1, 3, 1, 2],
+    rng = random.Random(seed)
+    for n in islice(pyramid(3, 3, 2), 2000):
+        lights = []
+        grow = rng.randint(40, 100)
+        while len(lights) < n:
+            if len(lights) < 1 or rng.randint(1, 100) < grow:
+                lights.append(rng.randint(0, 2))
+            else:
+                lights[-1] += 1
+        yield lights,
 
 
 def verify_betweenness_generator(seed):
@@ -369,7 +380,7 @@ def verify_betweenness_generator(seed):
                 constraints[ci] = (con[1], con[0], con[2])
             else:
                 constraints[ci] = (con[0], con[2], con[1])
-        yield (perm, constraints)
+        yield perm, constraints
 
 
 def stepping_stones_generator(seed):
@@ -687,7 +698,7 @@ def bridge_hand_generator(seed):
             if rng.randint(0, 99) < flip_prob:
                 suit = rng.choice(suits)
             rank = rng.choice(ranks_list)
-        yield (list(hand),)
+        yield list(hand),
 
 
 def winning_card_generator(seed):
@@ -2821,6 +2832,11 @@ testcases = [
      "verify_betweenness",
      verify_betweenness_generator(fixed_seed),
      "16b9176a15ffd0a8da7cbd5a125627fa68b6eca4ad01523515b95b0c8092f342"
+    ),
+    (
+     "illuminate_all",
+     illuminate_all_generator(fixed_seed),
+     "2b21126bfe7cc7abbfd45d6a9da7d2899a7db69bce0ffac0958d33fce3dcc7e1"
     )
 ]
 
