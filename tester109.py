@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "July 30, 2022"
+version = "August 27, 2022"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -342,6 +342,19 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # The test case generators for the individual functions.
+
+def best_clubs_generator(seed):
+    yield ([300, 250, 200, 325, 275, 350, 225, 375, 400],)
+    yield ([7, 11],)
+    yield ([40, 110, 210],)
+    yield ([2, 5, 7, 10, 14],)
+    rng = random.Random(seed)
+    m = 5
+    for n in islice(pyramid(4, 40, 1), 150):
+        holes = [rng.randint(1, m) for _ in range(n)]
+        yield holes,
+        m += 1
+
 
 def illuminate_all_generator(seed):
     yield [0, 0, 0, 0, 0],
@@ -966,7 +979,7 @@ def riffle_generator(seed):
 
 
 def words_with_given_shape_generator():
-    patterns = [  # Tactically chosen to give reasonably short answers
+    patterns = [  # Tactically chosen patterns to give reasonably short answers
         [1, 1, 1, 1, 1, -1, 1],
         [-1, 1, 1, 1, 1, 1, -1],
         [1, 1, -1, -1, 1, 1, 1, 1],
@@ -1059,16 +1072,17 @@ def lattice_paths_generator(seed):
 
 def count_carries_generator(seed):
     rng = random.Random(seed)
-    n, count, goal = 1, 0, 2
-    for _ in range(20000):
-        a = random_int(rng, n + rng.randint(0, 5), 70)
-        b = random_int(rng, n + rng.randint(0, 5), 50)
-        yield a, b
-        yield a, a
-        yield b, a
-        count += 1
-        if count == goal:
-            n, count, goal = n + 1, 0, goal * 2
+    for n in islice(pyramid(3, 5, 1), 5000):
+        nums = []
+        for _ in range(2):
+            m = 0
+            for _ in range(rng.randint(n // 2, n)):
+                if rng.randint(0, 99) < 80:
+                    m = 10 * m + rng.randint(5, 9)
+                else:
+                    m = 10 * m + rng.randint(0, 4)
+            nums.append(m)
+        yield nums[0], nums[1]
 
 
 def count_squares_generator(seed):
@@ -1138,8 +1152,14 @@ def sum_of_distinct_cubes_generator(seed):
     yield from islice(scale_random(seed, 2, 5), 200)
 
 
-def seven_zero_generator():
-    yield from range(2, 501)
+def seven_zero_generator(seed):
+    yield from [(7,), (70,), (7700,), (77770,), (7000000,)]
+    yield from [(2860,), (1001,), (2**20,), (2**10 - 1,)]
+    rng = random.Random(seed)
+    m = 2
+    for _ in range(500):
+        yield m,
+        m += rng.randint(1, 5)
 
 
 def remove_after_kth_generator(seed):
@@ -2215,8 +2235,8 @@ testcases = [
     ),
     (
      "seven_zero",
-     seven_zero_generator(),
-     "2cbae9ac1812d155ee34be3f908001b148bdf635109a38981e"
+     seven_zero_generator(fixed_seed),
+     "2f0c5d3a4246fca6c16b13fccadcfb77f8f75a3bf417c818a24d1e21d77d2183"
     ),
     # Removed from problem set December 10, 2020
     # (
@@ -2291,7 +2311,7 @@ testcases = [
     (
      "count_carries",
      count_carries_generator(fixed_seed),
-     "828d1619f82e852c15211efce4830fd40f8de7add7328a5bea"
+     "546a3962273c5c74c8d844b95d6080c48155090d467142d8c73a5450276d0caf"
     ),
     (
      "lattice_paths",
@@ -2837,6 +2857,11 @@ testcases = [
      "illuminate_all",
      illuminate_all_generator(fixed_seed),
      "2b21126bfe7cc7abbfd45d6a9da7d2899a7db69bce0ffac0958d33fce3dcc7e1"
+    ),
+    (
+     "best_clubs",
+     best_clubs_generator(fixed_seed),
+     "cf82279e4ea8b4e1bd79d62c00243a210076bfb3d59dff4b0516520ff77e02f4"
     )
 ]
 
