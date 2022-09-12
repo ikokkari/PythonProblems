@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "August 27, 2022"
+version = "September 11, 2022"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -174,7 +174,8 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
             result = f(*test_args)
         except Exception as e:  # catch any exception
             crashed = True
-            print(f"CRASH AT TEST CASE #{count}: {e}")
+            print(f"CRASH AT TEST CASE #{count} WITH ARGS: {test_args_string}")
+            print(f"CAUGHT EXCEPTION: {e}")
             break
         # If the result is a set or dictionary, turn it into sorted list first.
         result = canonize(result)
@@ -342,6 +343,27 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # The test case generators for the individual functions.
+
+def both_ways_generator(seed):
+    yield from [('rererere',), ('ouch',), ('mabaabaabbabbaabbaaa',),
+                ("",), ("q",), ("bigchungus",)]
+    rng = random.Random(seed)
+    m, p = 1, 0
+    for n in islice(pyramid(2, 2, 4), 4000):
+        alpha = lows[:(p + 2)]
+        p = (p + 1) % len(lows)
+        repeat = random_string(alpha, n, rng)
+        left_len = rng.randint(0, n)
+        left = random_string(alpha, left_len, rng)
+        mid_len = rng.randint(0, n)
+        mid = random_string(alpha, mid_len, rng)
+        right_len = rng.randint(0, n)
+        right = random_string(alpha, right_len, rng)
+        text = left + repeat + mid + repeat[::-1] + right
+        yield text,
+    # One last check that there is no hinky Shlemiel stuff going on.
+    yield 'axa' * 1000,
+
 
 def best_clubs_generator(seed):
     yield ([300, 250, 200, 325, 275, 350, 225, 375, 400],)
@@ -893,6 +915,7 @@ def balanced_ternary_generator(seed):
 
 
 __names = [
+    "hu", "oh", "eye", "kro", "atz", "put",
     "ross", "rachel", "monica", "phoebe", "joey", "chandler",
     "johndorian", "elliot", "turk", "carla", "perry", "bob",
     "eddie", "joy", "jeff", "steph", "allison", "doug",
@@ -2454,7 +2477,7 @@ testcases = [
     (
      "brangelina",
      brangelina_generator(),
-     "410b06f6b409dcf0befdff3775bec547bce02e61fb9be8d1098fdd8e35578b85"
+     "f864cef7d1d71768b2efa0334e963d517290440401d98a8e85e71134a7e12c1f"
     ),
     (
      "balanced_ternary",
@@ -2862,6 +2885,11 @@ testcases = [
      "best_clubs",
      best_clubs_generator(fixed_seed),
      "cf82279e4ea8b4e1bd79d62c00243a210076bfb3d59dff4b0516520ff77e02f4"
+    ),
+    (
+     "both_ways",
+     both_ways_generator(fixed_seed),
+     "86b5bb7cdb813db55f1886f43b1eeb21c14042f5d5f4cdcd6a990790f9c7cd64"
     )
 ]
 
