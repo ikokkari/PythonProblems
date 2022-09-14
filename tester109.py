@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "September 11, 2022"
+version = "September 14, 2022"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -344,32 +344,42 @@ def pyramid(n=1, goal=5, inc=1):
 
 # The test case generators for the individual functions.
 
+def staircase_generator(seed):
+    yield from [('100123',), ('301613',), ('335689',), ('502725',), ('503715',), ('602912',)]
+    yield from [('10013468',), ('10167967',), ('30034569',), ('30342789',), ('50478987',)]
+    rng = random.Random(seed)
+    for n in islice(pyramid(3, 4, 3), 500):
+        s = random_string('0123456789', n, rng)
+        yield s,
+
+
 def both_ways_generator(seed):
     yield from [('rererere',), ('ouch',), ('mabaabaabbabbaabbaaa',),
                 ("",), ("q",), ("bigchungus",)]
     rng = random.Random(seed)
     m, p = 1, 0
-    for n in islice(pyramid(2, 2, 4), 4000):
+    for n in islice(pyramid(2, 2, 4), 2000):
         alpha = lows[:(p + 2)]
         p = (p + 1) % len(lows)
         repeat = random_string(alpha, n, rng)
-        left_len = rng.randint(0, n)
+        left_len = rng.randint(0, 2 * n)
         left = random_string(alpha, left_len, rng)
-        mid_len = rng.randint(0, n)
+        mid_len = rng.randint(0, 2 * n)
         mid = random_string(alpha, mid_len, rng)
-        right_len = rng.randint(0, n)
+        right_len = rng.randint(0, 2 * n)
         right = random_string(alpha, right_len, rng)
         text = left + repeat + mid + repeat[::-1] + right
         yield text,
     # One last check that there is no hinky Shlemiel stuff going on.
     yield 'axa' * 1000,
+    yield 'z' * 10**6
 
 
 def best_clubs_generator(seed):
-    yield ([300, 250, 200, 325, 275, 350, 225, 375, 400],)
-    yield ([7, 11],)
-    yield ([40, 110, 210],)
-    yield ([2, 5, 7, 10, 14],)
+    yield [300, 250, 200, 325, 275, 350, 225, 375, 400],
+    yield [7, 11],
+    yield [40, 110, 210],
+    yield [2, 5, 7, 10, 14],
     rng = random.Random(seed)
     m = 5
     for n in islice(pyramid(4, 40, 1), 150):
@@ -952,10 +962,6 @@ def frequency_sort_generator(seed):
         else:
             scale += rng.randint(1, scale // 2)
         yield items
-
-
-def count_consecutive_summers_generator():
-    yield from range(1, 1000)
 
 
 def is_perfect_power_generator(seed):
@@ -2469,11 +2475,12 @@ testcases = [
      frequency_sort_generator(fixed_seed),
      "7cf98bb630901b746d4765edaaea5d5d2ea011e1271c7214111a52c9725fe8fd"
     ),
-    (
-     "count_consecutive_summers",
-     count_consecutive_summers_generator(),
-     "3ade63a194b40ff5aa1b53642eee754d30f2ab48ef77330540"
-    ),
+    # Removed from problem set September 14, 2022
+    # (
+    #  "count_consecutive_summers",
+    #  count_consecutive_summers_generator(),
+    #  "3ade63a194b40ff5aa1b53642eee754d30f2ab48ef77330540"
+    # ),
     (
      "brangelina",
      brangelina_generator(),
@@ -2889,7 +2896,12 @@ testcases = [
     (
      "both_ways",
      both_ways_generator(fixed_seed),
-     "86b5bb7cdb813db55f1886f43b1eeb21c14042f5d5f4cdcd6a990790f9c7cd64"
+     "9bfb5ef40a0c6347cd8594aa443a10462194792cd36089acae5a00071bbeb534"
+    ),
+    (
+     "staircase",
+     staircase_generator(fixed_seed),
+     "7c7678b1c20ea1260f828819cbea29880567572b0ffcb173eaccae193fdb8a4f"
     )
 ]
 
