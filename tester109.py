@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "September 14, 2022"
+version = "September 16, 2022"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -344,12 +344,31 @@ def pyramid(n=1, goal=5, inc=1):
 
 # The test case generators for the individual functions.
 
+def ordinal_transform_generator(seed):
+    rng, u, v = random.Random(seed), 1, 4
+    for (i, n) in enumerate(islice(pyramid(1, 6, 6), 3000)):
+        seq = [rng.randint(1, u)]
+        for _ in range(n):
+            seq.append(rng.choice(seq) if rng.randint(0, 99) < 70 else rng.randint(1, u))
+        yield seq, i
+        u += 1
+        if u == v:
+            u, v = 1, v + 1
+
+
 def staircase_generator(seed):
     yield from [('100123',), ('301613',), ('335689',), ('502725',), ('503715',), ('602912',)]
     yield from [('10013468',), ('10167967',), ('30034569',), ('30342789',), ('50478987',)]
     rng = random.Random(seed)
-    for n in islice(pyramid(3, 4, 3), 500):
+    for n in islice(pyramid(3, 4, 3), 400):
+        # A totally random digit sequence as test case
         s = random_string('0123456789', n, rng)
+        yield s,
+        # A digit sequence with increasing pieces for interesting edge cases
+        s, curr = '', rng.randint(1, 9999)
+        while len(s) < n:
+            s += str(curr)
+            curr = curr + rng.randint(-1, 1) if rng.randint(0, 99) < 80 else rng.randint(1, 9999)
         yield s,
 
 
@@ -1071,14 +1090,6 @@ def only_odd_digits_generator(seed):
             else:
                 n = 10 * n + rng.choice([0, 2, 4, 6, 8])
                 one_more = False
-
-
-def pancake_scramble_generator(seed):
-    rng = random.Random(seed)
-    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
-        words = [x.strip() for x in f]
-    for _ in range(10000):
-        yield rng.choice(words)
 
 
 def lattice_paths_generator(seed):
@@ -2347,11 +2358,12 @@ testcases = [
      lattice_paths_generator(fixed_seed),
      "5aab78160181125a6944933dbe70acde133ae2a739798a0ce7abfb9596a28436"
     ),
-    (
-     "pancake_scramble",
-     pancake_scramble_generator(fixed_seed),
-     "98fb3c9e30908ea6c2654d64d3c68ca2538927be529d75ddfe"
-    ),
+    # Removed from problem set September 16, 2022
+    # (
+    #  "pancake_scramble",
+    #  pancake_scramble_generator(fixed_seed),
+    #  "98fb3c9e30908ea6c2654d64d3c68ca2538927be529d75ddfe"
+    # ),
     (
      "only_odd_digits",
      only_odd_digits_generator(fixed_seed),
@@ -2901,7 +2913,12 @@ testcases = [
     (
      "staircase",
      staircase_generator(fixed_seed),
-     "7c7678b1c20ea1260f828819cbea29880567572b0ffcb173eaccae193fdb8a4f"
+     "20ceca8a5fea22f23dfba0b567555aeb5a8dc4553f03bf34b7fbb121de9d5f9e"
+    ),
+    (
+     "ordinal_transform",
+     ordinal_transform_generator(fixed_seed),
+     "de7f04aa8f6ea61b43a89bf9cce0dc594f856d7fdc7963ba12273dc09eb47568"
     )
 ]
 
