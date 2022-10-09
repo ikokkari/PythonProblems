@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "October 8, 2022"
+version = "October 9, 2022"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -344,6 +344,55 @@ def pyramid(n=1, goal=5, inc=1):
 
 # The test case generators for the individual functions.
 
+__suits = ['clubs', 'diamonds', 'hearts', 'spades']
+
+__bridge_ranks = {
+    'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8, 'nine': 9,
+    'ten': 10, 'jack': 11, 'queen': 12, 'king': 13, 'ace': 14
+}
+
+__gin_ranks = {
+    'ace': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7, 'eight': 8,
+    'nine': 9, 'ten': 10, 'jack': 11, 'queen': 12, 'king': 13,
+}
+
+__gin_ranks_r = {__gin_ranks[r]:r for r in __gin_ranks}
+
+__bridge_deck = [(rank, suit) for suit in __suits for rank in __bridge_ranks.keys()]
+
+__gin_deck = [(rank, suit) for suit in __suits for rank in __gin_ranks.keys()]
+
+
+def count_deadwood_generator(seed):
+    rng = random.Random(seed)
+    for _ in range(2000):
+        hand, taken = [], set()
+        rank = rng.randint(1, 13)
+        suit = rng.choice(__suits)
+        while len(hand) < 10:
+            if (rank, suit) not in taken:
+                hand.append((rank, suit))
+                taken.add((rank, suit))
+            roll = rng.randint(0, 99)
+            if roll < 40:
+                suit = rng.choice(__suits)
+            elif roll < 80:
+                rank = max(min(rank + rng.choice([-1, 1]), 13), 1)
+            else:
+                rank = rng.randint(1, 13)
+                suit = rng.choice(__suits)
+        hand.sort()
+        hand = [(__gin_ranks_r[rank], suit) for (rank, suit) in hand]
+        yield hand,
+
+
+def count_sevens_generator(seed):
+    chosen = [4, 7, 10, 17, 46, 47, 78, 199, 206, 207, 776, 777, 778, 6999, 7000, 7001, 7776, 7777, 7778]
+    yield from ((n,) for n in chosen)
+    for n in islice(scale_random(seed, 3, 5), 1500):
+        yield (n,)
+
+
 __morse = {
     '.-': 'a', '-...': 'b', '-.-.': 'c', '-..': 'd', '.': 'e', '..-.': 'f', '--.': 'g', '....': 'h',
     '..': 'i', '.---': 'j', '-.-': 'k', '.-..': 'l', '--': 'm', '-.': 'n', '---': 'o', '.--.': 'p',
@@ -352,6 +401,7 @@ __morse = {
     }
 
 __morse_r = {__morse[k]: k for k in __morse}
+
 
 def count_morse_generator(seed):
     for letters in ["omg", "whoa", "etaoinshrdlu", "abcdefghijklmnopqrstuvwxyz"]:
@@ -1143,27 +1193,18 @@ def give_change_generator(seed):
                 amount += rng.randint(1, 2 + 2 * amount // 3)
 
 
-suits = ['clubs', 'diamonds', 'hearts', 'spades']
-ranks = {'two': 2, 'three': 3, 'four': 4, 'five': 5,
-         'six': 6, 'seven': 7, 'eight': 8, 'nine': 9,
-         'ten': 10, 'jack': 11, 'queen': 12, 'king': 13,
-         'ace': 14}
-
-deck = [(rank, suit) for suit in suits for rank in ranks.keys()]
-
-
 def bridge_hand_generator(seed):
     rng = random.Random(seed)
-    ranks_list = [r for r in ranks]
+    ranks_list = [r for r in __bridge_ranks]
     for n in range(3000):
         flip_prob = 10 + 10 * (n % 8)
         hand = set()
-        suit = rng.choice(suits)
+        suit = rng.choice(__suits)
         rank = rng.choice(ranks_list)
         while len(hand) < 13:
             hand.add((rank, suit))
             if rng.randint(0, 99) < flip_prob:
-                suit = rng.choice(suits)
+                suit = rng.choice(__suits)
             rank = rng.choice(ranks_list)
         yield list(hand),
 
@@ -1171,8 +1212,8 @@ def bridge_hand_generator(seed):
 def winning_card_generator(seed):
     rng = random.Random(seed)
     for _ in range(10000):
-        hand = rng.sample(deck, 4)
-        for trump in suits:
+        hand = rng.sample(__bridge_deck, 4)
+        for trump in __suits:
             yield hand[:], trump
         yield hand[:], None
 
@@ -1180,14 +1221,14 @@ def winning_card_generator(seed):
 def hand_shape_distribution_generator(seed):
     rng = random.Random(seed)
     for i in range(2, 50):
-        hands = [rng.sample(deck, 13) for _ in range(i * i)]
+        hands = [rng.sample(__bridge_deck, 13) for _ in range(i * i)]
         yield hands
 
 
 def milton_work_point_count_generator(seed):
     for hand in bridge_hand_generator(seed):
         hand = hand[0]
-        for suit in suits:
+        for suit in __suits:
             yield hand, suit
         yield hand, 'notrump'
 
@@ -1418,7 +1459,7 @@ def count_divisibles_in_range_generator(seed):
 def losing_trick_count_generator(seed):
     rng = random.Random(seed)
     for _ in range(10000):
-        yield rng.sample(deck, 13)
+        yield rng.sample(__bridge_deck, 13)
 
 
 def riffle_generator(seed):
@@ -3337,6 +3378,16 @@ testcases = [
      "count_morse",
      count_morse_generator(fixed_seed),
      "f3db0082e241aa3c398d6da6597ec1e0f3a65a3bba71e31929194b5a694e4400"
+    ),
+    (
+     "count_sevens",
+     count_sevens_generator(fixed_seed),
+     "c056bb61e603b5e66c1772fa72178e54e42441176b13b7ef387567313a79e81a"
+    ),
+    (
+     "count_deadwood",
+     count_deadwood_generator(fixed_seed),
+     "92f9e59daf8c9b8e09fd6a73b73ec3c787cc2b96f05966deff015a4a876b5971"
     )
 ]
 
