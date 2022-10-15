@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "October 9, 2022"
+version = "October 15, 2022"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -344,6 +344,12 @@ def pyramid(n=1, goal=5, inc=1):
 
 # The test case generators for the individual functions.
 
+def addition_chain_generator():
+    for n in range(1, 500):
+        yield n, False
+        yield n, True
+
+
 __suits = ['clubs', 'diamonds', 'hearts', 'spades']
 
 __bridge_ranks = {
@@ -356,7 +362,7 @@ __gin_ranks = {
     'nine': 9, 'ten': 10, 'jack': 11, 'queen': 12, 'king': 13,
 }
 
-__gin_ranks_r = {__gin_ranks[r]:r for r in __gin_ranks}
+__gin_ranks_r = {__gin_ranks[r]: r for r in __gin_ranks}
 
 __bridge_deck = [(rank, suit) for suit in __suits for rank in __bridge_ranks.keys()]
 
@@ -366,13 +372,12 @@ __gin_deck = [(rank, suit) for suit in __suits for rank in __gin_ranks.keys()]
 def count_deadwood_generator(seed):
     rng = random.Random(seed)
     for _ in range(2000):
-        hand, taken = [], set()
+        hand = []
         rank = rng.randint(1, 13)
         suit = rng.choice(__suits)
         while len(hand) < 10:
-            if (rank, suit) not in taken:
+            if (rank, suit) not in hand:
                 hand.append((rank, suit))
-                taken.add((rank, suit))
             roll = rng.randint(0, 99)
             if roll < 40:
                 suit = rng.choice(__suits)
@@ -3388,6 +3393,11 @@ testcases = [
      "count_deadwood",
      count_deadwood_generator(fixed_seed),
      "92f9e59daf8c9b8e09fd6a73b73ec3c787cc2b96f05966deff015a4a876b5971"
+    ),
+    (
+     "addition_chain",
+     addition_chain_generator(),
+     "a2c9dfa8a7598ce1d2bd607ec8b2320b58257af7f185b6430d67e896014b30d2"
     )
 ]
 
