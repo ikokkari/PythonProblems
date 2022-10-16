@@ -26,11 +26,11 @@ Conversion notes:
 
 # 109 Problems Bonus Bounty List
 
-The collection _109 Python problems for CCPS 109_ contains fourteen bonus problems intended for students who are looking for a serious challenge. This collection is now complete, and no further problems will ever be added. For personal reasons, it is _extremely_ important to me that all these problems and their model solutions are correct and contain no bugs, so that the checksums hardcoded in the automated tester are true and achievable by everyone who works hard to solve these problems.
+This problem collection is now complete, and no further problems will ever be added. In addition to the actual problems, the collection [109 Python problems for CCPS 109](https://github.com/ikokkari/PythonProblems) includes fourteen bonus problems intended for students who are looking for a serious challenge. For personal reasons, it is _extremely_ important to me that all these bonus problems and their model contain no bugs, so that the checksums hardcoded in the automated tester are true and achievable by everyone who works hard to solve these problems.
 
 I will therefore offer a bounty of 100 CAD for each bonus problem to the first person to email me (ilkka.kokkarinen@gmail.com) a working solution to pass my automated tests for that problem. The solution must pass these tests within the twenty second time limit when executed on my machine. This bounty is paid to either Sick Kids Toronto or the Ukrainian War Effort, with the donation made in your name. And for whatever it's worth, you get your name permanently displayed in the table below.
 
-These bounties are available only for the bonus problems; solutions to the 109 actual problems do not qualify.
+To keep this fair and interesting, each individual person can get at most one bounty. These bounties are available only for the bonus problems; solutions to the 109 actual problems do not qualify.
 
 <table>
   <tr>
