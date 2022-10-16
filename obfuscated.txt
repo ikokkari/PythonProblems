@@ -151,31 +151,31 @@ def count_deadwood(hand):
         ██████████████████████
         ██████████
 
-        ██████████████████████
+        # Join an existing run
         ██████████████
             ██████████████████████
             █████████████████████████████████████
                 ██████████████████████
                 ███████████████████████████████████████████████████
                 ███████
-        █████████████████
+        # Start a new run
         █████████████████████████████████████████████████████████████
             ███████████████████████████
             ███████████████████████████████████████████████████
             ██████████
-        ██████████████████████
+        # Join an existing set
         ██████████████
             ██████████████████████
             █████████████████
                 ██████████████████████
                 ███████████████████████████████████████████████████
                 ███████
-        █████████████████
+        # Start a new set
         █████████████████████████
             ███████████████████████████
             █████████████████████████████████████████████████████
             ██████████
-        ███████████████████
+        # Leave as deadwood
         █████████████████████████████████
         █████████████████████████████████████████████████████████████████████
 
@@ -325,13 +325,13 @@ def __gcd(a, b):
 
 
 def __strokes_needed(hole, c1, c2, best):
-    ███████████████████████████████████████████████████████████████████
+    # If we can use just the higher club, that is the optimal solution.
     ██████████████████
         █████████████████
-    ██████████████████████████████████████████████████████████████████
+    # If we can use just the lower club, improve the solution for now.
     ██████████████████
         ████████████████████████████
-    ███████████████████████████
+    # Positive c1, positive c2.
     █████████████████
     ███████████████
         █████████████████████████
@@ -340,7 +340,7 @@ def __strokes_needed(hole, c1, c2, best):
             █████████████████████████████
             █████
         █████████
-    ███████████████████████████
+    # Positive c1, negative c2.
     █████████████████████
     ██████████████████
         ███████████████████████
@@ -349,7 +349,7 @@ def __strokes_needed(hole, c1, c2, best):
             █████████████████████████████
             █████
         █████████
-    ███████████████████████████████
+    # Non-positive c1, positive c2.
     █████████████████████
     ██████████████████
         ███████████████████████
@@ -431,7 +431,7 @@ def stepping_stones(n, ones):
                     ████████████████████████████
                     ███████████████████████████████████
                 █████
-                    ████████████████████████████████████████████████████████████████████████████
+                    # Treat a cell with an impossibly large value as having already been filled.
                     █████████████████████
                     ████████████████████████████████████
         ███████████████
@@ -506,10 +506,10 @@ def domino_tile(rows):
 
     █████████████████████████████████████
         █████████████████
-        ███████████████████████████████████████████████████████████████████
+        # Find the first uncovered square starting from (row_idx, col_idx).
         ███████████
             ████████████████
-                █████████████████████████████████████████████████████████████
+                # Current row has been fully filled, start filling above row.
                 ███████████████
                     ████████████████████████████████████████
                         █████████████████████████████████████████
@@ -518,17 +518,17 @@ def domino_tile(rows):
                         ███████████████████████████████████████████
                         █████████████
                 █████
-                    ██████████████████████████████████
+                    # The entire room has been filled.
                     ████████
             ██████████████████████████████████████
                 ████████████
             █████
                 █████
         ██████████
-        ██████████████████████████████████████████████████████████████████████████
+        # Count the ways to complete filling with domino placed horizontally here.
         ███████████████████████████████████████████████████████████
             ████████████████████████████████████████████
-        ████████████████████████████████████████████████████████████████████████
+        # Count the ways to complete filling with domino placed vertically here.
         ███████████████████████████████████████████████
             ███████████████
             ███████████████████
@@ -536,7 +536,7 @@ def domino_tile(rows):
             ██████████████████████████████████████████████
             █████████████████████
             ███████████████████
-        ██████████████████████████████████████████████████████████████████████
+        # The total number of ways to complete the filling from this position.
         █████████████
 
     ██████████████████████████████████████████████████████████████████████████████████████████
@@ -768,22 +768,22 @@ def hourglass_flips(glasses, tt):
         ████████████████████████████████████
         ██████████████# Can measure t from one hourglass.
             ██████████████████
-        ██████████████████████████████████████████████████████████████████████████
+        # Past the previous hurdle, we know that at least one flip will be needed.
         █████████████████████████# Time before first glass runs out.
         █████████████████████# Impossible with the current hourglasses
             ██████████████████
-        ███████████████████████████████████████████████
+        # New hourglasses after s minutes have elapsed.
         ███████████████████████████████████████████████████████
-        █████████████████████████████████████████████████████████
+        # Which of these hourglasses are currently u/l symmetric?
         ████████████████████████████████
-        █████████████████████████████████████████████████
+        # Best solution known for the current subproblem.
         █████████████████████████████
-        █████████████████████████████████████████████
+        # Try out all subsets of hourglasses to flip.
         ██████████████████████████████████████████████
-            ████████████████████████████████████████████████████████████████
+            # Do not branch on flipping a currently u/l symmetric hourglass.
             ███████████████████████████████████████████████████████
                 █████████████████# How many hourglasses are flipped this time.
-                █████████████████████████████████████████████████████
+                # Find the optimal way to measure the remaining time.
                 ████████████████████████████████████████████████████████████████████████████████████████
                                           ██████
                                           ████████████████████████████████
@@ -838,10 +838,10 @@ def conjugate_regular(infinitive, subject, tense):
         ████████████████████████████████████
     █
 
-    █████████████████████████████████████████████████████
+    # Future tense is formed by modifying the infinitive.
     █████████████████████
         █████████████████████████████████████████
-    █████████████████████████████████████████████████████████████████
+    # Present, past and imperfect past tenses are modified from stem.
     █████
         ██████████████████████
         ████████████████████████
@@ -895,14 +895,14 @@ def brussels_choice_step(n, mink, maxk):
 
 
 def fibonacci_sum(n):
-    █████████████████████████████
+    # Expand __fibs if necessary.
     █████████████████████
         ██████████████████████████████████████
 
-    ██████████████████████████████████████████████████████████
+    # Use binary search to find largest Fibonacci number <= n.
     ██████████████████████████████████████
 
-    ████████████████████████████████████████████████████████████
+    # Extract Fibonacci numbers in descending order as they fit.
     ████████████
         ██████████████████
             ████████████████████████
@@ -1209,12 +1209,12 @@ def brangelina(first, second):
 # Return the list of possible wordomino moves in the given state.
 def __wordomino_moves(state, words):
     ██████████████████████████████
-    █████████████████████████████████████████████████████████████████████
+    # Find the first word that starts with the given three-letter prefix.
     ██████████████████████████████
-    ████████████████████████████████████████████████████████████████████
+    # Advance from there over all the words that start with that prefix.
     █████████████████████████████████████████████████████
         ███████████████
-        █████████████████████████████████████████████████████████████████████
+        # If this word works, its last letter is a legal move from the state.
         █████████████████████████
             ██████████████████████
         ██████
@@ -1223,17 +1223,17 @@ def __wordomino_moves(state, words):
 
 def wordomino(state, words, really_need_lowest=True):
     ███████████████████████████████████████
-    █████████████████████████████████████████████████████████████████
+    # Check if this state is a single move insta-win into a dead end.
     ██████████████████████████
         ███████████████
-            ████████████████████████████████████████████████████████████████████████
+            # If list of moves from successor (state+c) is empty, move there to win.
             ███████████████████████████████████████████
                 ████████
-    ██████████████████████████████████████████████████████████████████████████████
+    # If not insta-win, or if we need the lowest winning move, find lowest winner.
     ███████████████
         ██████████████████████████████████████████
             ████████
-    █████████████████████████████████████████████████████████████████████
+    # No winning moves exist from this state; this state is a cold loser.
     ███████████
 
 
@@ -1258,9 +1258,9 @@ def bulgarian_solitaire(piles, k):
 def bulgarian_cycle(piles):
     ███████████████████████
     ███████████
-        ████████████████████████████████████
+        # Tortoise moves one step per round.
         █████████████████████████████████████
-        █████████████████████████████████████
+        # The hare moves two steps per round.
         ███████████████████████████████████████████████
         ██████████████████████████████
             ███████████████
@@ -1276,8 +1276,8 @@ def bulgarian_cycle(piles):
 
 
 def count_overlapping_disks(disks):
-    ███████████████████████████████████████████████████████████████
-    ████████████████████████████████████████████████████
+    # Enter events for the same x-coordinate must be handled before
+    # exit events, therefore 0 means enter, 1 means exit
     ███████████████████████████████████████████████████████
     ████████████████████████████████████████████████████████
     █████████████
@@ -1534,9 +1534,9 @@ def ryerson_letter_grade(n):
 
 
 def manhattan_skyline(towers):
-    ██████████████████████████████████████████████████████████████████
-    ███████████████████████████████████████████████████████████████████
-    ████████████████████████████████████████
+    # Collect events into a list; 0 means enter, 1 means exit. We need
+    # to store the building number i to distinguish between overlapping
+    # active buildings with the same height.
     ███████████████████████████████████████████████████████████████
     ████████████████████████████████████████████████████████████████
     ████████████████# Sort the events in ascending x-order, entries first.
@@ -1545,11 +1545,11 @@ def manhattan_skyline(towers):
     ████████████████# The active buildings currently in the sweep view.
     ████████████████# The height of the tallest active building.
     ██████████████████████████████
-        ████████████████████████████████████████████████████████████
-        █████████████████████████████████████████████████████████
-        ██████████████████████████████████████████████████████████
+        # Add the area from the slab between these events. If either
+        # slab width or the tallest building height is zero, this
+        # product is also zero and the total area does not change.
         ████████████████████████████████████
-        ██████████████████████████████████████████████████
+        # Update the active set depending on what happens.
         ███████████████# Building i enters the active view.
             ██████████████████
             ████████████████████████████# May need to update tallest.
@@ -1784,12 +1784,12 @@ def balanced_ternary(n, pp=None, sp=None):
 
 
 def __two_summers(items, goal, i=None, j=None):
-    ███████████████████████████████████████████████████
+    # Initialize the approaching indices, unless given.
     █████████████
         █████
     █████████████
         ██████████████████
-    █████████████████████████████████████████████████████████
+    # Each round, one index takes one step towards the other.
     ████████████
         ███████████████████████
         █████████████
@@ -1959,13 +1959,13 @@ def taxi_zum_zum(moves):
 
 
 def is_left_handed(pips):
-    ███████████████████████████████████████████████████
+    # How many sides need to be mirrored to get to 123?
     ██████████████████████████████████████████
-    ████████████████████████████████████
+    # Mirror the sides that are not 123.
     ████████████████████████████████████████████
-    █████████████████████████████████
+    # Is the resulting die clockwise?
     ████████████████████████████████████████████████
-    ████████████████████████████
+    # Flip the result if needed.
     █████████████████████████████████████
 
 
@@ -2076,19 +2076,19 @@ def wythoff_array(n):
         ███████# First two elements of the next row.
             █████████
             ██████████████████████████████████████████████
-        █████████████████████████████████████████████████████
+        # Initialize the state variables for the current row.
         ██████████████████████████████████
-        ███████████████████████████████████████████████
+        # Generate elements in the current row up to n.
         ██████████████
             █████████████# Found what we are looking for
                 ███████████
-            ███████████████████████████████████████████████
+            # Update the set of integers that we have seen.
             ████████████
-            █████████████████████████████████████████████████████
+            # Release the elements less than the smallest unseen.
             ███████████████████
                 █████████████████
                 █████████
-            ████████████████████████████████████████████████
+            # Move one step to the right in the current row.
             ██████████████████████████████
 
 
@@ -2184,7 +2184,7 @@ def only_odd_digits(n):
 
 
 def __expand_primes(n):
-    ███████████████████████████████████████████████████████████████
+    # Start looking for new primes after the largest prime we know.
     ████████████████████
     ███████████████████████
         █████████████████
@@ -2193,9 +2193,9 @@ def __expand_primes(n):
 
 
 def __is_prime(n):
-    ██████████████████████████████████████████████████████████
-    █████████████████████████████████████████████████████
-    █████████████████████████████████████████████████████████
+    # To check whether n is prime, check its divisibility with
+    # all known prime numbers up to the square root of n.
+    # First ensure that we have enough primes to do the test.
     ██████████████████████████
         ████████████████████████████████████
 
