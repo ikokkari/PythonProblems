@@ -26,12 +26,11 @@ Conversion notes:
 
 # 109 Problems Bonus Bounty List
 
-The collection _109 Python problems for CCPS 109_ contains fourteen bonus problems intended for students who are looking for a serious challenge. For personal reasons, it is _extremely_ important for me that all these problems and their model solutions are correct and contain no bugs, so  that the checksums hardcoded in the automated tester are achievable by students who have worked hard to solve these problems.
+The collection _109 Python problems for CCPS 109_ contains fourteen bonus problems intended for students who are looking for a serious challenge. This collection is now complete, and no further problems will ever be added. For personal reasons, it is _extremely_ important for me that all these problems and their model solutions are correct and contain no bugs, so that the checksums hardcoded in the automated tester are achievable by everyone who works hard to solve these problems.
 
-I will therefore offer a bounty of 100 CAD for each bonus problem, paid to the first person to email me (ilkka.kokkarinen@gmail.com) a working solution to pass my automated tests for that problem. The solution must pass these tests within the twenty second time limit when executed on my machine. This bounty is paid to the registered charity of your choice. Furthermore, you get your name permanently stored in the table below.
+I will therefore offer a bounty of 100 CAD for each bonus problem, paid to the first person to email me (ilkka.kokkarinen@gmail.com) a working solution to pass my automated tests for that problem. The solution must pass these tests within the twenty second time limit when executed on my machine. This bounty is paid to the registered charity of your choice. Furthermore, you get your name permanently displayed in the table below.
 
-The bounties are available only for the bonus problems; the solutions to the 109 actual problems do not qualify.
-
+These bounties are available only for the bonus problems; the solutions to the 109 actual problems do not qualify.
 
 <table>
   <tr>
