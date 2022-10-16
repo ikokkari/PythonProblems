@@ -30,7 +30,7 @@ The collection _109 Python problems for CCPS 109_ contains fourteen bonus proble
 
 I will therefore offer a bounty of 100 CAD for each bonus problem, paid to the first person to email me (ilkka.kokkarinen@gmail.com) a working solution to pass my automated tests for that problem. The solution must pass these tests within the twenty second time limit when executed on my machine. This bounty is paid to the registered charity of your choice. Furthermore, you get your name permanently displayed in the table below.
 
-These bounties are available only for the bonus problems; the solutions to the 109 actual problems do not qualify.
+These bounties are available only for the bonus problems; solutions to the 109 actual problems do not qualify.
 
 <table>
   <tr>
