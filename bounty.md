@@ -42,7 +42,7 @@ To keep this fair and interesting, each individual person can get at most one bo
   <tr>
    <td>110: Reverse the Rule 110
    </td>
-   <td>
+   <td>Karel Tutsu, October 22, 2022
    </td>
   </tr>
   <tr>
