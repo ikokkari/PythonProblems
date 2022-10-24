@@ -84,7 +84,7 @@ To keep this fair and interesting, each individual person can get at most one bo
   <tr>
    <td>117: TextmirrororrimtxeT
    </td>
-   <td>
+   <td>George Hotz, October 24, 2022
    </td>
   </tr>
   <tr>
