@@ -2,6 +2,8 @@
 
 This repository contains the problem specifications, the automated tester and the necessary data files for the graded lab problems for the course *CCPS 109 Computer Science I*, as taught by [Ilkka Kokkarinen](http://www.scs.ryerson.ca/~ikokkari/) for the Chang School of Continuing Education, Toronto Metropolitan University, Toronto, Canada.
 
+[The specifications for the 123 problems are here.](https://github.com/ikokkari/PythonProblems/blob/main/109%20Python%20Problems%20for%20CCPS%20109.pdf)
+
 Everyone teaching or learning Python is welcome to use, adapt and distribute these problems and the associated acceptance tester for their own purposes as they see fit. The author welcomes feedback by email at `ilkka.kokkarinen@gmail.com` from computer science instructors who use these problems in their courses.
 
 A bounty for each bonus problem is available to the first person to solve that problem. The file [bounty.md](https://github.com/ikokkari/PythonProblems/blob/main/bounty.md) contains more information.
