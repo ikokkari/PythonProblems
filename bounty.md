@@ -102,13 +102,13 @@ To keep this fair and interesting, each individual person can get at most one bo
   <tr>
    <td>120: Count the permorsetations
    </td>
-   <td>
+   <td>George Zhang, October 30, 2022
    </td>
   </tr>
   <tr>
    <td>121: Count your lucky sevens
    </td>
-   <td>George Zhang, October 30, 2022
+   <td>
    </td>
   </tr>
   <tr>
