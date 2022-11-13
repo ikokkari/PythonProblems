@@ -90,7 +90,7 @@ To keep this fair and interesting, each individual person can get at most one bo
   <tr>
    <td>118: Hy-phen-a-tion by com-pu-ter
    </td>
-   <td>
+   <td>Cindy Hua, November 13, 2022
    </td>
   </tr>
   <tr>
