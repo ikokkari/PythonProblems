@@ -1217,8 +1217,8 @@ def give_change_generator(seed):
                 use.append(1)
             amount = 1
             while amount < 5 * use[0]:
-                yield amount, use
-                amount += rng.randint(1, 2 + 2 * amount // 3)
+                yield amount, use[:]
+                amount += rng.randint(1, 2 + 2*amount//3)
 
 
 def bridge_hand_generator(seed):
@@ -1856,7 +1856,7 @@ def max_checkers_capture_generator(seed):
                 px, py = __checker_pos(n, rng)
             else:
                 dx, dy = rng.choice([(-2, 0), (2, 0), (0, 2), (2, 0)])
-                px, py = (px + dx) % n, (py + dy) % n
+                px, py = (px+dx) % n, (py+dy) % n
             pieces.add((px, py))
         (x, y) = __checker_pos(n, rng)
         while (x, y) in pieces:
@@ -2003,12 +2003,12 @@ def manhattan_skyline_generator(seed):
     scale = 1
     for (i, n) in enumerate(islice(pyramid(1, 3, 2), 3000)):
         towers = []
-        w = n * n + 5
-        max_area = w * w // 10
+        w = n*n + 5
+        max_area = w*w // 10
         for k in range(n):
             s = rng.randint(1, w)
-            e = s + rng.randint(1, n + 1)
-            max_height = 1 + max_area // (e - s)
+            e = s + rng.randint(1, n+1)
+            max_height = 1 + max_area // (e-s)
             h = rng.randint(1, max_height)
             off = rng.randint(0, 2 + scale // 4)
             towers.append((s * scale + off, e * scale + off, h * scale))
@@ -2021,16 +2021,16 @@ def fractran_generator(seed):
     rng = random.Random(seed)
     count, goal, prog, n = 0, 5, [], 1
     for i in range(500):
-        num = rng.randint(1, 10 + i)
-        den = rng.randint(1, 10 + i)
+        num = rng.randint(1, 10+i)
+        den = rng.randint(1, 10+i)
         prog.append((num, den))
-        k = rng.randint(0, len(prog) - 1)
+        k = rng.randint(0, len(prog)-1)
         prog[k], prog[-1] = prog[-1], prog[k]
         n = rng.randint(2, 10)
         yield n, prog[:], 10
         count += 1
         if count == goal:
-            count, goal, prog = 0, goal + 1, []
+            count, goal, prog = 0, goal+1, []
 
 
 def scylla_or_charybdis_generator(seed):
@@ -2146,17 +2146,17 @@ def hourglass_flips_generator(seed):
     for _ in range(50):
         glasses, curr = [], rng.randint(6, 11)
         for j in range(rng.randint(2, 4)):
-            low = 0 if rng.randint(0, 99) < 60 else rng.randint(5, max(6, curr // 2))
+            low = 0 if rng.randint(0, 99) < 60 else rng.randint(5, max(6, curr//2))
             glasses.append((curr, low))
             curr += rng.randint(1, 5)
-        t = rng.randint(curr + 2, 2 * curr)
+        t = rng.randint(curr+2, 2*curr)
         yield glasses, t
 
 
 def knight_jump_generator(seed):
     rng = random.Random(seed)
     for i in range(10000):
-        k = 2 + (i % 50)
+        k = 2 + i%50
         steps = [1]
         for _ in range(1, k):
             steps.append(steps[-1] + rng.randint(1, 5))
@@ -2165,7 +2165,7 @@ def knight_jump_generator(seed):
         end = [x + y * rng.choice([-1, 1])
                for (x, y) in zip(start, steps)]
         if rng.randint(1, 100) < 50:
-            end[rng.randint(0, k - 1)] += 1
+            end[rng.randint(0, k-1)] += 1
         steps.sort(reverse=True)
         yield tuple(steps), tuple(start), tuple(end)
 
@@ -2204,14 +2204,14 @@ def spread_the_coins_generator(seed):
             coins[i] += c
             m -= c
         u = rng.randint(2, 2 + max(coins) // 2)
-        left = rng.randint(1, u - 1)
+        left = rng.randint(1, u-1)
         yield coins, left, u-left
 
 
 def group_and_skip_generator(seed):
     rng = random.Random(seed)
     for n in islice(scale_random(seed, 2, 10), 400):
-        b = rng.randint(1, max(2, n // 100))
+        b = rng.randint(1, max(2, n//100))
         a = rng.randint(b+1, 2*b+1)
         yield n, a, b
 
@@ -2222,10 +2222,10 @@ def nearest_polygonal_number_generator(seed):
     curr = 20
     for i in range(250):
         for j in range(15):
-            curr = curr + rng.randint(1, curr // 10)
-            s = rng.randint(3, i + 3)
+            curr = curr + rng.randint(1, curr//10)
+            s = rng.randint(3, i+3)
             yield curr, s
-        curr = curr * 2
+        curr = curr*2
 
 
 def subtract_square_generator(seed):
@@ -2233,9 +2233,9 @@ def subtract_square_generator(seed):
     for i in range(1, 9):
         curr = rng.randint(1, 10)
         query = []
-        for j in range(2 * i):
+        for j in range(2*i):
             query.append(curr)
-            curr = (4 * curr) // 3 + rng.randint(1, max(3, curr // 3))
+            curr = (4*curr)//3 + rng.randint(1, max(3, curr//3))
         yield query
 
 
@@ -2243,7 +2243,7 @@ def perimeter_limit_split_generator(seed):
     rng = random.Random(seed)
     for a in range(10, 100):
         b = rng.randint(1, a)
-        p = rng.randint(5, 3 * a)
+        p = rng.randint(5, 3*a)
         yield (a, b, p) if rng.randint(0, 1) else (b, a, p)
 
 
@@ -2314,7 +2314,7 @@ def trips_fill_generator(seed):
     for i in range(130):
         n, pat, c = 3 + i // 20, '', 0
         for _ in range(n):
-            if rng.randint(0, 99) < 100 - 15 * (c + 2):
+            if rng.randint(0, 99) < 100 - 15 * (c+2):
                 pat += '*'
                 c += 1
             else:
