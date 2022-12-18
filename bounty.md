@@ -108,7 +108,7 @@ To keep this fair and interesting, each individual person can get at most one bo
   <tr>
    <td>121: Count your lucky sevens
    </td>
-   <td>
+   <td>Felix Nguyen, Dec 18, 2022
    </td>
   </tr>
   <tr>
