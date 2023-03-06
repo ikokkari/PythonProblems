@@ -23,22 +23,22 @@ from fractions import Fraction
 # position in the labs109.py file. Use the limit of -1 to say "all test cases".
 
 verbose_execution = {
-    #   "function_one": 100,  # Print the first 100 test cases of function_one
+    #   "function_one": 42,  # Print the first 42 test cases of function_one
     #   "function_two": -1,   # Print all test cases of function_two, however many there are
     #   "function_three": 0   # Be silent with function_three (but run it early)
 }
 
-# Whether to use the expected answers from that file when they exist.
+# Whether to use the expected answers from the expected answers file when they exist.
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "November 3, 2022"
+version = "March 6, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
 
 # How many test cases to record in the file for each function.
-testcase_cutoff = 400
+testcase_cutoff = 20
 
 # Name of the file that contains the expected answers.
 expected_answers_file = 'expected_answers'
@@ -139,7 +139,7 @@ def discrepancy(teacher, student, test_cases, stop_at_first=False):
         if stop_at_first:
             print("First discrepancy found. It was:")
         else:
-            print(f"For {cases} test cases, found {disc} discrepancies.")
+            print(f"For {cases} test cases, {disc} discrepancies were found.")
             print("Shortest discrepancy input was:")
         print(shortest_args)
         print(f"Teacher: {repr(disc_teacher)}")
@@ -182,9 +182,9 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
         # Print out the argument and result, if in verbose mode.
         if verb_count > 0 or verb_count == -1:
             verb_count -= 1 if verb_count > 0 else 0
-            print(f"{fname} #{count}: ", end="")
+            print(f"{fname} #{count}: ", end="", flush=True)
             print(test_args_string)
-            print(f"RESULT: {result}")
+            print(f"RESULT: {result}", flush=True)
         # Update the checksum.
         sr = str(result)
         chk.update(sr.encode('utf-8'))
@@ -245,7 +245,7 @@ def sort_by_source(testcases_):
         for (line_no, line) in enumerate(source):
             if line.startswith("def "):
                 fname = line[4:line.find('(')].strip()
-                if fname in funcs: # Who knows what future student this will save.
+                if fname in funcs:  # Who knows what future student this will save.
                     print(f"WARNING: MULTIPLE DEFINITION FOR {fname}")
                 if fname in recognized:
                     funcs[fname] = 0 if fname in verbose_execution or fname in need_check else line_no
@@ -339,10 +339,68 @@ def pyramid(n=1, goal=5, inc=1):
         yield n
         count += 1
         if count == goal:
-            goal, count, n = goal + inc, 0, n + 1
+            goal, count, n = goal+inc, 0, n+1
 
 
 # The test case generators for the individual functions.
+
+def sum_of_consecutive_squares_generator(seed):
+    def sum_of_sq(n_):  # Formula from Wolfram Mathematica
+        return (n_ * (1 + n_) * (1 + 2 * n_)) // 6
+    rng = random.Random(seed)
+    d = 5
+    for _ in range(400):
+        hi = rng.randint(1, d)
+        lo = rng.randint(1, d)
+        hi, lo = max(hi, lo), min(hi, lo)
+        n = sum_of_sq(hi) - sum_of_sq(lo-1)
+        for _ in range(rng.choice([0, 0, 0, 0, 0, 1, 1, 2, 3, 4])):
+            m = rng.randint(1, hi)
+            n += m*m*(1 if rng.randint(0, 1) else -1)
+        yield max(n, 1)
+        d += 4
+
+
+def soundex_generator(seed):
+    # From https://en.wikipedia.org/wiki/Soundex and https://www.familysearch.org/en/wiki/Soundex
+    for word in ['robert', 'pfister', 'ashcroft', 'tymczak', 'honeyman', 'gutierrez', 'carwruth',
+                 'lee', 'vandeusen', 'allricht', 'eberhard', 'hanselmann', 'heimbach', 'kavanagh',
+                 'lind', 'lukaschowsky', 'mcdonnell', 'mcgee', 'oppenheimer', 'riedemanas',
+                 'schafer', 'shaeffer', 'zita', 'zitzmeinn', 'wilkins', 'walakynovski']:
+        yield word,
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [w.strip() for w in f]
+    rng = random.Random(seed)
+    for word in rng.sample(words, 5000):
+        yield word,
+
+
+def is_chess_960_generator(seed):
+    rng = random.Random(seed)
+    rows = ["".join(perm) for perm in permutations("KQrrkkbb")]
+    rng.shuffle(rows)
+    yield from [(row,) for row in rows]
+
+
+__queen_dirs = [(0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1)]
+
+
+def queen_captures_all_generator(seed):
+    rng = random.Random(seed)
+    for n in islice(pyramid(4, 4, 2), 300):
+        m = n + rng.randint(0, 2)
+        pieces = set()
+        px = rng.randint(0, m-1)
+        py = rng.randint(0, m-1)
+        while len(pieces) < n:
+            pieces.add((px, py))
+            dx, dy = rng.choice(__queen_dirs)
+            d = rng.randint(1, m // 2)
+            px = (px + d*dx) % m
+            py = (py + d*dy) % m
+        pieces = list(pieces)
+        yield pieces[0], pieces[1:]
+
 
 def addition_chain_generator():
     for n in range(1, 500):
@@ -395,7 +453,7 @@ def count_sevens_generator(seed):
     chosen = [4, 7, 10, 17, 46, 47, 78, 199, 206, 207, 776, 777, 778, 6999, 7000, 7001, 7776, 7777, 7778]
     yield from ((n,) for n in chosen)
     for n in islice(scale_random(seed, 3, 5), 1500):
-        yield (n,)
+        yield n,
 
 
 __morse = {
@@ -1151,11 +1209,26 @@ def safe_squares_generator(seed):
     yield 3, [(2, 0), (0, 2)]
     yield 3, [(2, 1), (1, 2)]
     yield 3, [(0, 1), (0, 2)]
+
+    # Some cases of filling or near filling the board.
+    yield 10, [(x, x) for x in range(10)]
+    yield 10, [(x, 9-x) for x in range(10)]
+    yield 10, [(x, x) for x in range(0, 10, 2)]
+    yield 10, [(9-x, x) for x in range(0, 10, 2)]
+    yield 10, [(x, x) for x in range(5)]
+    yield 10, [(x, 9-x) for x in range(6, 10)]
+
+    # Okay, let's do some bigger cases also.
+    yield 42, [(17, 16), (1, 40), (36, 22)]
+    yield 55, [(1, 1), (1, 17), (7, 17), (1, 7)]
+    yield 77, [(14, 14), (1, 4), (14, 1), (4, 14), (1, 1), (4, 4)]
+    yield 100, [(99, 0), (0, 99), (0, 0), (99, 99)]
+
     # On to fuzzing...
     rng = random.Random(seed)
     for i in range(1000):
-        n = rng.randint(2, 3 + i // 50)
-        pn = rng.randint(0, n + 2)
+        n = rng.randint(2, 3 + i//20)
+        pn = rng.randint(0, n+2)
         pieces = set()
         while len(pieces) < pn:
             px = rng.randint(0, n-1)
@@ -1924,10 +1997,7 @@ def unscramble_generator(seed):
 
 
 def crag_score_generator():
-    for d1 in range(1, 7):
-        for d2 in range(1, 7):
-            for d3 in range(1, 7):
-                yield [d1, d2, d3]
+    yield from [list(p) for p in product([1, 2, 3, 4, 5, 6], repeat=3)]
 
 
 def midnight_generator(seed):
@@ -2156,7 +2226,7 @@ def hourglass_flips_generator(seed):
 def knight_jump_generator(seed):
     rng = random.Random(seed)
     for i in range(10000):
-        k = 2 + i%50
+        k = 2 + i % 50
         steps = [1]
         for _ in range(1, k):
             steps.append(steps[-1] + rng.randint(1, 5))
@@ -2462,9 +2532,11 @@ def schmalz_generator():
     yield "Spread love everywhere you go. Let no one ever come to you without leaving happier.",
     yield "When you reach the end of your rope, tie a knot in it and hang on.",
     yield "Why do you laugh? I chose death.",
+    yield "All you Calabrese do the mambo like a-crazy",
     yield 'These are the people you protect with your pain!',
     yield "Aye, yeah, hey, aah! You and our auergauer is a banana foobie doobie.",
-    yield 'We had to sacrifice a couple of miners to free Bolivia.',
+    yield "KiDs ThEsE dAyS tAlK lIkE aLl SaRcAsTiC tHiS wAy",
+    yield "We had to sacrifice a couple of miners to free Bolivia.",
     yield "Always remember that you are absolutely unique. Just like everyone else.",
     yield "Don't judge each day by the harvest you reap but by the seeds that you plant.",
     yield "The future belongs to those who believe in the beauty of their dreams.",
@@ -2472,14 +2544,15 @@ def schmalz_generator():
     yield "The best and most beautiful things in the world cannot be seen or even touched " +\
           "— they must be felt with the heart."
     yield "It is during our darkest moments that we must focus to see the light.",
-    yield "Who's the leader of the club that's made for you and me? T-R-I-C-K-Y M-O-U-S-E! Tricky Mouse! TRICKY MOUSE! Tricky Mouse! TRICKY MOUSE! Forever let us hold our Hammers high! High! High! High!",
+    yield "Who's the leader of the club that's made for you and me? T-R-I-C-K-Y M-O-U-S-E! Tricky Mouse! " +\
+          "TRICKY MOUSE! Tricky Mouse! TRICKY MOUSE! Forever let us hold our Hammers high! High! High! High!",
     yield "What puny mortal can comprehend the Mighty Mind of Galactus?",
     yield "To crush your enemies, to see them driven before you, and hear the lamentation of their women.",
     yield "Everything that irritates us about others can lead us to an understanding of ourselves.",
     yield "Trying to define yourself is like trying to bite your own teeth.",
     yield "Inability to accept the mystic experience is more than an intellectual handicap. Lack of " +\
           "awareness of the basic unity of organism and environment is a serious and dangerous hallucination."
-    yield '“Evil” read backwards is “live.” Demon est deus inversus.”'
+    yield '“Evil” read backwards is “live.” Demon est deus inversus.'
     yield "想像一下清晨的多維蜘蛛網，上面佈滿了露珠",
     yield "Өндөг бол эго, шувуу бол чөлөөлөгдсөн Би юм.",
     yield "Mỗi người trong chúng ta đều là một khẩu độ mà qua đó toàn bộ vũ trụ nhìn ra.",
@@ -2493,6 +2566,9 @@ def schmalz_generator():
           "dtimpeallacht nádúrtha."
     yield "Fa tsy misy fifaliana amin'ny faharetana mandrakizay. "\
           + "Irintsika fotsiny izany satria foana ny ankehitriny."
+    yield "àáâäæãåāèéêëēėęîïíīįìôöòóœøōõûüùúū"
+    yield "!@#$%^&*(){}:;'[]'"
+    yield "lowercaselettersonlyhere"
 
 
 def count_troikas_generator(seed):
@@ -2519,12 +2595,12 @@ def count_corners_generator(seed, slices=4000):
             h = rng.randint(1, 2 + n // 2)
             if rng.randint(0, 99) < 80:
                 points.add((x, y))
-            points.add((x + h, y))
-            points.add((x, y + h))
+            points.add((x+h, y))
+            points.add((x, y+h))
             if rng.randint(0, 99) < 50:
-                x = x + h
+                x = x+h
             else:
-                y = y + h
+                y = y+h
         yield sorted(points)
 
 
@@ -2761,7 +2837,7 @@ testcases = [
     (
      "reverse_vowels",
      schmalz_generator(),
-     "47d3eb8db3105a96e28f192d63069eabc3e73ca71e0803fce479f56b760d56b6"
+     "db4e408209986ba0ebb9b4ebbd1b4dc170d6cafd3cfc936e9fdc218b620ae57c"
     ),
     (
      "riffle",
@@ -2840,17 +2916,17 @@ testcases = [
     (
      "rooks_with_friends",
      rooks_with_friends_generator(fixed_seed),
-     "8b76288d37af4050e0eba5f1a69eba42e35286007a36fc2ed364ea12060cf034"
+     "865f129cec84fdf07bad9e7fcdfa85541746c58402871ae89e2f3f62dfce4abe"
     ),
     (
      "safe_squares_rooks",
      safe_squares_generator(fixed_seed),
-     "9e06a8a2766ab41420ded02e2e2ad4fc8b03138ab38992d530296431ac8d30b5"
+     "c5c1536e0b1eebc92f5def4f1d7be4116a8a0cb48d754f2234463fc0d8a8bbf7"
     ),
     (
      "safe_squares_bishops",
      safe_squares_generator(fixed_seed),
-     "71e6e56c9f044b66871de3b232bdafb2af5ffba99319d8fdc60de94f5e8735ee"
+     "7dc0f6070c0d360dbbb8a9fa35f1c205c4dc7319f07dd1780b31280dcdce8da4"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -3412,6 +3488,28 @@ testcases = [
      "addition_chain",
      addition_chain_generator(),
      "a2c9dfa8a7598ce1d2bd607ec8b2320b58257af7f185b6430d67e896014b30d2"
+    ),
+
+    # Second batch of problems starting in 2023.
+    (
+     "queen_captures_all",
+     queen_captures_all_generator(fixed_seed),
+     "77451e72db4c4889874f0707546910ac96569331c8fc91d88a29766b59ccefdd"
+    ),
+    (
+     "is_chess_960",
+     is_chess_960_generator(fixed_seed),
+     "4d9b0e6c631904cf993e4736fba5c0a5bd5fd87001468f36622fb316fd1d1827"
+    ),
+    (
+     "soundex",
+     soundex_generator(fixed_seed),
+     "8569238f186e3c9fb947bfcebaa57f3d48d9a9a8727e94a4176a04f49ebc53fe"
+    ),
+    (
+     "sum_of_consecutive_squares",
+     sum_of_consecutive_squares_generator(fixed_seed),
+     "be57860970677e4893ad158413f08c747210e0d893ebfaaf7ff2d0d22f487a6c"
     )
 ]
 
@@ -3464,6 +3562,7 @@ def run_all():
     except Exception as e:
         print(f"TESTER CRASHED WITH ERROR: {e}")
         exit(4)
+
 
 
 run_all()
