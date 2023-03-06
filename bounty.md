@@ -122,6 +122,45 @@ To keep this fair and interesting, each individual person can get at most one bo
    </td>
    <td>
    </td>
+</table>
+     
+Starting March 2023, the author started creating another set of Python problems. The following problems don't have paid bounties, but the first person to submit a working solution to the author will still get their name etched in the table below for perpetuity.
+     
+<table>
+  <tr>
+   <td>Problem
+   </td>
+   <td>Bounty claimed
+   </td>
+  </tr>
+  <tr>
+   <td>The Fischer King
+   </td>
+   <td>
+   </td>
+  </tr>
+  <tr>
+   <td>Soundex
+   </td>
+   <td>
+   </td>
+  </tr>
+  <tr>
+   <td>Sum of consecutive squares
+   </td>
+   <td>
+   </td>
+  </tr>
+  <tr>
+   <td>Scatter Her enemies
+   </td>
+   <td>
+   </td>
+  </tr>
+</table>
+     
+     
+     
   </tr>
 </table>
 
