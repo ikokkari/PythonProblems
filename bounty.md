@@ -139,6 +139,12 @@ Starting March 2023, the author started creating another set of Python problems.
    <td>
    </td>
   </tr>
+   <tr>
+   <td>Top of the swops
+   </td>
+   <td>
+   </td>
+  </tr>
   <tr>
    <td>Soundex
    </td>
@@ -152,7 +158,13 @@ Starting March 2023, the author started creating another set of Python problems.
    </td>
   </tr>
   <tr>
-   <td>Scatter Her enemies
+   <td>Scatter her enemies
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Complete a Costas array
    </td>
    <td>
    </td>
