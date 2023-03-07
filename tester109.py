@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "March 6, 2023"
+version = "March 7, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -342,7 +342,55 @@ def pyramid(n=1, goal=5, inc=1):
             goal, count, n = goal+inc, 0, n+1
 
 
-# The test case generators for the individual functions.
+# Test case generators for the individual functions.
+
+
+__primitive_roots = {
+    5: [2, 3], 7: [3, 5], 11: [2, 6, 7, 8], 13: [2, 6, 7, 11], 17: [3, 5, 6, 7, 10, 11, 12, 14]
+}
+
+
+def __welch_costas():
+    while True:
+        for p in __primitive_roots:
+            for g in __primitive_roots[p]:
+                rows = []
+                for i in range(1, p):
+                    for j in range(1, p+1):
+                        if j == g**i % p:
+                            rows.append(j-1)
+                            break
+                yield rows
+                yield [p-2-col for col in rows]
+                yield rows[::-1]
+                yield [p-2-col for col in rows[::-1]]
+
+
+def costas_array_generator(seed):
+    yield [4, None, None, 0, 5, None],
+    yield [4, None, None, 6, None, 5, None, 0, 9, None],
+    rng = random.Random(seed)
+    welch_generator = __welch_costas()
+    for n in islice(pyramid(4, 4, 6), 500):
+        if rng.randint(0, 99) < 50:
+            rows = list(range(n))
+            rng.shuffle(rows)
+        else:
+            rows = next(welch_generator)[:]
+        m = len(rows)
+        k = rng.randint(2, m//2)
+        for row in rng.sample(range(m), k):
+            rows[row] = None
+        yield rows[:],
+
+
+def topswops_generator(seed):
+    rng = random.Random(seed)
+    for n in islice(pyramid(2, 3, 3), 5000):
+        perm = list(range(1, n+1))
+        rng.shuffle(perm)
+        yield tuple(perm),
+
 
 def sum_of_consecutive_squares_generator(seed):
     def sum_of_sq(n_):  # Formula from Wolfram Mathematica
@@ -3490,7 +3538,7 @@ testcases = [
      "a2c9dfa8a7598ce1d2bd607ec8b2320b58257af7f185b6430d67e896014b30d2"
     ),
 
-    # Second batch of problems starting in 2023.
+    # Second batch of problems, created in 2023.
     (
      "queen_captures_all",
      queen_captures_all_generator(fixed_seed),
@@ -3510,6 +3558,16 @@ testcases = [
      "sum_of_consecutive_squares",
      sum_of_consecutive_squares_generator(fixed_seed),
      "be57860970677e4893ad158413f08c747210e0d893ebfaaf7ff2d0d22f487a6c"
+    ),
+    (
+     "topswops",
+     topswops_generator(fixed_seed),
+     "7829077541c4e84225ee30e742da1296d6c0225555736621eb5259769ebb2704"
+    ),
+    (
+     "costas_array",
+     costas_array_generator(fixed_seed),
+     "afeec4f4b07514b5bfbcb09617581e0b64aff4ebbb4a864fa82a9563dc8e163c"
     )
 ]
 
@@ -3562,7 +3620,6 @@ def run_all():
     except Exception as e:
         print(f"TESTER CRASHED WITH ERROR: {e}")
         exit(4)
-
 
 
 run_all()
