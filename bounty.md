@@ -124,7 +124,7 @@ To keep this fair and interesting, each individual person can get at most one bo
    </td>
 </table>
      
-Starting March 2023, the author started creating another set of Python problems. The following problems don't have paid bounties, but the first person to submit a working solution to the author will still get their name etched in the table below for perpetuity.
+Starting March 2023, the author started creating another set of Python problems. The following problems don't have paid bounties, but the first person to submit a working solution to the author will still get their name etched in the table below for perpetuity. Unlike the above list of bonus problems, each student is allowed to have several bounties from this list of additional problems.
      
 <table>
   <tr>
