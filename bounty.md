@@ -160,7 +160,7 @@ Starting March 2023, the author started creating another set of Python problems.
   <tr>
    <td>Scatter her enemies
    </td>
-   <td>
+   <td>Karel Tutsu, March 8, 2023
    </td>
   </tr>
    <tr>
