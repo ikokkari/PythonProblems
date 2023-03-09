@@ -151,6 +151,12 @@ Starting March 2023, the author started creating another set of Python problems.
    <td>
    </td>
   </tr>
+   <tr>
+   <td>Mian–Chowla sequence
+   </td>
+   <td>
+   </td>
+  </tr>
   <tr>
    <td>Sum of consecutive squares
    </td>
@@ -165,6 +171,12 @@ Starting March 2023, the author started creating another set of Python problems.
   </tr>
    <tr>
    <td>Complete a Costas array
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>A Lindenmayer system, bigly
    </td>
    <td>
    </td>
