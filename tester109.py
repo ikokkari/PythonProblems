@@ -8,7 +8,7 @@
 
 from hashlib import sha256
 from time import time
-from itertools import islice, permutations, zip_longest, cycle, product
+from itertools import islice, permutations, zip_longest, cycle, product, count
 import random
 import gzip
 import os.path
@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "March 7, 2023"
+version = "March 9, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -163,7 +163,7 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
     if expected_answers:
         recorded = expected_answers.get(fname, None)
     chk, start_time, crashed = sha256(), time(), False
-    for (count, test_args) in enumerate(test_cases):
+    for (test_case_idx, test_args) in enumerate(test_cases):
         # Convert a singleton of any non-tuple into singleton tuple.
         if not isinstance(test_args, tuple):
             test_args = (test_args,)
@@ -174,7 +174,7 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
             result = f(*test_args)
         except Exception as e:  # catch any exception
             crashed = True
-            print(f"CRASH AT TEST CASE #{count} WITH ARGS: {test_args_string}")
+            print(f"CRASH AT TEST CASE #{test_case_idx} WITH ARGS: {test_args_string}")
             print(f"CAUGHT EXCEPTION: {e}")
             break
         # If the result is a set or dictionary, turn it into sorted list first.
@@ -182,7 +182,7 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
         # Print out the argument and result, if in verbose mode.
         if verb_count > 0 or verb_count == -1:
             verb_count -= 1 if verb_count > 0 else 0
-            print(f"{fname} #{count}: ", end="", flush=True)
+            print(f"{fname} #{test_case_idx}: ", end="", flush=True)
             print(test_args_string)
             print(f"RESULT: {result}", flush=True)
         # Update the checksum.
@@ -193,20 +193,20 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
             output = sr.strip()
             print(output, file=recorder)
             output_len += len(output) + 1
-            if count >= testcase_cutoff:
+            if test_case_idx >= testcase_cutoff:
                 break
-        if use_expected_answers and expected_answers and count < testcase_cutoff and recorded:
-            if sr.strip() != recorded[count]:
+        if use_expected_answers and expected_answers and test_case_idx < testcase_cutoff and recorded:
+            if sr.strip() != recorded[test_case_idx]:
                 crashed = True
-                print(f"DISCREPANCY AT TEST CASE #{count}: ")
+                print(f"DISCREPANCY AT TEST CASE #{test_case_idx}: ")
                 print("ARGUMENTS: ", end="")
                 print(test_args_string)
-                print(f"EXPECTED: {recorded[count]}")
+                print(f"EXPECTED: {recorded[test_case_idx]}")
                 print(f"RETURNED: {sr}")
                 break
         total_time = time() - start_time
         if total_time > timeout_cutoff:
-            print(f"TIMEOUT AT TEST CASE #{count}. FUNCTION REJECTED AS TOO SLOW.")
+            print(f"TIMEOUT AT TEST CASE #{test_case_idx}. FUNCTION REJECTED AS TOO SLOW.")
             crashed = True
             break
     if not recorder:
@@ -263,7 +263,7 @@ def test_all_functions(module, testcases_, recorder=None, known=None):
         print(f"MESSAGE!!! ENSURE THAT THE FILE {expected_answers_file} FROM")
         print("WHEREVER YOU DOWNLOADED THIS AUTOMATED TESTER IS ALSO")
         print("PROPERLY PLACED IN THIS VERY SAME WORKING DIRECTORY!!!\n")
-    count, total = 0, 0
+    accepted_count, total = 0, 0
     if recorder:
         print(f"{version_prefix}{version}", file=recorder)
     for (fname, test_cases, expected) in testcases_:
@@ -274,13 +274,13 @@ def test_all_functions(module, testcases_, recorder=None, known=None):
         total += 1
         result = test_one_function(f, test_cases, expected, recorder, known)
         if result >= 0:
-            count += 1
+            accepted_count += 1
     if recorder:
         print("\nRecording model answers complete.")
     else:
-        print(f"{count} out of {total} functions ", end="")
+        print(f"{accepted_count} out of {total} functions ", end="")
         print(f"of {len(testcases_)} possible work.")
-    return count
+    return accepted_count
 
 
 # Named constants used by some test case generators.
@@ -300,14 +300,14 @@ __primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
 def scale_random(seed, scale, skip):
     # The seed value determines the future random sequence.
     rng = random.Random(seed)
-    curr, count, orig = 1, 0, scale
+    curr, count_until_increase, orig = 1, 0, scale
     while True:
         curr += rng.randint(1, scale)
         yield curr
-        count += 1
-        if count == skip:
+        count_until_increase += 1
+        if count_until_increase == skip:
             scale = scale * orig
-            count = 0
+            count_until_increase = 0
 
 
 # Produce a random (n+1)-digit integer with adjustable repeating digits.
@@ -334,15 +334,32 @@ def random_string(alphabet, n, rng):
 # manner of 1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, ...
 
 def pyramid(n=1, goal=5, inc=1):
-    count = 0
+    count_until_increase = 0
     while True:
         yield n
-        count += 1
-        if count == goal:
-            goal, count, n = goal+inc, 0, n+1
+        count_until_increase += 1
+        if count_until_increase == goal:
+            goal, count_until_increase, n = goal+inc, 0, n+1
 
 
 # Test case generators for the individual functions.
+
+def lindenmayer_generator(seed):
+    non_terminals = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    rng = random.Random(seed)
+    for r, steps in zip(islice(pyramid(3, 2, 1), 80), count(3)):
+        rules = dict()
+        alphabet = non_terminals[:r]
+        for symbol in alphabet:
+            m = rng.randint(2, r)
+            rules[symbol] = random_string(alphabet, m, rng)
+        seed += 1
+        for n in islice(scale_random(seed, 10, 1), steps):
+            yield rules, n, rng.choice(alphabet)
+
+
+def mian_chowla_generator():
+    yield from range(200)
 
 
 __primitive_roots = {
@@ -367,18 +384,16 @@ def __welch_costas():
 
 
 def costas_array_generator(seed):
-    yield [4, None, None, 0, 5, None],
-    yield [4, None, None, 6, None, 5, None, 0, 9, None],
     rng = random.Random(seed)
     welch_generator = __welch_costas()
-    for n in islice(pyramid(4, 4, 6), 500):
+    for n in islice(pyramid(4, 4, 6), 400):
         if rng.randint(0, 99) < 50:
             rows = list(range(n))
             rng.shuffle(rows)
         else:
             rows = next(welch_generator)[:]
         m = len(rows)
-        k = rng.randint(2, m//2)
+        k = rng.randint(2, max(m//2, m-5))
         for row in rng.sample(range(m), k):
             rows[row] = None
         yield rows[:],
@@ -435,7 +450,7 @@ __queen_dirs = [(0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1
 
 def queen_captures_all_generator(seed):
     rng = random.Random(seed)
-    for n in islice(pyramid(4, 4, 2), 300):
+    for n in islice(pyramid(4, 4, 2), 350):
         m = n + rng.randint(0, 2)
         pieces = set()
         px = rng.randint(0, m-1)
@@ -477,7 +492,7 @@ __gin_deck = [(rank, suit) for suit in __suits for rank in __gin_ranks.keys()]
 
 def count_deadwood_generator(seed):
     rng = random.Random(seed)
-    for _ in range(2000):
+    for _ in range(10000):
         hand = []
         rank = rng.randint(1, 13)
         suit = rng.choice(__suits)
@@ -1163,13 +1178,13 @@ def candy_share_generator(seed):
 def leibniz_generator(seed):
     yield [1, -1, 1, -1, 1], [0, 1, 2, 3, 4]
     rng = random.Random(seed)
-    n, count, goal, heads = 5, 0, 10, [1]
+    n, count_until_increase, goal, heads = 5, 0, 10, [1]
     for _ in range(1500):
         if goal < 30 or rng.randint(0, 99) < 50:
             e = rng.randint(-n, n)
         else:
             den = rng.randint(2, n)
-            num = rng.randint(1, den - 1)
+            num = rng.randint(1, den-1)
             sign = rng.choice([-1, 1])
             e = Fraction(sign * num, den)
         heads.append(e)
@@ -1177,9 +1192,9 @@ def leibniz_generator(seed):
             p = rng.randint(1, min(10, len(heads) // 2))
             pos = rng.sample(range(len(heads)), p)
             yield heads, pos
-        count += 1
-        if count == goal:
-            count, goal, n, heads = 0, goal + 1, n + 1, []
+        count_until_increase += 1
+        if count_until_increase == goal:
+            count_until_increase, goal, n, heads = 0, goal+1, n+1, []
 
 
 def prominences_generator(seed):
@@ -1199,21 +1214,21 @@ def prominences_generator(seed):
 
     # Okay, basic logic seems right, so on to pseudorandom fuzz testing.
 
-    scale, n, count, goal = 3, 7, 0, 10
+    scale, n, count_until_increase, goal = 3, 7, 0, 10
     for _ in range(5000):
         heights, change = [rng.randint(1, scale)], +1
         while len(heights) < n:
             if rng.randint(0, 99) < 40:
                 change = -change
             ee = max(1, heights[-1] + change * rng.randint(1, scale))
-            ee = ee if ee != heights[-1] else ee + 1
+            ee = ee if ee != heights[-1] else ee+1
             heights.append(ee)
         while heights[-1] > scale:
             heights.append(heights[-1] - rng.randint(1, scale))
         yield heights
-        count += 1
-        if count == goal:
-            count, goal, scale, n = 0, goal + 4, scale + 2, n + 1
+        count_until_increase += 1
+        if count_until_increase == goal:
+            count_until_increase, goal, scale, n = 0, goal+4, scale+2, n+1
 
 
 def brussels_choice_step_generator(seed):
@@ -1404,14 +1419,14 @@ def postfix_evaluate_generator(seed):
     yield [42]
     rng = random.Random(seed)
     for n in islice(pyramid(2, 10, 10), 1000):
-        exp, count = [], 0
-        while len(exp) < n or count != 1:
-            if count > 1 and (count > 10 or rng.randint(0, 99) < 50):
+        exp, expr_length = [], 0
+        while len(exp) < n or expr_length != 1:
+            if expr_length > 1 and (expr_length > 10 or rng.randint(0, 99) < 50):
                 exp.append(rng.choice(['+', '-', '*', '/']))
-                count -= 1
+                expr_length -= 1
             else:
                 exp.append(rng.randint(1, 10))
-                count += 1
+                expr_length += 1
         yield exp
 
 
@@ -1741,12 +1756,12 @@ def count_squares_generator(seed):
 
 def three_summers_generator(seed):
     rng = random.Random(seed)
-    count, goal = 0, 1
+    count_until_increase, goal = 0, 1
     items = []
     for i in range(200):
-        count += 1
-        if count == goal:
-            count, goal = 0, goal+5
+        count_until_increase += 1
+        if count_until_increase == goal:
+            count_until_increase, goal = 0, goal+5
             items = [rng.randint(1, 2 + i)]
         items.append(items[-1] + rng.randint(1, 2 + i*i))
         if len(items) > 2:
@@ -1801,7 +1816,7 @@ def seven_zero_generator(seed):
 
 def remove_after_kth_generator(seed):
     rng = random.Random(seed)
-    count, goal, items = 0, 5, []
+    count_until_increase, goal, items = 0, 5, []
     for i in range(10000):
         if len(items) > 0 and rng.randint(0, 99) < 50:
             new = rng.choice(items)
@@ -1812,9 +1827,9 @@ def remove_after_kth_generator(seed):
             new = rng.randint(-i*i, i*i + 1)
         items.append(new)
         yield items[:], rng.randint(1, 2 + i//100)
-        count += 1
-        if count == goal:
-            count, goal, items = 0, goal+5, []
+        count_until_increase += 1
+        if count_until_increase == goal:
+            count_until_increase, goal, items = 0, goal+5, []
 
 
 def __qwerty_dist():
@@ -1920,22 +1935,22 @@ def count_maximal_layers_generator(seed):
 
 def taxi_zum_zum_generator(seed):
     rng = random.Random(seed)
-    poss, moves, goal, count = ['L', 'R', 'F'], "", 5, 0
+    poss, moves, goal, count_until_increase = ['L', 'R', 'F'], "", 5, 0
     for _ in range(6000):
-        count += 1
-        if count == goal:
-            count, goal, moves = 0, goal+2, []
+        count_until_increase += 1
+        if count_until_increase == goal:
+            count_until_increase, goal, moves = 0, goal+2, []
         moves += rng.choice(poss)
         yield moves,
 
 
 def count_growlers_generator(seed):
     rng = random.Random(seed)
-    animals, goal, count = [], 5, 0
+    animals, goal, count_until_increase = [], 5, 0
     for _ in range(5000):
-        count += 1
-        if count == goal:
-            count, goal, animals = 0, goal+2, []
+        count_until_increase += 1
+        if count_until_increase == goal:
+            count_until_increase, goal, animals = 0, goal+2, []
         animals.append(rng.choice(['cat', 'tac', 'dog', 'god']))
         yield animals[:]
 
@@ -2034,14 +2049,14 @@ def unscramble_generator(seed):
     rng = random.Random(seed)
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
         words = [x.strip() for x in f]
-    count = 0
-    while count < 250:
+    instance_count = 0
+    while instance_count < 250:
         w = rng.choice(words)
         if 2 < len(w) < 9:
             first, mid, last = w[0], list(w[1:-1]), w[-1]
             rng.shuffle(mid)
             yield words, first + "".join(mid) + last
-            count += 1
+            instance_count += 1
 
 
 def crag_score_generator():
@@ -2137,7 +2152,7 @@ def manhattan_skyline_generator(seed):
 
 def fractran_generator(seed):
     rng = random.Random(seed)
-    count, goal, prog, n = 0, 5, [], 1
+    count_until_increase, goal, prog, n = 0, 5, [], 1
     for i in range(500):
         num = rng.randint(1, 10+i)
         den = rng.randint(1, 10+i)
@@ -2146,9 +2161,9 @@ def fractran_generator(seed):
         prog[k], prog[-1] = prog[-1], prog[k]
         n = rng.randint(2, 10)
         yield n, prog[:], 10
-        count += 1
-        if count == goal:
-            count, goal, prog = 0, goal+1, []
+        count_until_increase += 1
+        if count_until_increase == goal:
+            count_until_increase, goal, prog = 0, goal+1, []
 
 
 def scylla_or_charybdis_generator(seed):
@@ -2176,7 +2191,7 @@ def scylla_or_charybdis_generator(seed):
 
 def count_overlapping_disks_generator(seed):
     rng = random.Random(seed)
-    count, goal, max_r = 0, 5, 10
+    count_until_increase, goal, max_r = 0, 5, 10
     for n in range(1, 250, 2):
         d, m = 40*n, rng.randint(8*n, 12*n)
         disks = set()
@@ -2187,9 +2202,9 @@ def count_overlapping_disks_generator(seed):
             disks.add((x, y, r))
         disks = list(disks)
         yield disks
-        count += 1
-        if count == goal:
-            count, goal = 0, goal+2
+        count_until_increase += 1
+        if count_until_increase == goal:
+            count_until_increase, goal = 0, goal+2
             max_r += 5
 
 
@@ -2224,13 +2239,13 @@ def eliminate_neighbours_generator(seed):
         for p in permutations(range(1, n + 1)):
             yield list(p)
     rng = random.Random(seed)
-    count, goal = 0, 1
+    count_until_increase, goal = 0, 1
     items, m = [1, 2, 3, 4, 5, 6, 7], 7
     for i in range(2000):
         yield items[:]
-        count += 1
-        if count == goal:
-            count, goal = 0, goal + 3
+        count_until_increase += 1
+        if count_until_increase == goal:
+            count_until_increase, goal = 0, goal+3
             m = 8 + i // 50
             items = list(range(1, m))
         items.append(m)
@@ -2290,12 +2305,12 @@ def knight_jump_generator(seed):
 
 def frog_collision_time_generator(seed):
     rng = random.Random(seed)
-    count = 0
-    while count < 5000:
+    instance_count = 0
+    while instance_count < 5000:
         c = [rng.randint(-10, 10) for _ in range(6)]
         if c[2:4] == c[4:6] or c[2:4] == [0, 0] or c[4:6] == [0, 0]:
             continue
-        t = rng.randint(1, 2 + 2**(count // 100))
+        t = rng.randint(1, 2 + 2**(instance_count // 100))
         x1, y1 = c[0] + t * c[2], c[1] + t * c[3]
         x2, y2 = c[0] + t * c[4], c[1] + t * c[5]
         if rng.randint(1, 100) < 30:
@@ -2307,7 +2322,7 @@ def frog_collision_time_generator(seed):
             c[2], c[3] = -c[2], -c[3]
         if (x1, x2) != (y1, y2):
             yield (x1, y1, -c[2], -c[3]), (x2, y2, -c[4], -c[5])
-            count += 1
+            instance_count += 1
 
 
 def spread_the_coins_generator(seed):
@@ -2367,12 +2382,12 @@ def perimeter_limit_split_generator(seed):
 
 def duplicate_digit_bonus_generator(seed):
     rng = random.Random(seed)
-    n, count, goal = 1, 0, 5
+    n, count_until_increase, goal = 1, 0, 5
     for _ in range(3000):
         yield random_int(rng, n, 60)
-        count += 1
-        if count == goal:
-            count, goal, n = 0, goal+5, n+1
+        count_until_increase += 1
+        if count_until_increase == goal:
+            count_until_increase, goal, n = 0, goal+5, n+1
 
 
 def hitting_integer_powers_generator(seed):
@@ -2528,11 +2543,11 @@ def reach_corner_generator(seed):
     yield 1, 1, 1000, 2, [(0, 0), (0, 1), (999, 1)]
 
     rng = random.Random(seed)
-    count, goal, nn, aliens, n, m = 0, 1, 7, [], 0, 0
+    count_until_increase, goal, nn, aliens, n, m = 0, 1, 7, [], 0, 0
     for _ in range(5000):
-        count += 1
-        if count == goal:
-            count, goal, nn, aliens = 0, goal + 1, nn + 1, []
+        count_until_increase += 1
+        if count_until_increase == goal:
+            count_until_increase, goal, nn, aliens = 0, goal + 1, nn + 1, []
             n = rng.randint(4, nn - 3)
             m = rng.randint(nn - n + 2, nn)
             if n % 2 == 0 and m % 2 == 0:
@@ -2550,7 +2565,7 @@ def reach_corner_generator(seed):
 
 def bulgarian_cycle_generator(seed):
     rng = random.Random(seed)
-    count, goal, n, piles = 0, 2, 5, []
+    count_until_increase, goal, n, piles = 0, 2, 5, []
     for _ in range(300):
         piles.append(rng.randint(1, n))
         piles.append(rng.randint(1, n))
@@ -2558,9 +2573,9 @@ def bulgarian_cycle_generator(seed):
         piles[-1] += piles[pos]
         del piles[pos]
         yield piles[:]
-        count += 1
-        if count == goal:
-            count, goal, n, piles = 0, goal + 2, n + 1, []
+        count_until_increase += 1
+        if count_until_increase == goal:
+            count_until_increase, goal, n, piles = 0, goal + 2, n + 1, []
     for n in range(10, 30):
         yield [(i-1)*(i-2) for i in range(n)]
 
@@ -3530,7 +3545,7 @@ testcases = [
     (
      "count_deadwood",
      count_deadwood_generator(fixed_seed),
-     "92f9e59daf8c9b8e09fd6a73b73ec3c787cc2b96f05966deff015a4a876b5971"
+     "dd44068ef82650c1919652ddc808ad9798ece75f1196305a3a9e3a006bf47f6e"
     ),
     (
      "addition_chain",
@@ -3542,7 +3557,7 @@ testcases = [
     (
      "queen_captures_all",
      queen_captures_all_generator(fixed_seed),
-     "77451e72db4c4889874f0707546910ac96569331c8fc91d88a29766b59ccefdd"
+     "d3eecf7c5a9907d43e07bc74ad3bb8b5c754cd84298cd6c8a037d26570c1ce45"
     ),
     (
      "is_chess_960",
@@ -3567,7 +3582,17 @@ testcases = [
     (
      "costas_array",
      costas_array_generator(fixed_seed),
-     "afeec4f4b07514b5bfbcb09617581e0b64aff4ebbb4a864fa82a9563dc8e163c"
+     "6c9c0cfc7444d56bc21418d6776512e06da634998ed3012849e1b0bba048d221"
+    ),
+    (
+     "mian_chowla",
+     mian_chowla_generator(),
+     "fd77ebaf2b8835e626ff9e25a1d757bca6b7186af3d6cf925113b1732e92e392"
+    ),
+    (
+     "lindenmayer",
+     lindenmayer_generator(fixed_seed),
+     "7c9f332799d297bdbff7b3a3222285356f2435edc70ccacc17dd9856bc0df830"
     )
 ]
 
