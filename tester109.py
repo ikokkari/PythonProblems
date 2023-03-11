@@ -350,18 +350,20 @@ def bowling_score_generator(seed):
     for (_, p) in zip(range(10000), cycle([10, 12, 16, 20])):
         rolls = []
         for pos in range(12):
-            first = min(rng.randint(1, p), 10)
+            first = min(rng.randint(0, p), 10)
             if first == 10:
                 rolls.append('X')
             else:
                 remain = 10-first
-                second = min(rng.randint(1, remain+3), remain)
+                second = min(rng.randint(0, remain+3), remain)
                 rolls.append(f"{first}/" if first+second == 10 else f"{first}{second}")
         # Last roll handled special
         if rolls[9] == 'X':
             rolls[9] = f"XX{rolls[11][0]}" if rolls[10] == 'X' else f"X{rolls[10]}"
         elif rolls[9][1] == '/':
             rolls[9] = rolls[9] + rolls[10][0]
+        # Replace zeros with minus signs
+        rolls = [frame.replace('0', '-') for frame in rolls]
         yield rolls[:10],
 
 
@@ -369,20 +371,27 @@ def word_board_generator(seed):
     rng = random.Random(seed)
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
         words = [w.strip() for w in f if len(w) > 5]
-    for n in islice(pyramid(3, 3, 3), 200):
+    for n in islice(pyramid(3, 3, 4), 200):
         board = [[None for _ in range(n)] for _ in range(n)]
         unfilled = set((x, y) for x in range(n) for y in range(n))
         while len(unfilled) > 0:
             x = rng.randint(0, n-1)
             y = rng.randint(0, n-1)
+            while (x, y) not in unfilled:
+                x = rng.randint(0, n-1)
+                y = rng.randint(0, n-1)
             for c in rng.choice(words):
-                if (x, y) in unfilled:
-                    unfilled.remove((x, y))
                 board[x][y] = c
-                if rng.randint(0, 100) < 50:
-                    x = (x + rng.choice([-1, 1])) % n
+                unfilled.remove((x, y))
+                neighbours = []
+                for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                    nx, ny = x+dx, y+dy
+                    if 0 <= nx < n and 0 <= ny < n and (nx, ny) in unfilled:
+                        neighbours.append((nx, ny))
+                if len(neighbours) > 0:
+                    x, y = rng.choice(neighbours)
                 else:
-                    y = (y + rng.choice([-1, 1])) % n
+                    break
         yield board, words
 
 
@@ -3639,12 +3648,12 @@ testcases = [
     (
      "word_board",
      word_board_generator(fixed_seed),
-     "3d9e8b1e3579562082135b7e5146c1d5b456e7f7d91960313c48da972837d013"
+     "989cce8c708a04ded9e6d0fe42b76c3dac3922017ebfb973206c486426c3ee19"
     ),
     (
      "bowling_score",
      bowling_score_generator(fixed_seed),
-     "b6c1eeeb4d6d42c9bcdb7f51ab77b982d3bcd8898ab210de9180d47b5d9bc33b"
+     "336d1ceb26198d467fddcdc21fa36c0995d8d5fa10985b3281d3f0b90cd768bb"
     )
 ]
 
