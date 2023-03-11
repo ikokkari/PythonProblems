@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "March 9, 2023"
+version = "March 11, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -343,6 +343,48 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+
+def bowling_score_generator(seed):
+    rng = random.Random(seed)
+    for (_, p) in zip(range(10000), cycle([10, 12, 16, 20])):
+        rolls = []
+        for pos in range(12):
+            first = min(rng.randint(1, p), 10)
+            if first == 10:
+                rolls.append('X')
+            else:
+                remain = 10-first
+                second = min(rng.randint(1, remain+3), remain)
+                rolls.append(f"{first}/" if first+second == 10 else f"{first}{second}")
+        # Last roll handled special
+        if rolls[9] == 'X':
+            rolls[9] = f"XX{rolls[11][0]}" if rolls[10] == 'X' else f"X{rolls[10]}"
+        elif rolls[9][1] == '/':
+            rolls[9] = rolls[9] + rolls[10][0]
+        yield rolls[:10],
+
+
+def word_board_generator(seed):
+    rng = random.Random(seed)
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [w.strip() for w in f if len(w) > 5]
+    for n in islice(pyramid(3, 3, 3), 200):
+        board = [[None for _ in range(n)] for _ in range(n)]
+        unfilled = set((x, y) for x in range(n) for y in range(n))
+        while len(unfilled) > 0:
+            x = rng.randint(0, n-1)
+            y = rng.randint(0, n-1)
+            for c in rng.choice(words):
+                if (x, y) in unfilled:
+                    unfilled.remove((x, y))
+                board[x][y] = c
+                if rng.randint(0, 100) < 50:
+                    x = (x + rng.choice([-1, 1])) % n
+                else:
+                    y = (y + rng.choice([-1, 1])) % n
+        yield board, words
+
 
 def lindenmayer_generator(seed):
     non_terminals = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -3593,6 +3635,16 @@ testcases = [
      "lindenmayer",
      lindenmayer_generator(fixed_seed),
      "7c9f332799d297bdbff7b3a3222285356f2435edc70ccacc17dd9856bc0df830"
+    ),
+    (
+     "word_board",
+     word_board_generator(fixed_seed),
+     "3d9e8b1e3579562082135b7e5146c1d5b456e7f7d91960313c48da972837d013"
+    ),
+    (
+     "bowling_score",
+     bowling_score_generator(fixed_seed),
+     "b6c1eeeb4d6d42c9bcdb7f51ab77b982d3bcd8898ab210de9180d47b5d9bc33b"
     )
 ]
 
