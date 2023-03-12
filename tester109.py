@@ -371,6 +371,7 @@ def word_board_generator(seed):
     rng = random.Random(seed)
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
         words = [w.strip() for w in f if len(w) > 5]
+    long_words = [w for w in words if len(w) > 12]
     for n in islice(pyramid(3, 3, 4), 200):
         board = [[None for _ in range(n)] for _ in range(n)]
         unfilled = set((x, y) for x in range(n) for y in range(n))
@@ -380,7 +381,7 @@ def word_board_generator(seed):
             while (x, y) not in unfilled:
                 x = rng.randint(0, n-1)
                 y = rng.randint(0, n-1)
-            for c in rng.choice(words):
+            for c in rng.choice(long_words):
                 board[x][y] = c
                 unfilled.remove((x, y))
                 neighbours = []
@@ -3648,7 +3649,7 @@ testcases = [
     (
      "word_board",
      word_board_generator(fixed_seed),
-     "989cce8c708a04ded9e6d0fe42b76c3dac3922017ebfb973206c486426c3ee19"
+     "f1a97aff5897ded15791da610143c9a9e67151ba757b2c3d4f70f0769f39ae93"
     ),
     (
      "bowling_score",
