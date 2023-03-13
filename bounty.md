@@ -163,6 +163,18 @@ Starting March 2023, the author started creating another set of Python problems.
    <td>
    </td>
   </tr>
+   <tr>
+   <td>'Tis but a scratch
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Do or die
+   </td>
+   <td>
+   </td>
+  </tr>
   <tr>
    <td>Sum of consecutive squares
    </td>
