@@ -32,13 +32,13 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "March 11, 2023"
+version = "March 12, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
 
 # How many test cases to record in the file for each function.
-testcase_cutoff = 20
+testcase_cutoff = 400
 
 # Name of the file that contains the expected answers.
 expected_answers_file = 'expected_answers'
@@ -343,6 +343,25 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+
+def accumulate_dice_generator(seed):
+    rng = random.Random(seed)
+    for n in range(4, 20):
+        d = 2
+        while d < 2*n:
+            yield d, n
+            d += rng.randint(1, 3)
+
+
+def knight_survival_generator(seed):
+    rng = random.Random(seed)
+    for n in range(4, 20):
+        for _ in range(n//4 + 3):
+            x = rng.randint(0, n-1)
+            y = rng.randint(0, n-1)
+            k = rng.randint(1, n)
+            yield n, x, y, k
 
 
 def bowling_score_generator(seed):
@@ -3655,6 +3674,16 @@ testcases = [
      "bowling_score",
      bowling_score_generator(fixed_seed),
      "336d1ceb26198d467fddcdc21fa36c0995d8d5fa10985b3281d3f0b90cd768bb"
+    ),
+    (
+     "knight_survival",
+     knight_survival_generator(fixed_seed),
+     "0c1a661f8c2414a0945139d9c25aef4502927c71434a84b344724d609e41c1a8"
+    ),
+    (
+     "accumulate_dice",
+     accumulate_dice_generator(fixed_seed),
+     "0807db5f5be2ccf6dfc4c2ce8cf0e9e9a123ea2fc658a085bea1d6a563d22faa"
     )
 ]
 
