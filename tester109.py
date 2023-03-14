@@ -32,13 +32,10 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "March 12, 2023"
+version = "March 14, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
-
-# How many test cases to record in the file for each function.
-testcase_cutoff = 400
 
 # Name of the file that contains the expected answers.
 expected_answers_file = 'expected_answers'
@@ -50,6 +47,9 @@ function_prefix = '<****>'
 
 # Timeout cutoff for individual function tests, in seconds.
 timeout_cutoff = 20
+
+# How many test cases to record in the file for each function.
+testcase_cutoff = 400
 
 # For instructors who want to add their own problems to this set:
 #
@@ -263,12 +263,13 @@ def test_all_functions(module, testcases_, recorder=None, known=None):
         print(f"MESSAGE!!! ENSURE THAT THE FILE {expected_answers_file} FROM")
         print("WHEREVER YOU DOWNLOADED THIS AUTOMATED TESTER IS ALSO")
         print("PROPERLY PLACED IN THIS VERY SAME WORKING DIRECTORY!!!\n")
+        print(f"Recording {testcase_cutoff} test cases per problem.\n")
     accepted_count, total = 0, 0
     if recorder:
         print(f"{version_prefix}{version}", file=recorder)
-    for (fname, test_cases, expected) in testcases_:
+    for (f_name, test_cases, expected) in testcases_:
         try:
-            f = module.__dict__[fname]
+            f = module.__dict__[f_name]
         except KeyError:
             continue
         total += 1
@@ -3668,7 +3669,7 @@ testcases = [
     (
      "word_board",
      word_board_generator(fixed_seed),
-     "f1a97aff5897ded15791da610143c9a9e67151ba757b2c3d4f70f0769f39ae93"
+     "875a9c2a17d746676aea8c376ea7d82cf729abb8799d3200fd6afaa7f1c02a4a"
     ),
     (
      "bowling_score",
