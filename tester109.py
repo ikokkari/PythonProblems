@@ -3826,5 +3826,3 @@ def run_all():
 
 
 run_all()
-
-#discrepancy(labs109.count_odd_sum_subarrays2, labs109.count_odd_sum_subarrays, count_odd_sum_subarrays_generator(fixed_seed))
