@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "March 14, 2023"
+version = "March 20, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -346,6 +346,72 @@ def pyramid(n=1, goal=5, inc=1):
 # Test case generators for the individual functions.
 
 
+def bus_travel_generator(seed):
+    rng = random.Random(seed)
+    for n in islice(pyramid(4, 2, 1), 1000):
+        schedule = {i:[] for i in range(n)}
+        goal = rng.randint(1, n-1)
+        while len(schedule[0]) < 3:
+            hour = rng.randint(1, 20)
+            minute = rng.randint(0, 59)
+            city = rng.randint(0, n-1)
+            legs = 0
+            while legs < n:
+                duration = rng.randint(10, 100)
+                destination = rng.randint(0, n-1)
+                while city == destination:
+                    destination = rng.randint(0, n-1)
+                arrive_m = minute + duration
+                arrive_h, arrive_m = hour + arrive_m // 60, arrive_m % 60
+                schedule[city].append((destination, (hour, minute), (arrive_h, arrive_m)))
+                city, hour, minute = destination, arrive_h, arrive_m
+                legs += 1
+        for city in schedule:
+            schedule[city].sort()
+        yield schedule, goal
+
+
+def multiplicative_persistence_generator(seed):
+    rng = random.Random(seed)
+    for n in islice(pyramid(5, 5, 5), 2000):
+        m = rng.randint(1, 9)
+        for _ in range(n):
+            m = 10*m + rng.choice([1, 2, 3, 4, 5, 6, 6, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9])
+        yield m, True
+        yield m, False
+
+
+def count_odd_sum_sublists_generator(seed):
+    rng = random.Random(seed)
+    for n in islice(pyramid(3, 2, 2), 10000):
+        yield [rng.randint(0, n) for _ in range(n)],
+
+
+def largest_ones_square_generator(seed):
+    rng = random.Random(seed)
+    yield ['0'],
+    yield ['1'],
+    yield ['01', '10'],
+    yield ['11', '11'],
+    yield ['10', '11']
+    for p, n in zip(cycle([30, 60, 80, 90]), islice(pyramid(3, 3, 3), 2000)):
+        nn = n * n
+        board = [['0' for _ in range(n)] for _ in range(n)]
+        fill = rng.randint(nn//4, (7*nn)//8)
+        while fill > 0:
+            x = rng.randint(0, n-1)
+            y = rng.randint(0, n-1)
+            w = 1
+            while w < n-x and w < n-y and rng.randint(0, 99) < p:
+                w += 1
+            for xx in range(x, x+w):
+                for yy in range(y, y+w):
+                    if board[xx][yy] == '0':
+                        fill -= 1
+                        board[xx][yy] = '1'
+        yield ["".join(row) for row in board],
+
+
 def accumulate_dice_generator(seed):
     rng = random.Random(seed)
     for n in range(4, 20):
@@ -627,7 +693,7 @@ def othello_moves_generator(seed):
         yield othello, desdemona
 
 
-# Knuth and Liang's original hyphenation patterns from classic TeX. In the public domain.
+# Knuth and Liang's original hyphenation patterns from classic TeX. In public domain.
 
 __liang_patterns = """
 .ach4 .ad4der .af1t .al3t .am5at .an5c .ang4 .ani5m .ant4 .an3te .anti5s .ar5s
@@ -1004,7 +1070,7 @@ def ordinal_transform_generator(seed):
         yield seq, i
         u += 1
         if u == v:
-            u, v = 1, v + 1
+            u, v = 1, v+1
 
 
 def staircase_generator(seed):
@@ -1409,7 +1475,7 @@ def reverse_ascending_sublists_generator(seed):
             items.append(items[-1] + d * rng.randint(1, s))
             d = -d if rng.randint(0, 99) < p else d
         yield items
-        s, p = s + 1, (p+3) % 100
+        s, p = s+1, (p+3) % 100
 
 
 def give_change_generator(seed):
@@ -1558,7 +1624,7 @@ def bulls_and_cows_generator(seed):
             if __no_repeated_digits(guess, allowed):
                 bulls = rng.randint(0, 3)
                 cows = rng.randint(0, 3)
-                cows = min(cows, 4 - bulls)  # ensure bulls + cows <= 4
+                cows = min(cows, 4-bulls)  # ensure bulls + cows <= 4
                 if not(bulls == 3 and cows == 1):  # impossible
                     result.append((guess, bulls, cows))
         yield result
@@ -1573,10 +1639,10 @@ def can_balance_generator(seed):
             if i > 0 and moms[0] == moms[1] and items[0] != items[1]:
                 yield items[0][::-1] + [rng.randint(1, s)] + items[1]
             side = 0 if moms[1] > moms[0] else 1
-            other = 1 - side
+            other = 1-side
             if rng.randint(0, 99) < 25:
                 side, other = other, side
-            m = len(items[side]) + 1
+            m = len(items[side])+1
             diff = moms[other] - moms[side]
             if diff > 0 and diff % m == 0 and rng.randint(0, 99) < 30:
                 v = diff // m
@@ -2481,7 +2547,7 @@ def permutation_cycles_generator(seed):
     for n in range(1, 6):
         for p in permutations(range(n)):
             yield list(p)
-    # Fuzz test some of the longer permutations
+    # Fuzz test some longer permutations
     rng = random.Random(seed)
     for n in islice(pyramid(6, 2, 3), 1000):
         for _ in range(n//2):
@@ -2619,19 +2685,19 @@ def reach_corner_generator(seed):
     for _ in range(5000):
         count_until_increase += 1
         if count_until_increase == goal:
-            count_until_increase, goal, nn, aliens = 0, goal + 1, nn + 1, []
+            count_until_increase, goal, nn, aliens = 0, goal+1, nn+1, []
             n = rng.randint(4, nn - 3)
             m = rng.randint(nn - n + 2, nn)
             if n % 2 == 0 and m % 2 == 0:
                 m += 1
-        ex = rng.randint(0, n - 1)
-        ey = rng.randint(0, m - 1)
+        ex = rng.randint(0, n-1)
+        ey = rng.randint(0, m-1)
         if (ex, ey) not in aliens:
             aliens.append((ex, ey))
         x, y = ex, ey
         while (x, y) in aliens:
-            x = rng.randint(0, n - 1)
-            y = rng.randint(0, m - 1)
+            x = rng.randint(0, n-1)
+            y = rng.randint(0, m-1)
         yield x, y, n, m, aliens[:]
 
 
@@ -2641,13 +2707,13 @@ def bulgarian_cycle_generator(seed):
     for _ in range(300):
         piles.append(rng.randint(1, n))
         piles.append(rng.randint(1, n))
-        pos = rng.randint(0, len(piles) - 1)
+        pos = rng.randint(0, len(piles)-1)
         piles[-1] += piles[pos]
         del piles[pos]
         yield piles[:]
         count_until_increase += 1
         if count_until_increase == goal:
-            count_until_increase, goal, n, piles = 0, goal + 2, n + 1, []
+            count_until_increase, goal, n, piles = 0, goal+2, n+1, []
     for n in range(10, 30):
         yield [(i-1)*(i-2) for i in range(n)]
 
@@ -3625,7 +3691,7 @@ testcases = [
      "a2c9dfa8a7598ce1d2bd607ec8b2320b58257af7f185b6430d67e896014b30d2"
     ),
 
-    # Second batch of problems, created in 2023.
+    # Additional Python problems, created starting in 2023.
     (
      "queen_captures_all",
      queen_captures_all_generator(fixed_seed),
@@ -3685,6 +3751,26 @@ testcases = [
      "accumulate_dice",
      accumulate_dice_generator(fixed_seed),
      "0807db5f5be2ccf6dfc4c2ce8cf0e9e9a123ea2fc658a085bea1d6a563d22faa"
+    ),
+    (
+     "largest_ones_square",
+     largest_ones_square_generator(fixed_seed),
+     "b1d5012a603e85405d5148203940811110a150066243afc742aad3eab6ab5a4c"
+    ),
+    (
+     "count_odd_sum_sublists",
+     count_odd_sum_sublists_generator(fixed_seed),
+     "d3bcb659e3925df3b243b0c26889a9dc8bdc45221b0650c3c109a8461f6e9340"
+    ),
+    (
+     "multiplicative_persistence",
+     multiplicative_persistence_generator(fixed_seed),
+     "9113edadf34a5c6f66c9dae8fa101e90a64754fff952922fbb0ee70538b34415"
+    ),
+    (
+     "bus_travel",
+     bus_travel_generator(fixed_seed),
+     "e687056c08bbf99112cd5450dc057f0dc58ab92149c881bbba44f3c6b4d33dd2"
     )
 ]
 
@@ -3740,3 +3826,5 @@ def run_all():
 
 
 run_all()
+
+#discrepancy(labs109.count_odd_sum_subarrays2, labs109.count_odd_sum_subarrays, count_odd_sum_subarrays_generator(fixed_seed))
