@@ -140,6 +140,12 @@ Starting March 2023, the author started creating another set of Python problems.
    </td>
   </tr>
    <tr>
+   <td>Multiplicative persistence
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Top of the swops
    </td>
    <td>
@@ -175,8 +181,26 @@ Starting March 2023, the author started creating another set of Python problems.
    <td>
    </td>
   </tr>
+   <tr>
+   <td>Largest square of ones
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Count sublists with odd sums
+   </td>
+   <td>
+   </td>
+  </tr>
   <tr>
    <td>Sum of consecutive squares
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Out where the buses don't run
    </td>
    <td>
    </td>
