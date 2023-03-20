@@ -3770,7 +3770,7 @@ testcases = [
     (
      "bus_travel",
      bus_travel_generator(fixed_seed),
-     "e687056c08bbf99112cd5450dc057f0dc58ab92149c881bbba44f3c6b4d33dd2"
+     "6464911980162cd2d4782eed7b6e7b7db3102538746015f84bac7205830e0737"
     )
 ]
 
