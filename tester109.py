@@ -3252,7 +3252,7 @@ testcases = [
     (
      "sort_by_digit_count",
      sort_by_digit_count_generator(fixed_seed),
-     "0e09e921c16db7a7df6d53b0dc25d1621e908768bc872e73fd28557f4c26f140"
+     "089d0fe98f13d333f85969a574dec245e433a9e30610a4d9255bb39960aa173f"
     ),
     (
      "is_perfect_power",
