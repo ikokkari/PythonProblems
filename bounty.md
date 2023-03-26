@@ -164,6 +164,12 @@ Starting March 2023, the author started creating another set of Python problems.
    </td>
   </tr>
    <tr>
+   <td>Strict majority element
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Mian–Chowla sequence
    </td>
    <td>
@@ -188,6 +194,12 @@ Starting March 2023, the author started creating another set of Python problems.
    </td>
   </tr>
    <tr>
+   <td>Card row game
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Count sublists with odd sums
    </td>
    <td>
@@ -201,6 +213,12 @@ Starting March 2023, the author started creating another set of Python problems.
   </tr>
    <tr>
    <td>Out where the buses don't run
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Smetana interpreter
    </td>
    <td>
    </td>
