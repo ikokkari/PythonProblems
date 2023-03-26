@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "March 20, 2023"
+version = "March 25, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -344,6 +344,47 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+def smetana_interpreter_generator(seed):
+    rng = random.Random(seed)
+    for n in islice(pyramid(3, 2, 2), 4000):
+        program = []
+        for _ in range(n):
+            if rng.randint(0, 99) < 50:
+                s1 = rng.randint(0, n-1)
+                s2 = rng.randint(0, n-1)
+                while s1 == s2:
+                    s2 = rng.randint(0, n-1)
+                program.append(f"SWAP {s1} {s2}")
+            else:
+                s = rng.randint(0, n-1)
+                program.append(f"GOTO {s}")
+        yield program,
+
+
+def card_row_game_generator(seed):
+    rng = random.Random(seed)
+    for n in islice(pyramid(2, 2, 2), 1000):
+        yield [rng.randint(1, n*n) for _ in range(n)],
+
+
+def has_majority_generator(seed):
+    yield [],
+    yield [42],
+    yield [1, 2, 1, 2],
+    yield [49, 99],
+    yield [17, 17, 99],
+    yield [99, 42, 17],
+    rng = random.Random(seed)
+    for n, take, look in zip(islice(pyramid(3, 2, 1), 1000), cycle([30, 50, 90]), cycle([3, 4, 5, 6])):
+        m = n*n
+        items = [rng.randint(1, m) for _ in range(look)]
+        for _ in range(m-look):
+            items.append(rng.randint(1, n) if rng.randint(0, 99) < take else items[-rng.randint(1, look)])
+        item = rng.choice(items)
+        for _ in range(rng.randint(m//4, m)):
+            items[rng.randint(0, m-1)] = item
+        yield items
 
 
 def bus_travel_generator(seed):
@@ -1744,13 +1785,21 @@ def is_perfect_power_generator(seed):
 
 
 def sort_by_digit_count_generator(seed):
+    yield [7227, 2727, 7272, 2727, 2272],
     rng = random.Random(seed)
-    for n in islice(pyramid(1, 3, 1), 1000):
+    for (n, p) in zip(islice(pyramid(1, 2, 1), 1000), cycle([10, 50, 80])):
         items = []
         for _ in range(n):
-            d = rng.randint(1, n + 3)
-            items.append(random_int(rng, d, 50))
-        yield items
+            if len(items) < 2 or rng.randint(0, 99) > p:
+                items.append(random_int(rng, rng.randint(1, 10+n//2), 70))
+            else:
+                m = [d for d in str(rng.choice(items))]
+                rng.shuffle(m)
+                if rng.randint(0, 99) < 30:
+                    d = rng.choice("0123456789")
+                    m[rng.randint(0, len(m)-1)] = d
+                items.append(int("".join(m)))
+        yield items,
 
 
 def count_divisibles_in_range_generator(seed):
@@ -3203,7 +3252,7 @@ testcases = [
     (
      "sort_by_digit_count",
      sort_by_digit_count_generator(fixed_seed),
-     "6015a1e6aee7d3fb5f49e780a3dd935c9ffb70d7d082e75f070b714c43b7e8d8"
+     "0e09e921c16db7a7df6d53b0dc25d1621e908768bc872e73fd28557f4c26f140"
     ),
     (
      "is_perfect_power",
@@ -3771,6 +3820,21 @@ testcases = [
      "bus_travel",
      bus_travel_generator(fixed_seed),
      "6464911980162cd2d4782eed7b6e7b7db3102538746015f84bac7205830e0737"
+    ),
+    (
+     "has_majority",
+     has_majority_generator(fixed_seed),
+     "e8578d6ff24dc3a2532e247e5d95f1730871c71e26c7a0e15837a6ba5d69e8de"
+    ),
+    (
+     "card_row_game",
+     card_row_game_generator(fixed_seed),
+     "698fc8231b8cd745cb3223c986eec39f32a03426059971d6466ee9a72fe01a0c"
+    ),
+    (
+     "smetana_interpreter",
+     smetana_interpreter_generator(fixed_seed),
+     "46a70fa3ccff41c5cd08cf247513228a54113e4ca54ab18c5b4ec57a60c159cc"
     )
 ]
 
