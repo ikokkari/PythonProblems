@@ -96,7 +96,7 @@ To keep this fair and interesting, each individual person can get at most one bo
   <tr>
    <td>119: Jealous vs. zealous
    </td>
-   <td>
+   <td>ChatGPT 4, Mar 28, 2023
    </td>
   </tr>
   <tr>
