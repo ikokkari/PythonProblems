@@ -176,6 +176,18 @@ Starting March 2023, the author started creating another set of Python problems.
    </td>
   </tr>
    <tr>
+   <td>A place for everything and everything in its place
+   </td>
+   <td>
+   </td>
+   </tr>
+   <tr>
+   <td>When there's no item, there's no problem
+   </td>
+   <td>
+   </td>
+   </tr>
+   <tr>
    <td>'Tis but a scratch
    </td>
    <td>
