@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "March 25, 2023"
+version = "March 31, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -289,8 +289,7 @@ def test_all_functions(module, testcases_, recorder=None, known=None):
 ups = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 lows = "abcdefghijklmnopqrstuvwxyz"
 
-__primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
-            47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101]
+__primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101]
 
 # Some utility functions to help writing test generators.
 
@@ -344,6 +343,25 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+
+def stalin_sort_generator(seed):
+    yield [],
+    yield [42],
+    yield [1, 2],
+    yield [2, 1],
+    yield [42, 42],
+    rng = random.Random(seed)
+    m = 5
+    for n in islice(pyramid(3, 1, 1), 1000):
+        yield [rng.randint(-(m*m), (m*m)) for _ in range(n)],
+        items = list(range(n, -n, -1))
+        for _ in range(rng.randint(0, n//2)):
+            i = rng.randint(0, len(items)-1)
+            j = rng.randint(0, len(items)-1)
+            items[i], items[j] = items[j], items[j]
+        yield items,
+
 
 def smetana_interpreter_generator(seed):
     rng = random.Random(seed)
@@ -3835,6 +3853,16 @@ testcases = [
      "smetana_interpreter",
      smetana_interpreter_generator(fixed_seed),
      "46a70fa3ccff41c5cd08cf247513228a54113e4ca54ab18c5b4ec57a60c159cc"
+    ),
+    (
+     "stalin_sort",
+     stalin_sort_generator(fixed_seed),
+     "ee869e50c9b9def412fadb0d142a8e601d9d550921d04a1736e3a99b98a8deba"
+    ),
+    (
+     "insertion_sort_swaps",
+     stalin_sort_generator(fixed_seed),
+     "1c863b25d97baaaee165ee9a07e26b09ee6575634d5180a413836a14e6132d3b"
     )
 ]
 
