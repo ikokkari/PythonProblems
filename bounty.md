@@ -230,7 +230,7 @@ Starting March 2023, the author started creating another set of Python problems.
    </td>
   </tr>
    <tr>
-   <td>Smetana interpreter
+   <td>SMETANA interpreter
    </td>
    <td>
    </td>
