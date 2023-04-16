@@ -13,3 +13,5 @@ Obfuscated model solutions are available in the file `obfuscated.txt`, to give s
 The lab specification document and the automated tester software `tester109.py` are released under the [GNU General Public License v3](https://www.gnu.org/licenses/gpl-3.0.txt), with no warranties implied by the author.
 
 Wordlist `words_sorted.txt` adapted from [dwyl/english-words](https://github.com/dwyl/english-words).
+
+After these problems, the author also has a [similar collection of Java problems](https://github.com/ikokkari/CCPS209Labs) suitable for a second course on object oriented programming in Java.
