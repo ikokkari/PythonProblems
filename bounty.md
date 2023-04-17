@@ -235,10 +235,22 @@ Starting March 2023, the author started creating another set of Python problems.
    <td>
    </td>
   </tr>
+   <tr>
+   <td>Optimal blackjack play
+   </td>
+   <td>
+   </td>
+  </tr>
   <tr>
    <td>Scatter her enemies
    </td>
    <td>Karel Tutsu, March 8, 2023
+   </td>
+  </tr>
+   <tr>
+   <td>Blocking pawns
+   </td>
+   <td>
    </td>
   </tr>
    <tr>
