@@ -23,7 +23,7 @@ from fractions import Fraction
 # position in the labs109.py file. Use the limit of -1 to say "all test cases".
 
 verbose_execution = {
-    #   "function_one": 42,  # Print the first 42 test cases of function_one
+    #   "function_one": 42,   # Print the first 42 test cases of function_one
     #   "function_two": -1,   # Print all test cases of function_two, however many there are
     #   "function_three": 0   # Be silent with function_three (but run it early)
 }
@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "March 31, 2023"
+version = "April 17, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -343,6 +343,33 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+
+def blocking_pawns_generator(seed):
+    rng = random.Random(seed)
+    dirs = [(0, 0), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1)]
+    for n in islice(pyramid(8, 3, 3), 50):
+        taken, queens = set(), []
+        for _ in range(10):
+            x = rng.randint(1, n-2)
+            y = rng.randint(1, n-2)
+            for (dx, dy) in rng.sample(dirs, rng.randint(2, 5)):
+                d = rng.randint(2, 4)
+                nx, ny = (x + d*dx) % n, (y + d*dy) % n
+                for (ddx, ddy) in dirs:
+                    if (nx+ddx, ny+ddy) in taken:
+                        break
+                else:
+                    queens.append((nx, ny))
+                    for (ddx, ddy) in dirs:
+                        taken.add((nx+ddx, ny+ddy))
+        yield n, queens
+
+
+def optimal_blackjack_generator(seed):
+    rng = random.Random(seed)
+    for n in islice(pyramid(20, 2, 1), 2500):
+        yield [rng.choice([2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11]) for _ in range(n)],
 
 
 def stalin_sort_generator(seed):
@@ -3863,6 +3890,16 @@ testcases = [
      "insertion_sort_swaps",
      stalin_sort_generator(fixed_seed),
      "1c863b25d97baaaee165ee9a07e26b09ee6575634d5180a413836a14e6132d3b"
+    ),
+    (
+     "optimal_blackjack",
+     optimal_blackjack_generator(fixed_seed),
+     "205d163c94fb506e862b6b38b458cafb2659cb0ba2fcf9c53a507c1f1ad930e1"
+    ),
+    (
+     "blocking_pawns",
+     blocking_pawns_generator(fixed_seed),
+     "3d08794bf4533c633371fe69998e177660c6f5707241b3006d05bef2a2a524c7"
     )
 ]
 
