@@ -206,6 +206,18 @@ Starting March 2023, the author started creating another set of Python problems.
    </td>
   </tr>
    <tr>
+   <td>[Be]t[Te]r [C][Al]l [Sm][Al]l
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Forbidden digits 
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Card row game
    </td>
    <td>
