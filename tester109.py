@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "April 17, 2023"
+version = "April 19, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -345,6 +345,34 @@ def pyramid(n=1, goal=5, inc=1):
 # Test case generators for the individual functions.
 
 
+def break_bad_generator(seed):
+    rng = random.Random(seed)
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [w.strip() for w in f if len(w) > 2]
+    elements = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar',
+                'K', 'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Br',
+                'Kr', 'Rb', 'Sr', 'Y', 'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', 'In', 'Sn', 'Sb', 'Te',
+                'I', 'Xe', 'Cs', 'Ba', 'La', 'Ce', 'Pr', 'Nd', 'Pm', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er', 'Tm',
+                'Yb', 'Lu', 'Hf', 'Ta', 'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg', 'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn',
+                'Fr', 'Ra', 'Ac', 'Th', 'Pa', 'U', 'Np', 'Pu', 'Am', 'Cm', 'Bk', 'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr',
+                'Rf', 'Db', 'Sg', 'Bh', 'Hs', 'Mt', 'Ds', 'Rg', 'Cn', 'Nh', 'Fl', 'Mc', 'Lv', 'Ts', 'Og']
+    yield 'i', elements
+    yield 'no', elements
+    yield 'qx', elements
+    yield 'felina', elements
+    for word in rng.sample(words, 2000):
+        yield word, elements
+
+
+def forbidden_digit_generator(seed):
+    yield 0, 7
+    yield 1, 4
+    yield 2, 9
+    yield 3, 3
+    for n, d in islice(zip(scale_random(seed, 5, 3), cycle(range(10))), 1000):
+        yield n, d
+
+
 def blocking_pawns_generator(seed):
     rng = random.Random(seed)
     dirs = [(0, 0), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1), (-1, 0), (-1, 1)]
@@ -435,7 +463,7 @@ def has_majority_generator(seed):
 def bus_travel_generator(seed):
     rng = random.Random(seed)
     for n in islice(pyramid(4, 2, 1), 1000):
-        schedule = {i:[] for i in range(n)}
+        schedule = {i: [] for i in range(n)}
         goal = rng.randint(1, n-1)
         while len(schedule[0]) < 3:
             hour = rng.randint(1, 20)
@@ -3900,6 +3928,16 @@ testcases = [
      "blocking_pawns",
      blocking_pawns_generator(fixed_seed),
      "3d08794bf4533c633371fe69998e177660c6f5707241b3006d05bef2a2a524c7"
+    ),
+    (
+     "forbidden_digit",
+     forbidden_digit_generator(fixed_seed),
+     "6b39e16384361b0f4f2a6b026ac1b71c24d8ffc87317d9afd375b25a15c3af23"
+    ),
+    (
+     "break_bad",
+     break_bad_generator(fixed_seed),
+     "124006d47514ba14d9ef488020db56cefdc97fc79515b3c45e2b298ddd8eb2d1"
     )
 ]
 
