@@ -280,7 +280,7 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>A Lindenmayer system, bigly
    </td>
-   <td>
+   <td>John Hodgins, April 20, 2023
    </td>
   </tr>
 </table>
