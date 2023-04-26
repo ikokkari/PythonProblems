@@ -17,7 +17,7 @@ import labs109
 from fractions import Fraction
 
 # During development, this dictionary contains the functions whose calls and
-# results you want to see first during the test run. Make each entry "fname":N,
+# results you want to see first during the test run. Make each entry "name":N,
 # where N is how many test cases you want to see printed out. This also makes
 # the tester to run the tests for these functions first, regardless of their
 # position in the labs109.py file. Use the limit of -1 to say "all test cases".
@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "April 19, 2023"
+version = "April 26, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -343,6 +343,27 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+__keys = {'a': 2, 'b': 2, 'c': 2, 'd': 3, 'e': 3, 'f': 3, 'g': 4, 'h': 4, 'i': 4,
+          'j': 5, 'k': 5, 'l': 5, 'm': 6, 'n': 6, 'o': 6, 'p': 7, 'q': 7, 'r': 7,
+          's': 7, 't': 8, 'u': 8, 'v': 8, 'w': 9, 'x': 9, 'y': 9, 'z': 9}
+
+
+def keypad_words_generator(seed):
+    rng = random.Random(seed)
+    digits = [2, 2, 3, 3, 3, 4, 5, 5, 6, 6, 7, 7, 8, 8, 8, 9]
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [w.strip() for w in f if 3 < len(w) < 9]
+    yield '3287448', words
+    yield '4444444', words
+    for _ in range(500):
+        number = "".join(str(rng.choice(digits)) for _ in range(7))
+        yield number, words
+        while True:
+            word = rng.choice(words)
+            if len(word) == 7:
+                yield "".join(str(__keys[c]) for c in word), words
+                break
 
 
 def break_bad_generator(seed):
@@ -3938,12 +3959,18 @@ testcases = [
      "break_bad",
      break_bad_generator(fixed_seed),
      "124006d47514ba14d9ef488020db56cefdc97fc79515b3c45e2b298ddd8eb2d1"
+    ),
+    (
+     "keypad_words",
+     keypad_words_generator(fixed_seed),
+     "3298e017820c3af9d0e3252b0b849bd7e5d96e45519ce9b748f9a324e25b5132"
     )
 ]
 
 
 def run_all():
     print(f"109 Python Problems tester, {version}, Ilkka Kokkarinen.")
+    print("Latest version always at https://github.com/ikokkari/PythonProblems")
     try:
         if version_info < (3, 7, 0):
             print("THIS SCRIPT REQUIRES PYTHON 3.7.0 OR LATER. EXITING.")
