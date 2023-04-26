@@ -253,6 +253,12 @@ Starting March 2023, the author started creating another set of Python problems.
    <td>
    </td>
   </tr>
+   <tr>
+   <td>How's my coding? Call 1-800-3284778
+   </td>
+   <td>
+   </td>
+  </tr>
   <tr>
    <td>Scatter her enemies
    </td>
