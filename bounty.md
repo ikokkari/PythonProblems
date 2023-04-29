@@ -170,7 +170,19 @@ Starting March 2023, the author started creating another set of Python problems.
    </td>
   </tr>
    <tr>
+   <td>It's a game, a reflection
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Mian–Chowla sequence
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Stern–Brocot path
    </td>
    <td>
    </td>
