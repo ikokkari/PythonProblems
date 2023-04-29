@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "April 26, 2023"
+version = "April 28, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -343,6 +343,28 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+
+def stern_brocot_generator(seed):
+    rng = random.Random(seed)
+    for n in islice(pyramid(3, 2, 2), 10000):
+        den = rng.randint(n, 2*n)
+        num = rng.randint(1, 2*den)
+        yield Fraction(num, den),
+
+
+def abacaba_generator(seed):
+    rng = random.Random(seed)
+    for n in range(2**5-1):
+        yield n,
+    for m, p in zip(islice(pyramid(5, 1, 1), 10000), cycle([30, 60, 95])):
+        n = 2**m-1
+        while m > 0 and rng.randint(0, 99) < p:
+            m = m-1
+            n = n + (1 if rng.randint(0, 1) else -1) * 2**m
+        yield n,
+        yield n + rng.randint(1, n//3)
+
 
 __keys = {'a': 2, 'b': 2, 'c': 2, 'd': 3, 'e': 3, 'f': 3, 'g': 4, 'h': 4, 'i': 4,
           'j': 5, 'k': 5, 'l': 5, 'm': 6, 'n': 6, 'o': 6, 'p': 7, 'q': 7, 'r': 7,
@@ -3964,6 +3986,16 @@ testcases = [
      "keypad_words",
      keypad_words_generator(fixed_seed),
      "3298e017820c3af9d0e3252b0b849bd7e5d96e45519ce9b748f9a324e25b5132"
+    ),
+    (
+     "abacaba",
+     abacaba_generator(fixed_seed),
+     "ea34964bd4c72b543da28e9d7044acd24423c297fdd6465314d6b5d04ea80e67"
+    ),
+    (
+     "stern_brocot",
+     stern_brocot_generator(fixed_seed),
+     "9fa761f803fdf9a7c0359611cd0a62e91445e23e3f9754d5f746e5f787576a06"
     )
 ]
 
