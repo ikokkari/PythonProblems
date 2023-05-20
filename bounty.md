@@ -166,7 +166,7 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>Strict majority element
    </td>
-   <td>
+   <td>Maxim Olatoye, May 20, 2023
    </td>
   </tr>
    <tr>
