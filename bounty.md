@@ -151,6 +151,12 @@ Starting March 2023, the author started creating another set of Python problems.
    <td>
    </td>
   </tr>
+   <tr>
+   <td>Discrete rounding
+   </td>
+   <td>
+   </td>
+  </tr>
   <tr>
    <td>Soundex good to me
    </td>
@@ -250,7 +256,7 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>Out where the buses don't run
    </td>
-   <td>
+   <td>"Shwnzp", May 26, 2023
    </td>
   </tr>
    <tr>
