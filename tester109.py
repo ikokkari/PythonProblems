@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "April 28, 2023"
+version = "May 26, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -89,7 +89,7 @@ def canonize(result):
 # This makes the discrepancy outputs accurate and less confusing to students. Also,
 # when arguments are long, we will try not to flood the user console.
 
-def stringify_args(args, cutoff=600):
+def stringify_args(args, cutoff=2000):
     result = ""
     for (i, a) in enumerate(args):
         if i > 0:
@@ -110,10 +110,10 @@ def stringify_args(args, cutoff=600):
 # the test cases for both of them and output the first or the shortest
 # test case for which these two implementations disagree.
 
-def discrepancy(teacher, student, test_cases, stop_at_first=False):
+def discrepancy(teacher, student, test_cases, stop_at_first=False, print_all=False):
     shortest_args, disc_teacher, disc_student, disc, cases = None, None, None, 0, 0
     for n, args in enumerate(test_cases):
-        # Turn the args into a tuple, if they aren't that already.
+        # Turn the args into a tuple, if they aren't one already.
         if type(args) != tuple:
             args = (args,)
         current_args = stringify_args(args)
@@ -130,6 +130,10 @@ def discrepancy(teacher, student, test_cases, stop_at_first=False):
             disc += 1
             if stop_at_first or shortest_args is None or len(current_args) < len(shortest_args):
                 shortest_args, disc_teacher, disc_student = current_args, result_teacher, result_student
+            if print_all:
+                print(f"Current_args: {current_args}")
+                print(f"Student: {result_student}")
+                print(f"Teacher: {result_teacher}")
             if stop_at_first:
                 break
     if shortest_args is None:
@@ -343,6 +347,10 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+def discrete_rounding_generator(seed):
+    for n in range(1, 4000):
+        yield n,
 
 
 def stern_brocot_generator(seed):
@@ -3935,7 +3943,7 @@ testcases = [
     (
      "bus_travel",
      bus_travel_generator(fixed_seed),
-     "6464911980162cd2d4782eed7b6e7b7db3102538746015f84bac7205830e0737"
+     "ec65407429c27a358eee332724a024cdae1a71dda4706a83dc7f77df4ea6fbab"
     ),
     (
      "has_majority",
@@ -3996,6 +4004,11 @@ testcases = [
      "stern_brocot",
      stern_brocot_generator(fixed_seed),
      "9fa761f803fdf9a7c0359611cd0a62e91445e23e3f9754d5f746e5f787576a06"
+    ),
+    (
+     "discrete_rounding",
+     discrete_rounding_generator(fixed_seed),
+     "e8683699e3667c869320bc9e772206866c64fff5a4d34374fa9686b2b4ede827"
     )
 ]
 
