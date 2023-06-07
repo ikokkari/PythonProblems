@@ -136,25 +136,25 @@ Starting March 2023, the author started creating another set of Python problems.
   <tr>
    <td>The Fischer King
    </td>
-   <td>
+   <td>Karel Tutsu, June 7, 2023
    </td>
   </tr>
    <tr>
    <td>Multiplicative persistence
    </td>
-   <td>
+   <td>Karel Tutsu, June 7, 2023
    </td>
   </tr>
    <tr>
    <td>Top of the swops
    </td>
-   <td>
+   <td>Karel Tutsu, June 7, 2023
    </td>
   </tr>
    <tr>
    <td>Discrete rounding
    </td>
-   <td>
+   <td>Karel Tutsu, June 7, 2023
    </td>
   </tr>
   <tr>
@@ -166,7 +166,7 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>Ten pins, not six, Dolores
    </td>
-   <td>
+   <td>Karel Tutsu, June 7, 2023
    </td>
   </tr>
    <tr>
