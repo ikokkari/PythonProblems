@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "May 26, 2023"
+version = "June 10, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -116,6 +116,7 @@ def discrepancy(teacher, student, test_cases, stop_at_first=False, print_all=Fal
         # Turn the args into a tuple, if they aren't one already.
         if type(args) != tuple:
             args = (args,)
+        print(f"Trying {args}")
         current_args = stringify_args(args)
         cases += 1
         try:
@@ -345,8 +346,42 @@ def pyramid(n=1, goal=5, inc=1):
         if count_until_increase == goal:
             goal, count_until_increase, n = goal+inc, 0, n+1
 
-
 # Test case generators for the individual functions.
+
+
+def shotgun_generator(seed):
+    for n in islice(scale_random(seed, 2, 5), 100):
+        yield n,
+
+
+def count_palindromes_generator(seed):
+    yield 'a',
+    yield 'aa',
+    yield 'ab',
+    rng = random.Random(seed)
+    for n, p in islice(zip(pyramid(1, 1, 1), cycle([30, 50, 80])), 3000):
+        text = ""
+        while len(text) < n:
+            if len(text) > 4 and rng.randint(0, 99) < p:
+                i = rng.randint(-1, len(text)-1)
+                text += text[-1:i:-1]
+            else:
+                text += rng.choice(('a', 'b', 'ab', 'ba', 'aa', 'bb'))
+        yield text,
+
+
+def mu_torere_moves_generator(seed):
+    board = 'BW-'
+    rng = random.Random(seed)
+    for n in islice(pyramid(3, 2, 2), 1000):
+        yield board, 'W'
+        yield board, 'B'
+        if n > len(board):
+            board += 'BW'
+        board_l = [p for p in board]
+        rng.shuffle(board_l)
+        board = "".join(board_l)
+
 
 def discrete_rounding_generator(seed):
     for n in range(1, 4000):
@@ -3875,11 +3910,12 @@ testcases = [
      is_chess_960_generator(fixed_seed),
      "4d9b0e6c631904cf993e4736fba5c0a5bd5fd87001468f36622fb316fd1d1827"
     ),
-    (
-     "soundex",
-     soundex_generator(fixed_seed),
-     "8569238f186e3c9fb947bfcebaa57f3d48d9a9a8727e94a4176a04f49ebc53fe"
-    ),
+    # Removed from problem set June 10, 2023
+    # (
+    #  "soundex",
+    #  soundex_generator(fixed_seed),
+    #  "8569238f186e3c9fb947bfcebaa57f3d48d9a9a8727e94a4176a04f49ebc53fe"
+    # ),
     (
      "sum_of_consecutive_squares",
      sum_of_consecutive_squares_generator(fixed_seed),
@@ -4009,6 +4045,21 @@ testcases = [
      "discrete_rounding",
      discrete_rounding_generator(fixed_seed),
      "e8683699e3667c869320bc9e772206866c64fff5a4d34374fa9686b2b4ede827"
+    ),
+    (
+     "mu_torere_moves",
+     mu_torere_moves_generator(fixed_seed),
+     "a3a4ce73fcaad2dcc182c8c94181e817d0bebb47dabe566a39383e1f5ae45b16"
+    ),
+    (
+     "count_palindromes",
+     count_palindromes_generator(fixed_seed),
+     "d169a14f48d28e5ec4ae28a03a2925d811abee9c1ef6f4472e156ff84f7e8980"
+    ),
+    (
+     "shotgun",
+     shotgun_generator(fixed_seed),
+     "0f203942549b6168cdc63cad802601252655a39e098fab2d396f52c07358cd80"
     )
 ]
 
