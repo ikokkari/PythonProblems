@@ -157,8 +157,8 @@ Starting March 2023, the author started creating another set of Python problems.
    <td>Karel Tutsu, June 7, 2023
    </td>
   </tr>
-  <tr>
-   <td>Soundex good to me
+   <tr>
+   <td>Count palindromic substrings
    </td>
    <td>
    </td>
@@ -230,7 +230,13 @@ Starting March 2023, the author started creating another set of Python problems.
    </td>
   </tr>
    <tr>
-   <td>Forbidden digits 
+   <td>Forbidden digit 
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Shotgun sequence
    </td>
    <td>
    </td>
