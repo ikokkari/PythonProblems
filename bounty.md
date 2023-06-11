@@ -178,7 +178,7 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>It's a game, a reflection
    </td>
-   <td>
+   <td>Karel Tutsu, June 11, 2023
    </td>
   </tr>
    <tr>
