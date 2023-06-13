@@ -184,7 +184,7 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>Mian–Chowla sequence
    </td>
-   <td>
+   <td>Karel Tutsu, June 12, 2023
    </td>
   </tr>
    <tr>
