@@ -160,7 +160,7 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>Count palindromic substrings
    </td>
-   <td>
+   <td>Karel Tutsu, June 13, 2023
    </td>
   </tr>
    <tr>
