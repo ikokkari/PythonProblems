@@ -164,6 +164,12 @@ Starting March 2023, the author started creating another set of Python problems.
    </td>
   </tr>
    <tr>
+   <td>Count Langford violations
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Ten pins, not six, Dolores
    </td>
    <td>Karel Tutsu, June 7, 2023
@@ -224,6 +230,12 @@ Starting March 2023, the author started creating another set of Python problems.
    </td>
   </tr>
    <tr>
+   <td>Hofstadter's figure-figure sequences
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>[Be]t[Te]r [C][Al]l [Sm][Al]l
    </td>
    <td>
@@ -255,6 +267,12 @@ Starting March 2023, the author started creating another set of Python problems.
   </tr>
   <tr>
    <td>Sum of consecutive squares
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Kimberling's expulsion sequence
    </td>
    <td>
    </td>
