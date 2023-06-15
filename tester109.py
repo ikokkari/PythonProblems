@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "June 10, 2023"
+version = "June 14, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -116,7 +116,6 @@ def discrepancy(teacher, student, test_cases, stop_at_first=False, print_all=Fal
         # Turn the args into a tuple, if they aren't one already.
         if type(args) != tuple:
             args = (args,)
-        print(f"Trying {args}")
         current_args = stringify_args(args)
         cases += 1
         try:
@@ -349,6 +348,51 @@ def pyramid(n=1, goal=5, inc=1):
 # Test case generators for the individual functions.
 
 
+def kimberling_expulsion_generator(seed):
+    rng = random.Random(seed)
+    start = 0
+    for n in range(100):
+        end = start + rng.randint(1, n+2)
+        yield start, end
+        start = end
+
+
+def hofstadter_figure_figure_generator():
+    for n in range(0, 100001):
+        yield n,
+
+
+def langford_violations_generator(seed):
+    # Some known Langford sequences
+    yield [3, 1, 2, 1, 3, 2],
+    yield [4, 1, 3, 1, 2, 4, 3, 2],
+    yield [2, 3, 4, 2, 1, 3, 1, 4],
+    yield [5, 2, 8, 6, 2, 3, 5, 7, 4, 3, 6, 8, 1, 4, 1, 7],
+    yield [5, 8, 4, 1, 7, 1, 5, 4, 6, 3, 8, 2, 7, 3, 2, 6],
+    rng = random.Random(seed)
+    flip = True
+    for k in islice(pyramid(3, 2, 4), 2000):
+        n = 4*k - (1 if flip else 0)
+        flip = not flip
+        items = [None for _ in range(2*n)]
+        indices = list(range(1, n+1))
+        rng.shuffle(indices)
+        unpaired = []
+        for e in indices:
+            i = rng.randint(e+1, 2*n-1)
+            if items[i] is None and items[i-(e+1)] is None:
+                items[i] = items[i-(e+1)] = e
+            else:
+                unpaired.append(e)
+        unfilled = [i for i in range(2*n) if items[i] is None]
+        rng.shuffle(unfilled)
+        i = 0
+        for e in unpaired:
+            items[unfilled[i]] = items[unfilled[i+1]] = e
+            i += 2
+        yield items
+
+
 def shotgun_generator(seed):
     for n in islice(scale_random(seed, 2, 5), 100):
         yield n,
@@ -383,7 +427,7 @@ def mu_torere_moves_generator(seed):
         board = "".join(board_l)
 
 
-def discrete_rounding_generator(seed):
+def discrete_rounding_generator():
     for n in range(1, 4000):
         yield n,
 
@@ -760,20 +804,6 @@ def sum_of_consecutive_squares_generator(seed):
             n += m*m*(1 if rng.randint(0, 1) else -1)
         yield max(n, 1)
         d += 4
-
-
-def soundex_generator(seed):
-    # From https://en.wikipedia.org/wiki/Soundex and https://www.familysearch.org/en/wiki/Soundex
-    for word in ['robert', 'pfister', 'ashcroft', 'tymczak', 'honeyman', 'gutierrez', 'carwruth',
-                 'lee', 'vandeusen', 'allricht', 'eberhard', 'hanselmann', 'heimbach', 'kavanagh',
-                 'lind', 'lukaschowsky', 'mcdonnell', 'mcgee', 'oppenheimer', 'riedemanas',
-                 'schafer', 'shaeffer', 'zita', 'zitzmeinn', 'wilkins', 'walakynovski']:
-        yield word,
-    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
-        words = [w.strip() for w in f]
-    rng = random.Random(seed)
-    for word in rng.sample(words, 5000):
-        yield word,
 
 
 def is_chess_960_generator(seed):
@@ -4043,7 +4073,7 @@ testcases = [
     ),
     (
      "discrete_rounding",
-     discrete_rounding_generator(fixed_seed),
+     discrete_rounding_generator(),
      "e8683699e3667c869320bc9e772206866c64fff5a4d34374fa9686b2b4ede827"
     ),
     (
@@ -4060,6 +4090,21 @@ testcases = [
      "shotgun",
      shotgun_generator(fixed_seed),
      "0f203942549b6168cdc63cad802601252655a39e098fab2d396f52c07358cd80"
+    ),
+    (
+     "langford_violations",
+     langford_violations_generator(fixed_seed),
+     "0bfac84d1229eee67f2b0056efa5121fc7b65618b33aa28504013e4465c6d6b3"
+    ),
+    (
+     "hofstadter_figure_figure",
+     hofstadter_figure_figure_generator(),
+     "c2250ce763119b3bade3a84b3afb98915b7be968e4f6c25c40d7df88a21122c9"
+    ),
+    (
+     "kimberling_expulsion",
+     kimberling_expulsion_generator(fixed_seed),
+     "48771e32d9ca5633aa8185357a15ab815706e0fcb91d5ba0b4302a38530a1ba0"
     )
 ]
 
