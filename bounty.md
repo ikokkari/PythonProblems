@@ -226,7 +226,7 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>Largest square of ones
    </td>
-   <td>
+   <td>Maxim Olatoye, June 15, 2023
    </td>
   </tr>
    <tr>
