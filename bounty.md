@@ -302,7 +302,7 @@ Starting March 2023, the author started creating another set of Python problems.
    </td>
   </tr>
    <tr>
-   <td>Optimal blackjack play
+   <td>Casinos hate this Toronto man!
    </td>
    <td>
    </td>
