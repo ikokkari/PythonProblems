@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "June 14, 2023"
+version = "June 18, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -346,6 +346,32 @@ def pyramid(n=1, goal=5, inc=1):
             goal, count_until_increase, n = goal+inc, 0, n+1
 
 # Test case generators for the individual functions.
+
+
+def tog_comparison_generator(seed):
+    alpha = ups + lows + "0123456789.!@#$%^&*()[]{}"
+    rng = random.Random(seed)
+    for n, p in islice(zip(pyramid(5, 2, 2), cycle([40, 70, 90])), 2000):
+        first, second = "", ""
+        while len(first) < n:
+            if rng.randint(0, 99) < 50:
+                ch1 = rng.choice(alpha)
+                ch2 = ch1 if rng.randint(0, 99) < p else rng.choice(alpha)
+            else:
+                ch1 = rng.randint(0, 10**(n-2))
+                ch2 = rng.randint(0, 10**(n-3)) if rng.randint(0, 99) < p else ch1
+            first, second = first + str(ch1), second + str(ch2)
+        suffix = rng.choice([".txt", ".doc", ".dat", ".xls", ".jpg"])
+        first += suffix
+        second += suffix
+        if first != second:
+            yield first, second
+            yield second, first
+        yield first, first
+
+
+def repetition_resistant_generator():
+    yield from range(10000)
 
 
 def kimberling_expulsion_generator(seed):
@@ -4105,6 +4131,16 @@ testcases = [
      "kimberling_expulsion",
      kimberling_expulsion_generator(fixed_seed),
      "48771e32d9ca5633aa8185357a15ab815706e0fcb91d5ba0b4302a38530a1ba0"
+    ),
+    (
+     "repetition_resistant",
+     repetition_resistant_generator(),
+     "d7f292d22b9b223aabc3b3e8f9a7c512d082474f379408f69b755f380308622e"
+    ),
+    (
+     "tog_comparison",
+     tog_comparison_generator(fixed_seed),
+     "f55e23dcfc75636d3aa85e525e7b3132a1f7ae2e4c412adc01bc8be93adcada3"
     )
 ]
 
