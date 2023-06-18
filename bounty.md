@@ -164,6 +164,12 @@ Starting March 2023, the author started creating another set of Python problems.
    </td>
   </tr>
    <tr>
+   <td>Reasonable filename comparison
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Count Langford violations
    </td>
    <td>
@@ -256,7 +262,7 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>Card row game
    </td>
-   <td>
+   <td>Maxim Olatoye, June 18, 2023
    </td>
   </tr>
    <tr>
@@ -273,6 +279,12 @@ Starting March 2023, the author started creating another set of Python problems.
   </tr>
    <tr>
    <td>Kimberling's expulsion sequence
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Kimberling's repetition-resistant sequence
    </td>
    <td>
    </td>
