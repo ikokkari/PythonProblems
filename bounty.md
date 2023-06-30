@@ -298,7 +298,7 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>SMETANA interpreter
    </td>
-   <td>
+   <td>Mortreza Eivazi, June 30, 2023
    </td>
   </tr>
    <tr>
