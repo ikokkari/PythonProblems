@@ -166,13 +166,13 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>Reasonable filename comparison
    </td>
-   <td>Rimma Konoval, July 8, 2023
+   <td>"Anonymous", July 8, 2023
    </td>
   </tr>
    <tr>
    <td>Count Langford violations
    </td>
-   <td>Rimma Konoval, July 8, 2023
+   <td>"Anonymous", July 8, 2023
    </td>
   </tr>
    <tr>
