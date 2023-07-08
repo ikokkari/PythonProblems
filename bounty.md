@@ -54,7 +54,7 @@ To keep this fair and interesting, each individual person can get at most one bo
   <tr>
    <td>112: Count domino tilings
    </td>
-   <td>
+   <td>Maxim Olatoye, July 8
    </td>
   </tr>
   <tr>
@@ -166,13 +166,13 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>Reasonable filename comparison
    </td>
-   <td>
+   <td>Rimma Konoval, July 8, 2023
    </td>
   </tr>
    <tr>
    <td>Count Langford violations
    </td>
-   <td>
+   <td>Rimma Konoval, July 8, 2023
    </td>
   </tr>
    <tr>
