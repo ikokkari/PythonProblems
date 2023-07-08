@@ -54,7 +54,7 @@ To keep this fair and interesting, each individual person can get at most one bo
   <tr>
    <td>112: Count domino tilings
    </td>
-   <td>Maxim Olatoye, July 8
+   <td>Maxim Olatoye, July 8, 2023
    </td>
   </tr>
   <tr>
