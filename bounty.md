@@ -334,7 +334,7 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>Complete a Costas array
    </td>
-   <td>
+   <td>Karel Tutsu, August 22, 2023
    </td>
   </tr>
    <tr>
