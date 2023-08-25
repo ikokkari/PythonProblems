@@ -310,7 +310,7 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>How's my coding? Call 1-800-3284778
    </td>
-   <td>
+   <td>Karel Tutsu, August 25, 2023
    </td>
   </tr>
   <tr>
