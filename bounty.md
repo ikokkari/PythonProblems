@@ -214,7 +214,7 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>When there's no item, there's no problem
    </td>
-   <td>
+   <td>Karel Tutsu, August 30, 2023
    </td>
    </tr>
    <tr>
@@ -268,13 +268,13 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>Count sublists with odd sums
    </td>
-   <td>
+   <td>Karel Tutsu, August 30, 2023
    </td>
   </tr>
   <tr>
    <td>Sum of consecutive squares
    </td>
-   <td>
+   <td>Karel Tutsu, August 30, 2023
    </td>
   </tr>
    <tr>
