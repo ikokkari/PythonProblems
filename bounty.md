@@ -218,6 +218,12 @@ Starting March 2023, the author started creating another set of Python problems.
    </td>
    </tr>
    <tr>
+   <td>Boxed away
+   </td>
+   <td>
+   </td>
+   </tr>
+   <tr>
    <td>'Tis but a scratch
    </td>
    <td>
@@ -247,6 +253,12 @@ Starting March 2023, the author started creating another set of Python problems.
    <td>
    </td>
   </tr>
+   <tr>
+   <td>Total covered area
+   </td>
+   <td>
+   </td>
+   </tr>
    <tr>
    <td>Forbidden digit 
    </td>
@@ -331,6 +343,12 @@ Starting March 2023, the author started creating another set of Python problems.
    <td>Mortreza Eivazi, June 30, 2023
    </td>
   </tr>
+   <tr>
+   <td>The round number round
+   </td>
+   <td>
+   </td>
+   </tr>
    <tr>
    <td>Complete a Costas array
    </td>
