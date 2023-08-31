@@ -212,6 +212,12 @@ Starting March 2023, the author started creating another set of Python problems.
    </td>
    </tr>
    <tr>
+   <td>Scoring a tournament bridge hand
+   </td>
+   <td>
+   </td>
+   </tr>
+   <tr>
    <td>When there's no item, there's no problem
    </td>
    <td>Karel Tutsu, August 30, 2023
@@ -283,6 +289,12 @@ Starting March 2023, the author started creating another set of Python problems.
    <td>Karel Tutsu, August 30, 2023
    </td>
   </tr>
+   <tr>
+   <td>Tailfins and hamburgers
+   </td>
+   <td>
+   </td>
+   </tr>
   <tr>
    <td>Sum of consecutive squares
    </td>
