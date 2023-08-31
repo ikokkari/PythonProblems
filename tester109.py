@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "June 18, 2023"
+version = "August 30, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -118,6 +118,7 @@ def discrepancy(teacher, student, test_cases, stop_at_first=False, print_all=Fal
             args = (args,)
         current_args = stringify_args(args)
         cases += 1
+        print(f"{args=}")
         try:
             result_teacher = canonize(teacher(*args))
         except Exception as e:
@@ -345,7 +346,77 @@ def pyramid(n=1, goal=5, inc=1):
         if count_until_increase == goal:
             goal, count_until_increase, n = goal+inc, 0, n+1
 
+
 # Test case generators for the individual functions.
+
+def des_chiffres_generator(seed):
+    rng = random.Random(seed)
+    for n, s in islice(zip(pyramid(3, 5, 5), pyramid(10, 2, 1)), 100):
+        board = sorted([rng.randint(1, s) for _ in range(n)])
+        goal = board[-1]
+        while goal in board:
+            goal = rng.randint(1, n*s*4)
+        yield board, goal
+
+
+def fewest_boxes_generator(seed):
+    rng = random.Random(seed)
+    yield [], 42
+    yield [41], 42
+    s = 5
+    for n in islice(pyramid(2, 1, 1), 4000):
+        items = [rng.randint(1, s)]
+        for _ in range(n):
+            items.append(items[-1] + rng.randint(1, s))
+        yield items, items[-1] + rng.randint(1, s)
+        s += 1
+
+
+def squares_total_area_generator(seed):
+    rng = random.Random(seed)
+    yield [(3, 4)],
+    yield [(2, 2), (3, 3), (4, 4), (3, 3), (2, 2)],
+    yield [(6, 2), (5, 3), (9, 4)],
+    yield [(9, 4), (6, 2), (5, 3)],
+    yield [(5, 7), (8, 5)],
+    yield [(3, 3), (5, 5), (7, 3)],
+    yield [(6, 4), (3, 7)],
+    yield [(3, 2), (3, 1)],
+    yield [(2, 2), (5, 5), (6, 2)],
+    s = 5
+    for n in islice(pyramid(2, 1, 1), 2000):
+        points = []
+        for m in range(n):
+            if m < 3 or rng.randint(0, 99) < 70:
+                x = rng.randint(0, s)
+                y = rng.randint(0, s)
+            else:
+                x = points[rng.randint(0, m-1)][0]
+                y = points[rng.randint(0, m-1)][1]
+            points.append((x, y))
+            s += 1
+        yield points,
+
+
+def bridge_score_generator(seed):
+    rng = random.Random(seed)
+    for level in range(1, 8):
+        for vul in [True, False]:
+            for doubled in ['-', 'X', 'XX']:
+                for strain in ['diamonds', 'clubs', 'hearts', 'spades', 'notrump']:
+                    made = rng.randint(level, min(level+3, 7))
+                    yield strain, level, vul, doubled, made
+
+
+def trip_plan_generator(seed):
+    rng = random.Random(seed)
+    step = 20
+    for n in islice(pyramid(1, 1, 1), 2000):
+        motels = [rng.randint(1, step // 2)]
+        while len(motels) < n:
+            motels.append(motels[-1] + rng.randint(5, step // 2))
+        yield motels, rng.randint(motels[-1] // 20 + 2, motels[-1] // 2 + 2)
+        step += 2
 
 
 def tog_comparison_generator(seed):
@@ -3204,12 +3275,6 @@ testcases = [
     ),
     # Removed from problem set April 20, 2020
     # (
-    # "bridge_score",
-    # bridge_score_generator(),
-    # "1d1e3f4be9fec5fd85d87f7dcfa8c9e40b267c4de49672c65f"
-    # ),
-    # Removed from problem set April 20, 2020
-    # (
     # "minimize_sum",
     # minimize_sum_generator(seed),
     # "7e6257c998d5842ec41699b8b51748400a15e539083e5a0a20"
@@ -4141,6 +4206,31 @@ testcases = [
      "tog_comparison",
      tog_comparison_generator(fixed_seed),
      "f55e23dcfc75636d3aa85e525e7b3132a1f7ae2e4c412adc01bc8be93adcada3"
+    ),
+    (
+     "trip_plan",
+     trip_plan_generator(fixed_seed),
+     "e014b488d173342b34ec6527275855dadff78b45adb6b3900f188e549d96c4ba"
+    ),
+    (
+     "bridge_score",
+     bridge_score_generator(fixed_seed),
+     "b4ba8ca19871247542d172a16c065e7f41598ada7551b54088acb928278d5476"
+    ),
+    (
+     "squares_total_area",
+     squares_total_area_generator(fixed_seed),
+     "df1f99b0923eb8591b3dce170c7de2d784caf0f304e88d10d20157b7c0e981ed"
+    ),
+    (
+     "fewest_boxes",
+     fewest_boxes_generator(fixed_seed),
+     "db346b93869969e0c9f496115b5ce894911c23e6f9d9a20ac3e4cc20c7875100"
+    ),
+    (
+     "des_chiffres",
+     des_chiffres_generator(fixed_seed),
+     "1f3dfbcdfbc56462ea786672124615ee2e480fb47c8a4c141c3c9b25436cab00"
     )
 ]
 
