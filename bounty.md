@@ -34,9 +34,9 @@ To keep this fair and interesting, each individual person can get at most one bo
 
 <table>
   <tr>
-   <td>Problem
+   <td><b>Problem</b>
    </td>
-   <td>Bounty claimed
+   <td><b>Bounty claimed</b>
    </td>
   </tr>
   <tr>
@@ -128,9 +128,9 @@ Starting March 2023, the author started creating another set of Python problems.
      
 <table>
   <tr>
-   <td>Problem
+   <td><b>Problem</b>
    </td>
-   <td>Bounty claimed
+   <td><b>Bounty claimed</b>
    </td>
   </tr>
   <tr>
