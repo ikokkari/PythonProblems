@@ -32,7 +32,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "August 30, 2023"
+version = "September 1, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -4220,7 +4220,7 @@ testcases = [
     (
      "squares_total_area",
      squares_total_area_generator(fixed_seed),
-     "df1f99b0923eb8591b3dce170c7de2d784caf0f304e88d10d20157b7c0e981ed"
+     "6cf12847fd4a49b76e773364d435a433079433b18be903cc0163a13b123a7052"
     ),
     (
      "fewest_boxes",
