@@ -262,7 +262,7 @@ Starting March 2023, the author started creating another set of Python problems.
    <tr>
    <td>Total covered area
    </td>
-   <td>
+   <td>Karel Tutsu, September 1, 2023
    </td>
    </tr>
    <tr>
