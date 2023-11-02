@@ -78,7 +78,7 @@ To keep this fair and interesting, each individual person can get at most one bo
   <tr>
    <td>116: Flatland golf
    </td>
-   <td>
+   <td>Dennis Kaydalov, Nov 2, 2023
    </td>
   </tr>
   <tr>
