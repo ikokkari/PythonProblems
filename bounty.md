@@ -26,7 +26,7 @@ Conversion notes:
 
 # 109 Problems Bonus Bounty List
 
-This problem collection is now complete, and no further problems will ever be added. In addition to the actual problems, the collection [109 Python problems for CCPS 109](https://github.com/ikokkari/PythonProblems) includes fourteen bonus problems intended for students who are looking for a serious challenge. For personal reasons, it is extremely important to me that all these bonus problem specifications and their private model solutions contain no bugs, so that the checksums hardcoded in the automated tester are true and achievable by everyone who chooses to work hard to solve these problems.
+The problem collection "109 Python Problems for CCPS 109" is now complete, and no further problems will ever be added to this collection. In addition to the actual problems, the collection [109 Python problems for CCPS 109](https://github.com/ikokkari/PythonProblems) includes fourteen bonus problems intended for students who are looking for a serious challenge. For personal reasons, it is extremely important to me that all these bonus problem specifications and their private model solutions contain no bugs, so that the checksums hardcoded in the automated tester are true and achievable by everyone who chooses to work hard to solve these problems.
 
 I will therefore offer a bounty of 100 CAD for each bonus problem to the first person to email me (ilkka.kokkarinen@gmail.com) a working solution to pass my automated tests for that problem. The solution must pass these tests within the twenty second time limit when executed on my machine. This bounty is paid to either Sick Kids Toronto or the Ukrainian war effort, the donation made in your name. And for whatever it's worth, you get your name permanently displayed in the table below as long as this problem collection exists.
 
@@ -124,7 +124,7 @@ To keep this fair and interesting, each individual person can get at most one bo
    </td>
 </table>
      
-Starting March 2023, the author started creating another set of Python problems. The following problems don't have paid bounties, but the first person to submit a working solution to the author will still get their name etched in the table below for perpetuity. Unlike the above list of bonus problems, each student is allowed to have several bounties from this list of additional problems.
+Starting March 2023, the author started creating another set of Python problems, separate from the main corpus of the *109 Python Problems*. (One can only quit for so long without the inevitable relapse.) The following problems don't have paid bounties, but the first person to submit a working solution for each of the following problems will still get their name etched in the table below for perpetuity. Unlike the above list of bonus problems, each student is allowed to get several bounties from this list of additional problems. There are no monetary bounties for the following problems, though, just the bragging rights and the good feeling for the work well done.
      
 <table>
   <tr>
