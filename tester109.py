@@ -12,6 +12,7 @@ from itertools import islice, permutations, zip_longest, cycle, product, count
 import random
 import gzip
 import os.path
+import string
 from sys import version_info, exit
 import labs109
 from fractions import Fraction
@@ -32,7 +33,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "September 1, 2023"
+version = "November 1, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -348,6 +349,44 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+def digit_partition_generator(seed):
+    rng = random.Random(seed)
+    for (n, d) in islice(zip(pyramid(5, 6, 6), pyramid(4, 5, 6)), 300):
+        digits, goal = "", 0
+        while len(digits) < n:
+            m = random_string("0123456789", rng.randint(1, d), rng)
+            goal += int(m)
+            digits += m
+        if rng.randint(0, 99) < 50:
+            off = goal // 10
+            goal = rng.randint(goal-off, goal+off)
+        yield digits, goal
+
+
+def tr_generator(seed):
+    alphabet = string.ascii_letters + string.digits
+    rng = random.Random(seed)
+    yield "abc", "", ""
+    yield "", "X", "Y"
+    yield "X", "Z", "Y"
+    yield "ab", "ab", "ba"
+    for n in islice(pyramid(2, 2, 2), 2000):
+        k = rng.randint(1, n+5)
+        text = "".join([rng.choice(alphabet[:n+2]) for _ in range(n)])
+        ch_from = "".join(rng.sample(alphabet[:n+5], k))
+        ch_to = "".join(rng.choices(alphabet[:n+10], k=k))
+        yield text, ch_from, ch_to
+
+
+def cube_tower_generator(seed):
+    rng = random.Random(seed)
+    for n in islice(pyramid(3, 2, 1), 400):
+        cubes, m = [], rng.randint(n+1, n+6)
+        for _ in range(n):
+            cubes.append([rng.randint(0, m-1) for _ in range(6)])
+        yield cubes,
+
 
 def des_chiffres_generator(seed):
     rng = random.Random(seed)
@@ -4231,6 +4270,21 @@ testcases = [
      "des_chiffres",
      des_chiffres_generator(fixed_seed),
      "1f3dfbcdfbc56462ea786672124615ee2e480fb47c8a4c141c3c9b25436cab00"
+    ),
+    (
+     "cube_tower",
+     cube_tower_generator(fixed_seed),
+     "a729ad1e589e0870ae4c708b86c2c24ea496d11819e6c551ca7a35645b23e265"
+    ),
+    (
+     "tr",
+     tr_generator(fixed_seed),
+     "92039e11e76854a376b7c548520fa50277bfc023c3a5f8c9fc00b6d1886231f1"
+    ),
+    (
+     "digit_partition",
+     digit_partition_generator(fixed_seed),
+     "cc91cf1324d3e0b37b02becacaea78264bf5ccf616bb1812416cf919b14355b4"
     )
 ]
 
