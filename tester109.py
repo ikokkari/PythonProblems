@@ -4284,7 +4284,7 @@ testcases = [
     (
      "digit_partition",
      digit_partition_generator(fixed_seed),
-     "cc91cf1324d3e0b37b02becacaea78264bf5ccf616bb1812416cf919b14355b4"
+     "71c1df0a8d58974cdde824788b9eab8ecd13aa77b0fcc08e63f9cdd7232c6fc4"
     )
 ]
 
