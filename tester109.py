@@ -33,7 +33,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "November 1, 2023"
+version = "November 19, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -349,6 +349,17 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+def measure_balsam_generator(seed):
+    rng = random.Random(seed)
+    for n, m in islice(zip(pyramid(3, 50, 10), pyramid(8, 2, 2)), 400):
+        flasks = sorted([rng.randint(1, m) for _ in range(n)], reverse=True)
+        flasks[0] += 1
+        goal = rng.randint(1, flasks[0] - 1)
+        while goal in flasks:
+            goal = rng.randint(1, flasks[0] - 1)
+        yield tuple(flasks), goal
+
 
 def digit_partition_generator(seed):
     rng = random.Random(seed)
@@ -2321,9 +2332,9 @@ def seven_zero_generator(seed):
     yield from [(2860,), (1001,), (2**20,), (2**10 - 1,)]
     rng = random.Random(seed)
     m = 2
-    for _ in range(500):
+    for _ in range(200):
         yield m,
-        m += rng.randint(1, 5)
+        m += rng.randint(1, 10)
 
 
 def remove_after_kth_generator(seed):
@@ -3095,7 +3106,7 @@ def bulgarian_cycle_generator(seed):
 def colour_trio_generator(seed):
     rng = random.Random(seed)
     items = ''
-    for n in islice(pyramid(3, 4, 1), 10000):
+    for n in islice(pyramid(3, 4, 1), 5000):
         items += rng.choice('ryb')
         yield items
         if len(items) == n:
@@ -3384,7 +3395,7 @@ testcases = [
     (
      "seven_zero",
      seven_zero_generator(fixed_seed),
-     "2f0c5d3a4246fca6c16b13fccadcfb77f8f75a3bf417c818a24d1e21d77d2183"
+     "907ec1aed8dde0ef69efc30a876af3adda28787e8c3cf67e8c0c47fa858ee9bc"
     ),
     # Removed from problem set December 10, 2020
     # (
@@ -3942,7 +3953,7 @@ testcases = [
     (
      "colour_trio",
      colour_trio_generator(fixed_seed),
-     "0b9f0e3ce49d5eea0073721da2ee28654151a1e2653f9b64745b65e07bf25780"
+     "d06b021c2742fd6e29c0617c705c3a17845a9eae5b028ad5bf2fa58718fbdbd6"
     ),
     (
      "wordomino",
@@ -4285,6 +4296,11 @@ testcases = [
      "digit_partition",
      digit_partition_generator(fixed_seed),
      "71c1df0a8d58974cdde824788b9eab8ecd13aa77b0fcc08e63f9cdd7232c6fc4"
+    ),
+    (
+     "measure_balsam",
+     measure_balsam_generator(fixed_seed),
+     "a15cdb98d1c1c6ccebc5ef47610f29d6b0cdf97ddd93baf642b148ce5718707e"
     )
 ]
 
