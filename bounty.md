@@ -224,6 +224,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
    </tr>
    <tr>
+   <td>Count distinct substrings
+   </td>
+   <td>
+   </td>
+   </tr>
+   <tr>
    <td>When there's no item, there's no problem
    </td>
    <td>Karel Tutsu, August 30, 2023
