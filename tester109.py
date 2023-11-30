@@ -33,7 +33,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "November 24, 2023"
+version = "November 29, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -349,6 +349,30 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+def count_distinct_substrings_generator(seed):
+    rng = Random(seed)
+    yield "",
+    yield "a",
+    yield "ab",
+    yield "bb",
+    for n, p in islice(zip(pyramid(3, 2, 2), cycle([10, 50, 90])), 2000):
+        text = [rng.choice(lows) for _ in range(3)]
+        i = rng.randint(0, 2)
+        while len(text) < n:
+            if i == len(text) or rng.randint(0, 99) < p:
+                text.append(rng.choice(lows))
+                i = rng.randint(0, len(text)-1)
+            else:
+                text.append(text[i])
+                if rng.randint(0, 99) < 30:
+                    i += 1
+        yield "".join(text),
+    # Don't be a Shlemiel.
+    yield "abc" * 500,
+    yield "xyx" * 501
+    yield "brrr" * 400
+
 
 def measure_balsam_generator(seed):
     rng = Random(seed)
@@ -4308,6 +4332,11 @@ testcases = [
      "measure_balsam",
      measure_balsam_generator(fixed_seed),
      "a15cdb98d1c1c6ccebc5ef47610f29d6b0cdf97ddd93baf642b148ce5718707e"
+    ),
+    (
+     "count_distinct_substrings",
+     count_distinct_substrings_generator(fixed_seed),
+     "0ea1c4446e997cf3395947bf66a01525147ab06083891da579f370d706c4b225"
     )
 ]
 
