@@ -8,7 +8,7 @@
 
 from hashlib import sha256
 from time import time
-from itertools import islice, permutations, zip_longest, cycle, product, count
+from itertools import islice, permutations, zip_longest, cycle, product, count, chain
 from random import Random
 import gzip
 import os.path
@@ -33,7 +33,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "November 29, 2023"
+version = "December 8, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -107,52 +107,6 @@ def stringify_args(args, cutoff=2000):
     return result
 
 
-# Given teacher and student implementations of the same function, run
-# the test cases for both of them and output the first or the shortest
-# test case for which these two implementations disagree.
-
-def discrepancy(teacher, student, test_cases, stop_at_first=False, print_all=False):
-    shortest_args, disc_teacher, disc_student, disc, cases = None, None, None, 0, 0
-    for n, args in enumerate(test_cases):
-        # Turn the args into a tuple, if they aren't one already.
-        if type(args) != tuple:
-            args = (args,)
-        current_args = stringify_args(args)
-        cases += 1
-        print(f"{args=}")
-        try:
-            result_teacher = canonize(teacher(*args))
-        except Exception as e:
-            result_teacher = f"TEACHER CRASH! {e}"
-        try:
-            result_student = canonize(student(*args))
-        except Exception as e:
-            result_student = f"STUDENT CRASH! {e}"
-        if result_teacher != result_student:
-            disc += 1
-            if stop_at_first or shortest_args is None or len(current_args) < len(shortest_args):
-                shortest_args, disc_teacher, disc_student = current_args, result_teacher, result_student
-            if print_all:
-                print(f"Current_args: {current_args}")
-                print(f"Student: {result_student}")
-                print(f"Teacher: {result_teacher}")
-            if stop_at_first:
-                break
-    if shortest_args is None:
-        print("Both functions returned the same answers.")
-        return True
-    else:
-        if stop_at_first:
-            print("First discrepancy found. It was:")
-        else:
-            print(f"For {cases} test cases, {disc} discrepancies were found.")
-            print("Shortest discrepancy input was:")
-        print(shortest_args)
-        print(f"Teacher: {repr(disc_teacher)}")
-        print(f"Student: {repr(disc_student)}")
-        return False
-
-
 # Runs the function f for its test cases, calculating SHA256 checksum
 # for the results. If the checksum matches the expected, return the
 # running time, otherwise return -1. If expected == None, print out
@@ -160,14 +114,14 @@ def discrepancy(teacher, student, test_cases, stop_at_first=False, print_all=Fal
 # arguments and the result returned from function into the recorder.
 
 def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expected_answers=None):
-    fname, recorded, output_len = f.__name__, None, 0
-    print(f"{fname}: ", end="", flush=True)
+    function_name, recorded, output_len = f.__name__, None, 0
+    print(f"{function_name}: ", end="", flush=True)
     # How many results of function calls to print out.
-    verb_count = verbose_execution.get(fname, 0)
+    verb_count = verbose_execution.get(function_name, 0)
     if recorder:
-        print(f"{function_prefix}{fname}", file=recorder)
+        print(f"{function_prefix}{function_name}", file=recorder)
     if expected_answers:
-        recorded = expected_answers.get(fname, None)
+        recorded = expected_answers.get(function_name, None)
     chk, start_time, crashed = sha256(), time(), False
     for (test_case_idx, test_args) in enumerate(test_cases):
         # Convert a singleton of any non-tuple into singleton tuple.
@@ -188,7 +142,7 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
         # Print out the argument and result, if in verbose mode.
         if verb_count > 0 or verb_count == -1:
             verb_count -= 1 if verb_count > 0 else 0
-            print(f"{fname} #{test_case_idx}: ", end="", flush=True)
+            print(f"{function_name} #{test_case_idx}: ", end="", flush=True)
             print(test_args_string)
             print(f"RESULT: {result}", flush=True)
         # Update the checksum.
@@ -232,7 +186,7 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
             print(f"IN THE FIRST {testcase_cutoff} TEST CASES. IF YOU CAN'T FIND THIS")
             print("BUG AFTER SLEEPING OVER IT ONCE, PLEASE SEND YOUR FUNCTION")
             print("TO ilkka.kokkarinen@gmail.com TO HELP IMPROVE THE QUALITY OF")
-            print(f"THESE AUTOMATED TEST CASES. ENSURE THAT YOUR {fname}")
+            print(f"THESE AUTOMATED TEST CASES. ENSURE THAT YOUR {function_name}")
             print("DOES NOT USE ANY FLOATING POINT CALCULATIONS WHOSE PRECISION")
             print("RUNS OUT ONCE THE NUMBERS INVOLVED BECOME LARGE ENOUGH.")
             return -1
@@ -250,11 +204,11 @@ def sort_by_source(testcases_):
     with open('labs109.py', 'r', encoding='utf-8') as source:
         for (line_no, line) in enumerate(source):
             if line.startswith("def "):
-                fname = line[4:line.find('(')].strip()
-                if fname in funcs:  # Who knows what future student this will save.
-                    print(f"WARNING: MULTIPLE DEFINITION FOR {fname}")
-                if fname in recognized:
-                    funcs[fname] = 0 if fname in verbose_execution or fname in need_check else line_no
+                function_name = line[4:line.find('(')].strip()
+                if function_name in funcs:  # Who knows how many future students this will save.
+                    print(f"WARNING: MULTIPLE DEFINITION FOR {function_name}")
+                if function_name in recognized:
+                    funcs[function_name] = 0 if function_name in verbose_execution or function_name in need_check else line_no
         testcases_.sort(key=lambda x: funcs.get(x[0], 9999999))
     return sorted(funcs.keys())
 
@@ -349,6 +303,46 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+def vector_add_reach_generator(seed):
+    rng = Random(seed)
+    for n, d in islice(zip(pyramid(2, 8, 10), cycle(range(2, 11))), 250):
+        m, vectors = rng.randint(max(2, n-2), n), set()
+        while len(vectors) < m:
+            v = tuple(rng.randint(-m, m) for _ in range(d))
+            if any(c != 0 for c in v):
+                vectors.add(v)
+        vectors = list(vectors)
+        start = end = 0
+        while start == end:
+            if rng.randint(0, 99) < 20:
+                coords = [rng.randint(0, 2*n) for _ in range(2*d)]
+                start = tuple(coords[:d])
+                goal = tuple(coords[d:])
+            else:
+                goal = start = tuple(rng.randint(n, 3*n) for _ in range(d))
+                for _ in range(rng.randint(2*n, 3*n)):
+                    step = tuple(x+y for (x, y) in zip(goal, rng.choice(vectors)))
+                    if all(c >= 0 for c in step):
+                        goal = step
+        yield start, goal, vectors, 3 * n
+
+
+def mmu_generator(seed):
+    rng = Random(seed)
+    for n, m, p in chain(
+            islice(zip(pyramid(2, 8, 10), pyramid(5, 3, 4), cycle([20, 35, 60])), 2000),
+            islice(zip(pyramid(20, 2, 2), range(100, 600), cycle([10, 20, 30])), 500)
+    ):
+        pages = []
+        while len(pages) < m:
+            if len(pages) < 3 or rng.randint(0, 99) < p:
+                p = rng.randint(0, 2*n)
+            else:
+                p = rng.choice(pages)
+            pages.append(p)
+        yield rng.randint(1, n+1), pages
+
 
 def count_distinct_substrings_generator(seed):
     rng = Random(seed)
@@ -2330,24 +2324,21 @@ def three_summers_generator(seed):
 
 
 def ztalloc_generator(seed):
-    yield from ['d', 'uuddd', 'ddd', 'udud', 'uduuudddd']
+    yield from ((p,) for p in ['d', 'uuddd', 'ddd', 'udud', 'uduuudddd', 'uuudddddddd', 'ddudd', 'dduudd'])
     rng = Random(seed)
-    for i in range(15000):
-        if rng.randint(0, 99) < 50:
-            c = rng.randint(1, 2 + 10 * i)
-            pat = []
-            while c > 1:
-                if c % 2 == 0:
-                    c = c // 2
-                    pat.append('d')
-                else:
-                    c = 3 * c + 1
-                    pat.append('u')
-        else:
-            len_ = rng.randint(1, min(100, 2 + i // 1000))
-            pat = [('u' if (rng.randint(0, 99) < 50) else 'd') for _ in range(len_)]
-            pat.extend(['d', 'd', 'd', 'd'])
-        yield ''.join(pat)
+    for n in range(2, 10000):
+        pat = []
+        while n > 1:
+            if n % 2 == 0:
+                n = n // 2
+                pat.append('d')
+            else:
+                n = 3 * n + 1
+                pat.append('u')
+        while rng.randint(0, 99) < 50:
+            i = rng.randint(0, len(pat)-1)
+            pat[i] = 'u' if pat[i] == 'd' else 'd'
+        yield ''.join(pat),
 
 
 def sum_of_two_squares_generator(seed):
@@ -3458,7 +3449,7 @@ testcases = [
     (
      "ztalloc",
      ztalloc_generator(fixed_seed),
-     "b570cd16dec9233f324d34de8aa87084700f334c3e4cb17fe3660168ebdb0eff"
+     "b1c4615a2b3b086a26dd8c5211f065c8227d9c138dd9bd51422c177f4ca03b14"
     ),
     (
      "losing_trick_count",
@@ -4337,6 +4328,21 @@ testcases = [
      "count_distinct_substrings",
      count_distinct_substrings_generator(fixed_seed),
      "0ea1c4446e997cf3395947bf66a01525147ab06083891da579f370d706c4b225"
+    ),
+    (
+     "mmu_lru",
+     mmu_generator(fixed_seed),
+     "1cf6e3ac363dcd3b59df1ff53cf9abdd84487747f51d32f8af4cd34f1d40e35a"
+    ),
+    (
+     "mmu_optimal",
+     mmu_generator(fixed_seed),
+     "fb6b9c3578fcd78de3953e650ea321eba4466950985b5ce56649c6a43e1eb3e1"
+    ),
+    (
+     "vector_add_reach",
+     vector_add_reach_generator(fixed_seed),
+     "a4da54deb5b13790eb6d081e4126cfa43005e2c004fdc5184d4e182e8c919a3b"
     )
 ]
 
@@ -4392,4 +4398,51 @@ def run_all():
         exit(4)
 
 
+# Given teacher and student implementations of the same function, run
+# the test cases for both of them and output the first or the shortest
+# test case for which these two implementations disagree.
+
+def discrepancy(teacher, student, test_cases, stop_at_first=False, print_all=False):
+    shortest_args, disc_teacher, disc_student, disc, cases = None, None, None, 0, 0
+    for n, args in enumerate(test_cases):
+        # Turn the args into a tuple, if they aren't one already.
+        if type(args) != tuple:
+            args = (args,)
+        current_args = stringify_args(args)
+        cases += 1
+        try:
+            result_teacher = canonize(teacher(*args))
+        except Exception as e:
+            result_teacher = f"TEACHER CRASH! {e}"
+        try:
+            result_student = canonize(student(*args))
+        except Exception as e:
+            result_student = f"STUDENT CRASH! {e}"
+        if result_teacher != result_student:
+            disc += 1
+            if stop_at_first or shortest_args is None or len(current_args) < len(shortest_args):
+                shortest_args, disc_teacher, disc_student = current_args, result_teacher, result_student
+            if print_all:
+                print(f"Current_args: {current_args}")
+                print(f"Student: {result_student}")
+                print(f"Teacher: {result_teacher}")
+            if stop_at_first:
+                break
+    if shortest_args is None:
+        print("Both functions returned the same answers.")
+        return True
+    else:
+        if stop_at_first:
+            print("First discrepancy found. It was:")
+        else:
+            print(f"For {cases} test cases, {disc} discrepancies were found.")
+            print("Shortest discrepancy input was:")
+        print(shortest_args)
+        print(f"Teacher: {repr(disc_teacher)}")
+        print(f"Student: {repr(disc_student)}")
+        return False
+
+
 run_all()
+
+#discrepancy(labs109.count_growlers, count_growlers, count_growlers_generator(fixed_seed), print_all=True)
