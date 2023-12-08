@@ -313,8 +313,8 @@ def vector_add_reach_generator(seed):
             if any(c != 0 for c in v):
                 vectors.add(v)
         vectors = list(vectors)
-        start = end = 0
-        while start == end:
+        start = goal = 0
+        while start == goal:
             if rng.randint(0, 99) < 20:
                 coords = [rng.randint(0, 2*n) for _ in range(2*d)]
                 start = tuple(coords[:d])
