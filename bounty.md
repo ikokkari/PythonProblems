@@ -230,6 +230,18 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
    </tr>
    <tr>
+   <td>Luck Bélády tonight
+   </td>
+   <td>
+   </td>
+   </tr>
+   <tr>
+   <td>Making your own luck
+   </td>
+   <td>
+   </td>
+   </tr>
+   <tr>
    <td>When there's no item, there's no problem
    </td>
    <td>Karel Tutsu, August 30, 2023
@@ -351,6 +363,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>SMETANA interpreter
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>The sharpest axes
    </td>
    <td>
    </td>
