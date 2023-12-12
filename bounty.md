@@ -158,6 +158,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>The parking lot is full
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Translate
    </td>
    <td>
@@ -337,6 +343,12 @@ Starting March 2023, the author started creating another set of Python problems,
    <td>
    </td>
   </tr>
+   <tr>
+   <td>Gijswijt sequence
+   </td>
+   <td>
+   </td>
+  </tr>
   <tr>
    <td>Sum of consecutive squares
    </td>
@@ -351,6 +363,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Kimberling's repetition-resistant sequence
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Tower of Babel
    </td>
    <td>
    </td>
