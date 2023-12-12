@@ -33,7 +33,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "December 8, 2023"
+version = "December 11, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -303,6 +303,44 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+def gijswijt_generator(seed):
+    rng = Random(seed)
+    n = 0
+    for m in islice(pyramid(3, 1, 1), 300):
+        yield n,
+        nn = n + rng.randint(1, m)
+        if n < 219 < nn:
+            yield 219,
+        n = nn
+
+
+def parking_lot_permutation_generator(seed):
+    rng = Random(seed)
+    yield [0],
+    yield [1, 0],
+    yield [1, 1],
+    yield [0, 0]
+    for n, p in islice(zip(pyramid(3, 1, 1), cycle([20, 50, 70])), 1000):
+        preferred_spot = list(range(n))
+        rng.shuffle(preferred_spot)
+        for i in range(n):
+            if rng.randint(0, 99) < p:
+                preferred_spot[i] = rng.choice(preferred_spot)
+        yield preferred_spot,
+
+
+def tower_of_babel_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(2, 2, 2), pyramid(7, 1, 1)), 100):
+        blocks = []
+        for _ in range(n):
+            x = rng.randint(1, m)
+            y = rng.randint(1, m)
+            z = rng.randint(1, m)
+            blocks.append((x, y, z))
+        yield blocks,
+
 
 def vector_add_reach_generator(seed):
     rng = Random(seed)
@@ -4343,6 +4381,21 @@ testcases = [
      "vector_add_reach",
      vector_add_reach_generator(fixed_seed),
      "a4da54deb5b13790eb6d081e4126cfa43005e2c004fdc5184d4e182e8c919a3b"
+    ),
+    (
+     "tower_of_babel",
+     tower_of_babel_generator(fixed_seed),
+     "60ed0f633b21e9ed353972241cff02fa09ff29e9425888374395959ad182281e"
+    ),
+    (
+     "parking_lot_permutation",
+     parking_lot_permutation_generator(fixed_seed),
+     "2033e14ea8323502638b89793d35bf53720a091c5eb0680eafac7e900b81b4f8"
+    ),
+    (
+     "gijswijt",
+     gijswijt_generator(fixed_seed),
+     "61727e9c59198b85f3ef3e61074a5c9b33782cd9d2ca184d70aef543f4c10877"
     )
 ]
 
