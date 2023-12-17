@@ -1,5 +1,7 @@
 # 109 Python Problems for CCPS 109
 
+**Beginner Python coders can watch the video [Solving 109 Python Problems for CCPS 109](https://youtu.be/a9EsZl9ryWg) on YouTube for a demonstration of how to solve these problems and use the automated tester.**
+
 This repository contains the problem specifications, the automated tester and the necessary data files for the graded lab problems for the course *CCPS 109 Computer Science I*, as taught by [Ilkka Kokkarinen](http://www.scs.ryerson.ca/~ikokkari/) for the Chang School of Continuing Education, Toronto Metropolitan University, Toronto, Canada. The lecture material and example Python programs of that course are also freely available in the GitHub repository [ikokkari/PythonExamples](https://github.com/ikokkari/PythonExamples).
 
 The specifications for all these lab problems are collected in the file [109 Python Problems.pdf](https://github.com/ikokkari/PythonProblems/blob/main/109%20Python%20Problems%20for%20CCPS%20109.pdf). Another set of problems is being collected to the ongoing document [Additional Python Problems.pdf](https://github.com/ikokkari/PythonProblems/blob/main/Additional%20Python%20Problems.pdf), currently holding 52 fresh problems in addition to the main problem collection. Both collections use the same automated tester script [tester109.py](https://github.com/ikokkari/PythonProblems/blob/main/tester109.py) to verify the correctness of student solutions.
