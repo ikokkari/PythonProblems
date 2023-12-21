@@ -164,6 +164,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Count unicolour rectangles
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Translate
    </td>
    <td>
@@ -236,13 +242,13 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
    </tr>
    <tr>
-   <td>Luck Bélády tonight
+   <td>Replacement with perfect hindsight
    </td>
    <td>
    </td>
    </tr>
    <tr>
-   <td>Making your own luck
+   <td>Replacement with perfect foresight
    </td>
    <td>
    </td>
@@ -275,6 +281,12 @@ Starting March 2023, the author started creating another set of Python problems,
    <td>Largest square of ones
    </td>
    <td>Maxim Olatoye, June 15, 2023
+   </td>
+  </tr>
+   <tr>
+   <td>Markov distance
+   </td>
+   <td>
    </td>
   </tr>
    <tr>
@@ -337,6 +349,12 @@ Starting March 2023, the author started creating another set of Python problems,
    <td>
    </td>
    </tr>
+   <tr>
+   <td>Split the digits, maximize the product
+   </td>
+   <td>
+   </td>
+  </tr>
    <tr>
    <td>Tower of cubes
    </td>
