@@ -33,7 +33,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "December 11, 2023"
+version = "December 21, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -303,6 +303,47 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+def max_product_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(4, 2, 2), 400):
+        digits = [str(rng.randint(0, 9)) for _ in range(n)]
+        digits.sort(reverse=True)
+        m = rng.randint(1, n-1)
+        yield "".join(digits), max(n-m, m), min(n-m, m)
+
+
+def count_unicolour_rectangles_generator(seed):
+    yield ["c"],
+    yield ["aa", "aa"],
+    yield ["aba", "ccc", "ada"],
+    yield ["ddd", "ddd", "ddd"],
+    yield ["aba", "bab", "aba"],
+    yield ["ccc", "ccc", "ccc", "ccc"],
+    rng = Random(seed)
+    for n in islice(pyramid(3, 2, 2), 400):
+        m = rng.randint(1, 2*n)
+        grid = ["".join(rng.choice("abcd") for _ in range(m)) for _ in range(n)]
+        yield grid,
+
+
+def markov_distance_generator(seed):
+    rng = Random(seed)
+    triples_list = [(1, 2, 5), (13, 34, 1325), (2, 29, 169)]
+    triples_set = set(triples_list)
+    while len(triples_list) < 400:
+        triple = list(rng.choice(triples_list))
+        rng.shuffle(triple)
+        (x, y, z) = triple
+        succ = tuple(sorted([x, y, 3 * x * y - z]))
+        if succ not in triples_set:
+            triples_set.add(succ)
+            triples_list.append(succ)
+    for n in range(400):
+        i1 = rng.randint(0, n)
+        i2 = rng.randint(0, n)
+        yield triples_list[i1], triples_list[i2]
+
 
 def gijswijt_generator(seed):
     rng = Random(seed)
@@ -2600,6 +2641,7 @@ def nearest_smaller_generator(seed):
 
 def domino_cycle_generator(seed):
     rng = Random(seed)
+    yield [],
     yield [(4, 4)],
     yield [(1, 3)],
     yield [(2, 6), (6, 2)],
@@ -3360,7 +3402,7 @@ testcases = [
     (
      "domino_cycle",
      domino_cycle_generator(fixed_seed),
-     "8f5eb9b52de7ff3f7d162974abcfcbf764d58d256d55634097e5c3566fe1bccf"
+     "63ad8f4f4cf4a1ee9f7949fb8be6c173aac5ecf19b998418fb4f8c3e9a9decda"
     ),
     # Removed from problem set August 10, 2021
     # (
@@ -4396,6 +4438,21 @@ testcases = [
      "gijswijt",
      gijswijt_generator(fixed_seed),
      "61727e9c59198b85f3ef3e61074a5c9b33782cd9d2ca184d70aef543f4c10877"
+    ),
+    (
+     "markov_distance",
+     markov_distance_generator(fixed_seed),
+     "68ada2f65a1bd602fbe361a9327cb59c88cc28ee0dc7671af9b0db2bb3d17ece"
+    ),
+    (
+     "count_unicolour_rectangles",
+     count_unicolour_rectangles_generator(fixed_seed),
+     "14b4467fc57c884e0a583c7659985bdd8a0c84e095ef1b581586d00f7609e126"
+    ),
+    (
+     "max_product",
+     max_product_generator(fixed_seed),
+     "639791d496fd80720d4986925a37937dfb5a8cd3025c651677796c917abca2c9"
     )
 ]
 
@@ -4498,4 +4555,5 @@ def discrepancy(teacher, student, test_cases, stop_at_first=False, print_all=Fal
 
 run_all()
 
-#discrepancy(labs109.count_growlers, count_growlers, count_growlers_generator(fixed_seed), print_all=True)
+
+#discrepancy(labs109.max_product2, labs109.max_product, max_product_generator(fixed_seed), print_all=True)
