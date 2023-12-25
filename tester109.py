@@ -33,7 +33,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "December 21, 2023"
+version = "December 24, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -303,6 +303,24 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+
+def prize_strings_generator(seed):
+    rng = Random(seed)
+    for n in range(4, 60):
+        for _ in range(3):
+            late_limit = rng.randint(1, 4)
+            absent_limit = rng.randint(2, 6)
+            yield n, late_limit, absent_limit
+
+
+def goodstein_generator(seed):
+    rng = Random(seed)
+    for n in range(1, 200):
+        yield n, rng.randint(1, n)
+        yield n, rng.randint(2*n, 3*n)
+        yield n, rng.randint(10*n, 20*n)
+
 
 def max_product_generator(seed):
     rng = Random(seed)
@@ -4453,6 +4471,16 @@ testcases = [
      "max_product",
      max_product_generator(fixed_seed),
      "639791d496fd80720d4986925a37937dfb5a8cd3025c651677796c917abca2c9"
+    ),
+    (
+     "goodstein",
+     goodstein_generator(fixed_seed),
+     "cf10c309927110702b1ad430a88e59d78b8e389f51f66b616d88770e35ba5f48"
+    ),
+    (
+     "prize_strings",
+     prize_strings_generator(fixed_seed),
+     "bf65f0be4387fca6f16e89e30257d62e5924d5173a11d44d4b62296e9e04a168"
     )
 ]
 
