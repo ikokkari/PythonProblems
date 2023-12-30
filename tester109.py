@@ -33,7 +33,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "December 24, 2023"
+version = "December 30, 2023"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -304,6 +304,54 @@ def pyramid(n=1, goal=5, inc=1):
 
 # Test case generators for the individual functions.
 
+def carryless_multiplication_generator(seed):
+    yield 0, 10
+    yield 12, 0
+    rng = Random(seed)
+    for n, p in islice(zip(pyramid(2, 1, 1), cycle([20, 40, 60, 80])), 1000):
+        m = rng.randint(1, n)
+        a = random_int(rng, n, p)
+        b = random_int(rng, m, p)
+        yield a, b
+
+
+def game_with_multiset_generator(seed):
+    yield [('A', 0), ('A', 0), ('A', 2), ('G', 6)]
+    powers = [2**i for i in range(100)]
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(10, 3, 3), pyramid(3, 2, 3)), 300):
+        queries, total, used = [], 0, []
+        for i in range(n):
+            if i < n-1 and (i < 3 or rng.randint(0, 99) < 50):
+                val = rng.randint(0, m)
+                queries.append(('A', val))
+                used.append(val)
+                total += powers[val]
+            else:
+                if rng.randint(0, 99) < 50:
+                    queries.append(('G', rng.randint(0, total)))
+                else:
+                    val = 0
+                    for x in rng.sample(used, rng.randint(2, len(used))):
+                        val += powers[x]
+                    queries.append(('G', val))
+        yield queries,
+
+
+def nice_sequence_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(6, 3, 3), 200):
+        items = rng.sample(range(2, 20*n), 4)
+        while len(items) < n:
+            c = rng.choice(items)
+            if rng.randint(0, 99) < 50:
+                c *= rng.choice(range(2, 7))
+            else:
+                c = c // rng.choice(range(2, 7))
+            if c > 1 and c not in items:
+                items.append(c)
+        yield sorted(items), rng.choice(items)
+
 
 def prize_strings_generator(seed):
     rng = Random(seed)
@@ -477,6 +525,10 @@ def measure_balsam_generator(seed):
 
 
 def digit_partition_generator(seed):
+    # Some systematic test cases to reveal most bugs
+    yield from [("1", 1), ("12", 3), ("12", 12), ("123", 6), ("123", 24), ("1234", 10), ("1234", 28),
+                ("1234", 127), ("1234", 235), ("1234", 1234), ("1234", 19), ("1234", 37), ("1234", 1234)]
+    # The rest with fuzzing
     rng = Random(seed)
     for (n, d) in islice(zip(pyramid(5, 6, 6), pyramid(4, 5, 6)), 300):
         digits, goal = "", 0
@@ -4415,7 +4467,7 @@ testcases = [
     (
      "digit_partition",
      digit_partition_generator(fixed_seed),
-     "71c1df0a8d58974cdde824788b9eab8ecd13aa77b0fcc08e63f9cdd7232c6fc4"
+     "6b1bdd849118a4405ebc7fc3f66f7082c56be26c9fb3e39ca26278c8967dcf15"
     ),
     (
      "measure_balsam",
@@ -4481,6 +4533,21 @@ testcases = [
      "prize_strings",
      prize_strings_generator(fixed_seed),
      "bf65f0be4387fca6f16e89e30257d62e5924d5173a11d44d4b62296e9e04a168"
+    ),
+    (
+     "nice_sequence",
+     nice_sequence_generator(fixed_seed),
+     "4b8d06baba51031db34501b056beded81f15c8ab83f47985c79c715fb2958aca"
+    ),
+    (
+     "game_with_multiset",
+     game_with_multiset_generator(fixed_seed),
+     "bea9a0fed502f5967a175bf0f2f0dc83269043c419f17da309c9179c435593fb"
+    ),
+    (
+     "carryless_multiplication",
+     carryless_multiplication_generator(fixed_seed),
+     "4a8271e20c0925d77b221278c0dbb23408887a52c70e2a80a5722366551db923"
     )
 ]
 
