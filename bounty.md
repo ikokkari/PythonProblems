@@ -224,6 +224,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Carryless multiplication
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>A place for everything and everything in its place
    </td>
    <td>
@@ -326,7 +332,13 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
    </tr>
    <tr>
-   <td>Balsam for the code 
+   <td>Nice sequence 
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Stern–Brocot path
    </td>
    <td>
    </td>
@@ -393,6 +405,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Kimberling's repetition-resistant sequence
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Game with multiset
    </td>
    <td>
    </td>
