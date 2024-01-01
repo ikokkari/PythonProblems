@@ -212,6 +212,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Reverse a Fibonacci-like sequence
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Mian–Chowla sequence
    </td>
    <td>Karel Tutsu, June 12, 2023
@@ -417,6 +423,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Tower of Babel
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Kayles
    </td>
    <td>
    </td>
