@@ -33,7 +33,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "December 30, 2023"
+version = "January 1, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -303,6 +303,36 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+def kayles_generator(seed):
+    rng = Random(seed)
+    for n in range(1, 10):
+        yield [n],
+    for n in range(2, 12):
+        for p in range(n):
+            yield [n, p],
+    for n in range(3, 12):
+        for m in range(n, 4*n):
+            piles = [0 for _ in range(n)]
+            for _ in range(m):
+                piles[rng.randint(0, n-1)] += 1
+            piles = [p for p in piles if p > 0]
+            yield piles,
+
+
+def reversenacci_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(3, 5, 6), 250):
+        a = rng.randint(1, n)
+        b = rng.randint(a, a+n+1)
+        i = 1
+        for _ in range(rng.randint(1, 2*n)):
+            a, b = b, a+b
+            i += 1
+        yield i, b
+        yield i, b+1
+        yield i, b-1
+
 
 def carryless_multiplication_generator(seed):
     yield 0, 10
@@ -3067,14 +3097,6 @@ def subtract_square_generator(seed):
         yield query
 
 
-def perimeter_limit_split_generator(seed):
-    rng = Random(seed)
-    for a in range(10, 100):
-        b = rng.randint(1, a)
-        p = rng.randint(5, 3*a)
-        yield (a, b, p) if rng.randint(0, 1) else (b, a, p)
-
-
 def duplicate_digit_bonus_generator(seed):
     rng = Random(seed)
     n, count_until_increase, goal = 1, 0, 5
@@ -4548,6 +4570,19 @@ testcases = [
      "carryless_multiplication",
      carryless_multiplication_generator(fixed_seed),
      "4a8271e20c0925d77b221278c0dbb23408887a52c70e2a80a5722366551db923"
+    ),
+
+    # New additions to the problem set in 2024.
+
+    (
+     "reversenacci",
+     reversenacci_generator(fixed_seed),
+     "2142cca26a02e73bcf5ddd13766f394930d679081f6c9c003901003285cfd577"
+    ),
+    (
+     "kayles",
+     kayles_generator(fixed_seed),
+     "1f346bcd31387e134394072470e5c460ab8f1b342ed5ddf1a93be28e99f618b3"
     )
 ]
 
