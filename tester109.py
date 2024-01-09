@@ -33,7 +33,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "January 1, 2024"
+version = "January 8, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -303,6 +303,35 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # Test case generators for the individual functions.
+
+def van_der_corput_generator(seed):
+    rng = Random(seed)
+    for base, n in islice(zip(pyramid(2, 3, 3), count(1)), 1000):
+        yield base, rng.randint(1, n)
+
+
+def super_tiny_rng_generator(seed):
+    rng = Random(seed)
+    for n, bits in islice(zip(pyramid(3, 10, 2), cycle(range(8, 65))), 1000):
+        yield rng.randint(0, 2**32-1), n, bits
+
+
+def minimal_egyptian_generator(seed):
+    for ft, k in islice(zip(greedy_egyptian_generator(seed), cycle([2, 3, 4])), 2500):
+        f = ft[0]
+        if f.denominator > 50:
+            yield f, k
+
+
+def greedy_egyptian_generator(seed):
+    rng = Random(seed)
+    b = 5
+    for n in islice(pyramid(3, 5, 6), 1000):
+        for _ in range(n):
+            a = rng.randint(2, b-1)
+            yield Fraction(a, b),
+        b += 1
+
 
 def kayles_generator(seed):
     rng = Random(seed)
@@ -4583,6 +4612,31 @@ testcases = [
      "kayles",
      kayles_generator(fixed_seed),
      "1f346bcd31387e134394072470e5c460ab8f1b342ed5ddf1a93be28e99f618b3"
+    ),
+    (
+     "greedy_egyptian",
+     greedy_egyptian_generator(fixed_seed),
+     "be7ba3e90b7c410b4eecfbcd88ecbdfc133cf22ac80dd77212927b6a0a773738"
+    ),
+    (
+     "minimal_egyptian",
+     minimal_egyptian_generator(fixed_seed),
+     "752f2bbdabaa37bb900a7642026cc257d22571ee8c09fd72949df0b9ef92c7a4"
+    ),
+    (
+     "carving_egyptian",
+     islice(greedy_egyptian_generator(fixed_seed), 3000),
+     "b21cc8f569c9dba1598df800132a0663ec753de87fbde79c5077e9b843447b4a"
+    ),
+    (
+     "super_tiny_rng",
+     super_tiny_rng_generator(fixed_seed),
+     "79462fa344225685a68470f3b8f08f017b629d46af69f1292187076b339b4d70"
+    ),
+    (
+     "van_der_corput",
+     van_der_corput_generator(fixed_seed),
+     "309c5f9f5ba1e72b5b4673f3e5e44af9376c8c5eb79d6338d8dac13e38b08ae7"
     )
 ]
 
