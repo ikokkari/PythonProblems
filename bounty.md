@@ -206,6 +206,18 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Add like an Egyptian
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Van der Corput sequence
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>It's a game, a reflection
    </td>
    <td>Karel Tutsu, June 11, 2023
@@ -290,6 +302,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Carving Egyptian fractions
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Largest square of ones
    </td>
    <td>Maxim Olatoye, June 15, 2023
@@ -309,6 +327,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Markov distance
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>St. Bitus‘ Dance
    </td>
    <td>
    </td>
@@ -393,6 +417,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Gijswijt sequence
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Minimal Egyptian fractions
    </td>
    <td>
    </td>
