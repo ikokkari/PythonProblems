@@ -482,7 +482,7 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
-   <td>Kayles
+   <td>Two pins, not three, Dolores
    </td>
    <td>
    </td>
