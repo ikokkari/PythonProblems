@@ -152,9 +152,21 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Lowest common dominator
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Discrete rounding
    </td>
    <td>Karel Tutsu, June 7, 2023
+   </td>
+  </tr>
+   <tr>
+   <td>Ifs and butts
+   </td>
+   <td>
    </td>
   </tr>
    <tr>
@@ -179,6 +191,12 @@ Starting March 2023, the author started creating another set of Python problems,
    <td>Count palindromic substrings
    </td>
    <td>Karel Tutsu, June 13, 2023
+   </td>
+  </tr>
+   <tr>
+   <td>Longest mirrored substring
+   </td>
+   <td>
    </td>
   </tr>
    <tr>
@@ -315,6 +333,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Prize strings
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>String shuffle
    </td>
    <td>
    </td>
