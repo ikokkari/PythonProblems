@@ -33,7 +33,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "January 8, 2024"
+version = "February 18, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -51,6 +51,7 @@ timeout_cutoff = 20
 
 # How many test cases to record in the file for each function.
 testcase_cutoff = 400
+
 
 # For instructors who want to add their own problems to this set:
 #
@@ -101,7 +102,7 @@ def stringify_args(args, cutoff=2000):
             else:
                 left = ", ".join([str(x) for x in a[:5]])
                 right = ", ".join([str(x) for x in a[-5:]])
-                result += f"[{left}, <{len(a)-10} omitted...>, {right}]"
+                result += f"[{left}, <{len(a) - 10} omitted...>, {right}]"
         else:
             result += repr(a) if len(repr(a)) < cutoff else '[...]'
     return result
@@ -208,7 +209,8 @@ def sort_by_source(testcases_):
                 if function_name in funcs:  # Who knows how many future students this will save.
                     print(f"WARNING: MULTIPLE DEFINITION FOR {function_name}")
                 if function_name in recognized:
-                    funcs[function_name] = 0 if function_name in verbose_execution or function_name in need_check else line_no
+                    funcs[
+                        function_name] = 0 if function_name in verbose_execution or function_name in need_check else line_no
         testcases_.sort(key=lambda x: funcs.get(x[0], 9999999))
     return sorted(funcs.keys())
 
@@ -251,6 +253,21 @@ lows = "abcdefghijklmnopqrstuvwxyz"
 
 __primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101]
 
+__names = [
+    "hu", "oh", "eye", "kro", "atz", "put",
+    "ross", "rachel", "monica", "phoebe", "joey", "chandler",
+    "johndorian", "elliot", "turk", "carla", "perry", "bob",
+    "eddie", "joy", "jeff", "steph", "allison", "doug",
+    "jules", "ellie", "laurie", "travis", "grayson", "andy",
+    "donald", "melania", "hillary", "barack", "bill", "kamala",
+    "mxuzptlk", "ouagadougou", "oumoumou", "auervaara",
+    "britain", "germany", "france", "canada", "exit",
+    "urban", "zuauaua", "aueiosh", "knickerbocker",
+    "keihanaikukauakahihuliheekahaunaele",
+    "llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch"
+]
+
+
 # Some utility functions to help writing test generators.
 
 # Produce an infinite sequence of exponentially increasing integers.
@@ -275,7 +292,7 @@ def scale_random(seed, scale, skip):
 def random_int(rng, n, prob=70):
     r, curr = 0, rng.randint(1, 9)
     for _ in range(n):
-        r = 10*r + curr
+        r = 10 * r + curr
         if rng.randint(0, 99) < prob:
             curr = rng.randint(0, 9)
     return r
@@ -299,10 +316,73 @@ def pyramid(n=1, goal=5, inc=1):
         yield n
         count_until_increase += 1
         if count_until_increase == goal:
-            goal, count_until_increase, n = goal+inc, 0, n+1
+            goal, count_until_increase, n = goal + inc, 0, n + 1
 
 
-# Test case generators for the individual functions.
+# XXX Test case generators for the individual functions.
+
+def lowest_common_dominator_generator(seed):
+    rng = Random(seed)
+    m = 2
+    for n in islice(pyramid(2, 2, 2), 3000):
+        beta = [rng.randint(-m, m) for _ in range(n)]
+        gamma = [rng.randint(-m, m) for _ in range(n)]
+        yield beta, gamma
+        m += 1
+
+
+def str_rts_generator(seed):
+    for text in ["", "x", "abcd", "bb", "aaa", "hahahexoxehah", "abcdefgfoooof", "bxuzazuxbzuzax"]:
+        yield text,
+    rng = Random(seed)
+    for n in islice(pyramid(10, 2, 2), 2500):
+        text = ""
+        while len(text) < n:
+            if len(text) < 3 or rng.randint(0, 100) < 50:
+                text += rng.choice(lows)
+            else:
+                i = rng.randint(0, len(text))
+                j = rng.randint(0, len(text))
+                i, j = min(i, j), max(i, j)
+                text += text[j:i-1:-1] if rng.randint(0, 100) < 70 else text[i:j+1]
+        yield text,
+
+
+def is_string_shuffle_generator(seed):
+    rng = Random(seed)
+    for _ in range(1000):
+        names = rng.sample(__names, 2)
+        name1, name2 = names[0], names[1]
+        n1, n2 = len(name1), len(name2)
+        result, i, j = "", 0, 0
+        while len(result) < n1 + n2:
+            if j < n2 and (i == n1 or rng.randint(0, 99) < 50):
+                result += name2[j]
+                j += 1
+            else:
+                result += name1[i]
+                i += 1
+        while rng.randint(0, 100) < 50:
+            i = rng.randint(0, n1 + n2 - 1)
+            j = rng.randint(0, n1 + n2 - 1)
+            if i < j:
+                result = result[:i] + result[j] + result[i + 1:j] + result[i] + result[j + 1:]
+            elif j < i:
+                result = result[:j] + result[i] + result[j + 1:i] + result[j] + result[i + 1:]
+        yield name1, name2, result
+
+
+def count_cigarettes_generator(seed):
+    yield 25, 5
+    rng = Random(seed)
+    for n in range(5, 1000):
+        for k in rng.sample(range(2, n + 1), min(10, n - 1)):
+            yield n, k
+    for n in islice(scale_random(seed, 2, 5), 1000):
+        n += 2000
+        k = rng.randint(2, 100)
+        yield n, k
+
 
 def van_der_corput_generator(seed):
     rng = Random(seed)
@@ -313,7 +393,7 @@ def van_der_corput_generator(seed):
 def super_tiny_rng_generator(seed):
     rng = Random(seed)
     for n, bits in islice(zip(pyramid(3, 10, 2), cycle(range(8, 65))), 1000):
-        yield rng.randint(0, 2**32-1), n, bits
+        yield rng.randint(0, 2 ** 32 - 1), n, bits
 
 
 def minimal_egyptian_generator(seed):
@@ -328,7 +408,7 @@ def greedy_egyptian_generator(seed):
     b = 5
     for n in islice(pyramid(3, 5, 6), 1000):
         for _ in range(n):
-            a = rng.randint(2, b-1)
+            a = rng.randint(2, b - 1)
             yield Fraction(a, b),
         b += 1
 
@@ -341,10 +421,10 @@ def kayles_generator(seed):
         for p in range(n):
             yield [n, p],
     for n in range(3, 12):
-        for m in range(n, 4*n):
+        for m in range(n, 4 * n):
             piles = [0 for _ in range(n)]
             for _ in range(m):
-                piles[rng.randint(0, n-1)] += 1
+                piles[rng.randint(0, n - 1)] += 1
             piles = [p for p in piles if p > 0]
             yield piles,
 
@@ -353,14 +433,14 @@ def reversenacci_generator(seed):
     rng = Random(seed)
     for n in islice(pyramid(3, 5, 6), 250):
         a = rng.randint(1, n)
-        b = rng.randint(a, a+n+1)
+        b = rng.randint(a, a + n + 1)
         i = 1
-        for _ in range(rng.randint(1, 2*n)):
-            a, b = b, a+b
+        for _ in range(rng.randint(1, 2 * n)):
+            a, b = b, a + b
             i += 1
         yield i, b
-        yield i, b+1
-        yield i, b-1
+        yield i, b + 1
+        yield i, b - 1
 
 
 def carryless_multiplication_generator(seed):
@@ -376,12 +456,12 @@ def carryless_multiplication_generator(seed):
 
 def game_with_multiset_generator(seed):
     yield [('A', 0), ('A', 0), ('A', 2), ('G', 6)]
-    powers = [2**i for i in range(100)]
+    powers = [2 ** i for i in range(100)]
     rng = Random(seed)
     for n, m in islice(zip(pyramid(10, 3, 3), pyramid(3, 2, 3)), 300):
         queries, total, used = [], 0, []
         for i in range(n):
-            if i < n-1 and (i < 3 or rng.randint(0, 99) < 50):
+            if i < n - 1 and (i < 3 or rng.randint(0, 99) < 50):
                 val = rng.randint(0, m)
                 queries.append(('A', val))
                 used.append(val)
@@ -400,7 +480,7 @@ def game_with_multiset_generator(seed):
 def nice_sequence_generator(seed):
     rng = Random(seed)
     for n in islice(pyramid(6, 3, 3), 200):
-        items = rng.sample(range(2, 20*n), 4)
+        items = rng.sample(range(2, 20 * n), 4)
         while len(items) < n:
             c = rng.choice(items)
             if rng.randint(0, 99) < 50:
@@ -425,8 +505,8 @@ def goodstein_generator(seed):
     rng = Random(seed)
     for n in range(1, 200):
         yield n, rng.randint(1, n)
-        yield n, rng.randint(2*n, 3*n)
-        yield n, rng.randint(10*n, 20*n)
+        yield n, rng.randint(2 * n, 3 * n)
+        yield n, rng.randint(10 * n, 20 * n)
 
 
 def max_product_generator(seed):
@@ -434,8 +514,8 @@ def max_product_generator(seed):
     for n in islice(pyramid(4, 2, 2), 400):
         digits = [str(rng.randint(0, 9)) for _ in range(n)]
         digits.sort(reverse=True)
-        m = rng.randint(1, n-1)
-        yield "".join(digits), max(n-m, m), min(n-m, m)
+        m = rng.randint(1, n - 1)
+        yield "".join(digits), max(n - m, m), min(n - m, m)
 
 
 def count_unicolour_rectangles_generator(seed):
@@ -447,7 +527,7 @@ def count_unicolour_rectangles_generator(seed):
     yield ["ccc", "ccc", "ccc", "ccc"],
     rng = Random(seed)
     for n in islice(pyramid(3, 2, 2), 400):
-        m = rng.randint(1, 2*n)
+        m = rng.randint(1, 2 * n)
         grid = ["".join(rng.choice("abcd") for _ in range(m)) for _ in range(n)]
         yield grid,
 
@@ -511,7 +591,7 @@ def tower_of_babel_generator(seed):
 def vector_add_reach_generator(seed):
     rng = Random(seed)
     for n, d in islice(zip(pyramid(2, 8, 10), cycle(range(2, 11))), 250):
-        m, vectors = rng.randint(max(2, n-2), n), set()
+        m, vectors = rng.randint(max(2, n - 2), n), set()
         while len(vectors) < m:
             v = tuple(rng.randint(-m, m) for _ in range(d))
             if any(c != 0 for c in v):
@@ -520,13 +600,13 @@ def vector_add_reach_generator(seed):
         start = goal = 0
         while start == goal:
             if rng.randint(0, 99) < 20:
-                coords = [rng.randint(0, 2*n) for _ in range(2*d)]
+                coords = [rng.randint(0, 2 * n) for _ in range(2 * d)]
                 start = tuple(coords[:d])
                 goal = tuple(coords[d:])
             else:
-                goal = start = tuple(rng.randint(n, 3*n) for _ in range(d))
-                for _ in range(rng.randint(2*n, 3*n)):
-                    step = tuple(x+y for (x, y) in zip(goal, rng.choice(vectors)))
+                goal = start = tuple(rng.randint(n, 3 * n) for _ in range(d))
+                for _ in range(rng.randint(2 * n, 3 * n)):
+                    step = tuple(x + y for (x, y) in zip(goal, rng.choice(vectors)))
                     if all(c >= 0 for c in step):
                         goal = step
         yield start, goal, vectors, 3 * n
@@ -541,11 +621,11 @@ def mmu_generator(seed):
         pages = []
         while len(pages) < m:
             if len(pages) < 3 or rng.randint(0, 99) < p:
-                p = rng.randint(0, 2*n)
+                p = rng.randint(0, 2 * n)
             else:
                 p = rng.choice(pages)
             pages.append(p)
-        yield rng.randint(1, n+1), pages
+        yield rng.randint(1, n + 1), pages
 
 
 def count_distinct_substrings_generator(seed):
@@ -560,7 +640,7 @@ def count_distinct_substrings_generator(seed):
         while len(text) < n:
             if i == len(text) or rng.randint(0, 99) < p:
                 text.append(rng.choice(lows))
-                i = rng.randint(0, len(text)-1)
+                i = rng.randint(0, len(text) - 1)
             else:
                 text.append(text[i])
                 if rng.randint(0, 99) < 30:
@@ -597,7 +677,7 @@ def digit_partition_generator(seed):
             digits += m
         if rng.randint(0, 99) < 50:
             off = goal // 10
-            goal = rng.randint(goal-off, goal+off)
+            goal = rng.randint(goal - off, goal + off)
         yield digits, goal
 
 
@@ -609,19 +689,19 @@ def tr_generator(seed):
     yield "X", "Z", "Y"
     yield "ab", "ab", "ba"
     for n in islice(pyramid(2, 2, 2), 2000):
-        k = rng.randint(1, n+5)
-        text = "".join([rng.choice(alphabet[:n+2]) for _ in range(n)])
-        ch_from = "".join(rng.sample(alphabet[:n+5], k))
-        ch_to = "".join(rng.choices(alphabet[:n+10], k=k))
+        k = rng.randint(1, n + 5)
+        text = "".join([rng.choice(alphabet[:n + 2]) for _ in range(n)])
+        ch_from = "".join(rng.sample(alphabet[:n + 5], k))
+        ch_to = "".join(rng.choices(alphabet[:n + 10], k=k))
         yield text, ch_from, ch_to
 
 
 def cube_tower_generator(seed):
     rng = Random(seed)
     for n in islice(pyramid(3, 2, 1), 400):
-        cubes, m = [], rng.randint(n+1, n+6)
+        cubes, m = [], rng.randint(n + 1, n + 6)
         for _ in range(n):
-            cubes.append([rng.randint(0, m-1) for _ in range(6)])
+            cubes.append([rng.randint(0, m - 1) for _ in range(6)])
         yield cubes,
 
 
@@ -631,7 +711,7 @@ def des_chiffres_generator(seed):
         board = sorted([rng.randint(1, s) for _ in range(n)])
         goal = board[-1]
         while goal in board:
-            goal = rng.randint(1, n*s*4)
+            goal = rng.randint(1, n * s * 4)
         yield board, goal
 
 
@@ -667,8 +747,8 @@ def squares_total_area_generator(seed):
                 x = rng.randint(0, s)
                 y = rng.randint(0, s)
             else:
-                x = points[rng.randint(0, m-1)][0]
-                y = points[rng.randint(0, m-1)][1]
+                x = points[rng.randint(0, m - 1)][0]
+                y = points[rng.randint(0, m - 1)][1]
             points.append((x, y))
             s += 1
         yield points,
@@ -680,7 +760,7 @@ def bridge_score_generator(seed):
         for vul in [True, False]:
             for doubled in ['-', 'X', 'XX']:
                 for strain in ['diamonds', 'clubs', 'hearts', 'spades', 'notrump']:
-                    made = rng.randint(level, min(level+3, 7))
+                    made = rng.randint(level, min(level + 3, 7))
                     yield strain, level, vul, doubled, made
 
 
@@ -705,8 +785,8 @@ def tog_comparison_generator(seed):
                 ch1 = rng.choice(alpha)
                 ch2 = ch1 if rng.randint(0, 99) < p else rng.choice(alpha)
             else:
-                ch1 = rng.randint(0, 10**(n-2))
-                ch2 = rng.randint(0, 10**(n-3)) if rng.randint(0, 99) < p else ch1
+                ch1 = rng.randint(0, 10 ** (n - 2))
+                ch2 = rng.randint(0, 10 ** (n - 3)) if rng.randint(0, 99) < p else ch1
             first, second = first + str(ch1), second + str(ch2)
         suffix = rng.choice([".txt", ".doc", ".dat", ".xls", ".jpg"])
         first += suffix
@@ -725,7 +805,7 @@ def kimberling_expulsion_generator(seed):
     rng = Random(seed)
     start = 0
     for n in range(100):
-        end = start + rng.randint(1, n+2)
+        end = start + rng.randint(1, n + 2)
         yield start, end
         start = end
 
@@ -745,23 +825,23 @@ def langford_violations_generator(seed):
     rng = Random(seed)
     flip = True
     for k in islice(pyramid(3, 2, 4), 2000):
-        n = 4*k - (1 if flip else 0)
+        n = 4 * k - (1 if flip else 0)
         flip = not flip
-        items = [None for _ in range(2*n)]
-        indices = list(range(1, n+1))
+        items = [None for _ in range(2 * n)]
+        indices = list(range(1, n + 1))
         rng.shuffle(indices)
         unpaired = []
         for e in indices:
-            i = rng.randint(e+1, 2*n-1)
-            if items[i] is None and items[i-(e+1)] is None:
-                items[i] = items[i-(e+1)] = e
+            i = rng.randint(e + 1, 2 * n - 1)
+            if items[i] is None and items[i - (e + 1)] is None:
+                items[i] = items[i - (e + 1)] = e
             else:
                 unpaired.append(e)
-        unfilled = [i for i in range(2*n) if items[i] is None]
+        unfilled = [i for i in range(2 * n) if items[i] is None]
         rng.shuffle(unfilled)
         i = 0
         for e in unpaired:
-            items[unfilled[i]] = items[unfilled[i+1]] = e
+            items[unfilled[i]] = items[unfilled[i + 1]] = e
             i += 2
         yield items
 
@@ -780,7 +860,7 @@ def count_palindromes_generator(seed):
         text = ""
         while len(text) < n:
             if len(text) > 4 and rng.randint(0, 99) < p:
-                i = rng.randint(-1, len(text)-1)
+                i = rng.randint(-1, len(text) - 1)
                 text += text[-1:i:-1]
             else:
                 text += rng.choice(('a', 'b', 'ab', 'ba', 'aa', 'bb'))
@@ -808,22 +888,22 @@ def discrete_rounding_generator():
 def stern_brocot_generator(seed):
     rng = Random(seed)
     for n in islice(pyramid(3, 2, 2), 10000):
-        den = rng.randint(n, 2*n)
-        num = rng.randint(1, 2*den)
+        den = rng.randint(n, 2 * n)
+        num = rng.randint(1, 2 * den)
         yield Fraction(num, den),
 
 
 def abacaba_generator(seed):
     rng = Random(seed)
-    for n in range(2**5-1):
+    for n in range(2 ** 5 - 1):
         yield n,
     for m, p in zip(islice(pyramid(5, 1, 1), 10000), cycle([30, 60, 95])):
-        n = 2**m-1
+        n = 2 ** m - 1
         while m > 0 and rng.randint(0, 99) < p:
-            m = m-1
-            n = n + (1 if rng.randint(0, 1) else -1) * 2**m
+            m = m - 1
+            n = n + (1 if rng.randint(0, 1) else -1) * 2 ** m
         yield n,
-        yield n + rng.randint(1, n//3)
+        yield n + rng.randint(1, n // 3)
 
 
 __keys = {'a': 2, 'b': 2, 'c': 2, 'd': 3, 'e': 3, 'f': 3, 'g': 4, 'h': 4, 'i': 4,
@@ -882,18 +962,18 @@ def blocking_pawns_generator(seed):
     for n in islice(pyramid(8, 3, 3), 50):
         taken, queens = set(), []
         for _ in range(10):
-            x = rng.randint(1, n-2)
-            y = rng.randint(1, n-2)
+            x = rng.randint(1, n - 2)
+            y = rng.randint(1, n - 2)
             for (dx, dy) in rng.sample(dirs, rng.randint(2, 5)):
                 d = rng.randint(2, 4)
-                nx, ny = (x + d*dx) % n, (y + d*dy) % n
+                nx, ny = (x + d * dx) % n, (y + d * dy) % n
                 for (ddx, ddy) in dirs:
-                    if (nx+ddx, ny+ddy) in taken:
+                    if (nx + ddx, ny + ddy) in taken:
                         break
                 else:
                     queens.append((nx, ny))
                     for (ddx, ddy) in dirs:
-                        taken.add((nx+ddx, ny+ddy))
+                        taken.add((nx + ddx, ny + ddy))
         yield n, queens
 
 
@@ -912,11 +992,11 @@ def stalin_sort_generator(seed):
     rng = Random(seed)
     m = 5
     for n in islice(pyramid(3, 1, 1), 1000):
-        yield [rng.randint(-(m*m), (m*m)) for _ in range(n)],
+        yield [rng.randint(-(m * m), (m * m)) for _ in range(n)],
         items = list(range(n, -n, -1))
-        for _ in range(rng.randint(0, n//2)):
-            i = rng.randint(0, len(items)-1)
-            j = rng.randint(0, len(items)-1)
+        for _ in range(rng.randint(0, n // 2)):
+            i = rng.randint(0, len(items) - 1)
+            j = rng.randint(0, len(items) - 1)
             items[i], items[j] = items[j], items[j]
         yield items,
 
@@ -927,13 +1007,13 @@ def smetana_interpreter_generator(seed):
         program = []
         for _ in range(n):
             if rng.randint(0, 99) < 50:
-                s1 = rng.randint(0, n-1)
-                s2 = rng.randint(0, n-1)
+                s1 = rng.randint(0, n - 1)
+                s2 = rng.randint(0, n - 1)
                 while s1 == s2:
-                    s2 = rng.randint(0, n-1)
+                    s2 = rng.randint(0, n - 1)
                 program.append(f"SWAP {s1} {s2}")
             else:
-                s = rng.randint(0, n-1)
+                s = rng.randint(0, n - 1)
                 program.append(f"GOTO {s}")
         yield program,
 
@@ -941,7 +1021,7 @@ def smetana_interpreter_generator(seed):
 def card_row_game_generator(seed):
     rng = Random(seed)
     for n in islice(pyramid(2, 2, 2), 1000):
-        yield [rng.randint(1, n*n) for _ in range(n)],
+        yield [rng.randint(1, n * n) for _ in range(n)],
 
 
 def has_majority_generator(seed):
@@ -953,13 +1033,13 @@ def has_majority_generator(seed):
     yield [99, 42, 17],
     rng = Random(seed)
     for n, take, look in zip(islice(pyramid(3, 2, 1), 1000), cycle([30, 50, 90]), cycle([3, 4, 5, 6])):
-        m = n*n
+        m = n * n
         items = [rng.randint(1, m) for _ in range(look)]
-        for _ in range(m-look):
+        for _ in range(m - look):
             items.append(rng.randint(1, n) if rng.randint(0, 99) < take else items[-rng.randint(1, look)])
         item = rng.choice(items)
-        for _ in range(rng.randint(m//4, m)):
-            items[rng.randint(0, m-1)] = item
+        for _ in range(rng.randint(m // 4, m)):
+            items[rng.randint(0, m - 1)] = item
         yield items
 
 
@@ -967,17 +1047,17 @@ def bus_travel_generator(seed):
     rng = Random(seed)
     for n in islice(pyramid(4, 2, 1), 1000):
         schedule = {i: [] for i in range(n)}
-        goal = rng.randint(1, n-1)
+        goal = rng.randint(1, n - 1)
         while len(schedule[0]) < 3:
             hour = rng.randint(1, 20)
             minute = rng.randint(0, 59)
-            city = rng.randint(0, n-1)
+            city = rng.randint(0, n - 1)
             legs = 0
             while legs < n:
                 duration = rng.randint(10, 100)
-                destination = rng.randint(0, n-1)
+                destination = rng.randint(0, n - 1)
                 while city == destination:
-                    destination = rng.randint(0, n-1)
+                    destination = rng.randint(0, n - 1)
                 arrive_m = minute + duration
                 arrive_h, arrive_m = hour + arrive_m // 60, arrive_m % 60
                 schedule[city].append((destination, (hour, minute), (arrive_h, arrive_m)))
@@ -993,7 +1073,7 @@ def multiplicative_persistence_generator(seed):
     for n in islice(pyramid(5, 5, 5), 2000):
         m = rng.randint(1, 9)
         for _ in range(n):
-            m = 10*m + rng.choice([1, 2, 3, 4, 5, 6, 6, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9])
+            m = 10 * m + rng.choice([1, 2, 3, 4, 5, 6, 6, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9])
         yield m, True
         yield m, False
 
@@ -1014,15 +1094,15 @@ def largest_ones_square_generator(seed):
     for p, n in zip(cycle([30, 60, 80, 90]), islice(pyramid(3, 3, 3), 2000)):
         nn = n * n
         board = [['0' for _ in range(n)] for _ in range(n)]
-        fill = rng.randint(nn//4, (7*nn)//8)
+        fill = rng.randint(nn // 4, (7 * nn) // 8)
         while fill > 0:
-            x = rng.randint(0, n-1)
-            y = rng.randint(0, n-1)
+            x = rng.randint(0, n - 1)
+            y = rng.randint(0, n - 1)
             w = 1
-            while w < n-x and w < n-y and rng.randint(0, 99) < p:
+            while w < n - x and w < n - y and rng.randint(0, 99) < p:
                 w += 1
-            for xx in range(x, x+w):
-                for yy in range(y, y+w):
+            for xx in range(x, x + w):
+                for yy in range(y, y + w):
                     if board[xx][yy] == '0':
                         fill -= 1
                         board[xx][yy] = '1'
@@ -1033,7 +1113,7 @@ def accumulate_dice_generator(seed):
     rng = Random(seed)
     for n in range(4, 20):
         d = 2
-        while d < 2*n:
+        while d < 2 * n:
             yield d, n
             d += rng.randint(1, 3)
 
@@ -1041,9 +1121,9 @@ def accumulate_dice_generator(seed):
 def knight_survival_generator(seed):
     rng = Random(seed)
     for n in range(4, 20):
-        for _ in range(n//4 + 3):
-            x = rng.randint(0, n-1)
-            y = rng.randint(0, n-1)
+        for _ in range(n // 4 + 3):
+            x = rng.randint(0, n - 1)
+            y = rng.randint(0, n - 1)
             k = rng.randint(1, n)
             yield n, x, y, k
 
@@ -1057,9 +1137,9 @@ def bowling_score_generator(seed):
             if first == 10:
                 rolls.append('X')
             else:
-                remain = 10-first
-                second = min(rng.randint(0, remain+3), remain)
-                rolls.append(f"{first}/" if first+second == 10 else f"{first}{second}")
+                remain = 10 - first
+                second = min(rng.randint(0, remain + 3), remain)
+                rolls.append(f"{first}/" if first + second == 10 else f"{first}{second}")
         # Last roll handled special
         if rolls[9] == 'X':
             rolls[9] = f"XX{rolls[11][0]}" if rolls[10] == 'X' else f"X{rolls[10]}"
@@ -1079,17 +1159,17 @@ def word_board_generator(seed):
         board = [[None for _ in range(n)] for _ in range(n)]
         unfilled = set((x, y) for x in range(n) for y in range(n))
         while len(unfilled) > 0:
-            x = rng.randint(0, n-1)
-            y = rng.randint(0, n-1)
+            x = rng.randint(0, n - 1)
+            y = rng.randint(0, n - 1)
             while (x, y) not in unfilled:
-                x = rng.randint(0, n-1)
-                y = rng.randint(0, n-1)
+                x = rng.randint(0, n - 1)
+                y = rng.randint(0, n - 1)
             for c in rng.choice(long_words):
                 board[x][y] = c
                 unfilled.remove((x, y))
                 neighbours = []
                 for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-                    nx, ny = x+dx, y+dy
+                    nx, ny = x + dx, y + dy
                     if 0 <= nx < n and 0 <= ny < n and (nx, ny) in unfilled:
                         neighbours.append((nx, ny))
                 if len(neighbours) > 0:
@@ -1128,14 +1208,14 @@ def __welch_costas():
             for g in __primitive_roots[p]:
                 rows = []
                 for i in range(1, p):
-                    for j in range(1, p+1):
-                        if j == g**i % p:
-                            rows.append(j-1)
+                    for j in range(1, p + 1):
+                        if j == g ** i % p:
+                            rows.append(j - 1)
                             break
                 yield rows
-                yield [p-2-col for col in rows]
+                yield [p - 2 - col for col in rows]
                 yield rows[::-1]
-                yield [p-2-col for col in rows[::-1]]
+                yield [p - 2 - col for col in rows[::-1]]
 
 
 def costas_array_generator(seed):
@@ -1148,7 +1228,7 @@ def costas_array_generator(seed):
         else:
             rows = next(welch_generator)[:]
         m = len(rows)
-        k = rng.randint(2, max(m//2, m-5))
+        k = rng.randint(2, max(m // 2, m - 5))
         for row in rng.sample(range(m), k):
             rows[row] = None
         yield rows[:],
@@ -1157,7 +1237,7 @@ def costas_array_generator(seed):
 def topswops_generator(seed):
     rng = Random(seed)
     for n in islice(pyramid(2, 3, 3), 5000):
-        perm = list(range(1, n+1))
+        perm = list(range(1, n + 1))
         rng.shuffle(perm)
         yield tuple(perm),
 
@@ -1165,16 +1245,17 @@ def topswops_generator(seed):
 def sum_of_consecutive_squares_generator(seed):
     def sum_of_sq(n_):  # Formula from Wolfram Mathematica
         return (n_ * (1 + n_) * (1 + 2 * n_)) // 6
+
     rng = Random(seed)
     d = 5
     for _ in range(400):
         hi = rng.randint(1, d)
         lo = rng.randint(1, d)
         hi, lo = max(hi, lo), min(hi, lo)
-        n = sum_of_sq(hi) - sum_of_sq(lo-1)
+        n = sum_of_sq(hi) - sum_of_sq(lo - 1)
         for _ in range(rng.choice([0, 0, 0, 0, 0, 1, 1, 2, 3, 4])):
             m = rng.randint(1, hi)
-            n += m*m*(1 if rng.randint(0, 1) else -1)
+            n += m * m * (1 if rng.randint(0, 1) else -1)
         yield max(n, 1)
         d += 4
 
@@ -1194,14 +1275,14 @@ def queen_captures_all_generator(seed):
     for n in islice(pyramid(4, 4, 2), 350):
         m = n + rng.randint(0, 2)
         pieces = set()
-        px = rng.randint(0, m-1)
-        py = rng.randint(0, m-1)
+        px = rng.randint(0, m - 1)
+        py = rng.randint(0, m - 1)
         while len(pieces) < n:
             pieces.add((px, py))
             dx, dy = rng.choice(__queen_dirs)
             d = rng.randint(1, m // 2)
-            px = (px + d*dx) % m
-            py = (py + d*dy) % m
+            px = (px + d * dx) % m
+            py = (py + d * dy) % m
         pieces = list(pieces)
         yield pieces[0], pieces[1:]
 
@@ -1265,7 +1346,7 @@ __morse = {
     '..': 'i', '.---': 'j', '-.-': 'k', '.-..': 'l', '--': 'm', '-.': 'n', '---': 'o', '.--.': 'p',
     '--.-': 'q', '.-.': 'r', '...': 's', '-': 't', '..-': 'u', '...-': 'v', '.--': 'w', '-..-': 'x',
     '-.--': 'y', '--..': 'z'
-    }
+}
 
 __morse_r = {__morse[k]: k for k in __morse}
 
@@ -1289,7 +1370,7 @@ def othello_moves_generator(seed):
         while len(taken) < pn:
             (x, y) = rng.choice(othello if rng.randint(0, 99) < 50 else desdemona)
             dx, dy = rng.choice(dirs)
-            nx, ny = x+dx, y+dy
+            nx, ny = x + dx, y + dy
             if 0 <= nx < 8 and 0 < ny < 8 and (nx, ny) not in taken:
                 taken.add((nx, ny))
                 (othello if rng.randint(0, 99) < 50 else desdemona).append((nx, ny))
@@ -1673,7 +1754,7 @@ def ordinal_transform_generator(seed):
         yield seq, i
         u += 1
         if u == v:
-            u, v = 1, v+1
+            u, v = 1, v + 1
 
 
 def staircase_generator(seed):
@@ -1711,7 +1792,7 @@ def both_ways_generator(seed):
         yield text,
     # One last check that there is no hinky Shlemiel stuff going on.
     yield 'axa' * 1000,
-    yield 'z' * 10**6
+    yield 'z' * 10 ** 6
 
 
 def best_clubs_generator(seed):
@@ -1748,7 +1829,7 @@ def verify_betweenness_generator(seed):
     for n in islice(pyramid(3, 3, 2), 2000):
         perm = [i for i in range(n)]
         rng.shuffle(perm)
-        m = rng.randint(1, n-1)
+        m = rng.randint(1, n - 1)
         constraints = set()
         while len(constraints) < m:
             idx = sorted(rng.sample(range(n), 3))
@@ -1758,7 +1839,7 @@ def verify_betweenness_generator(seed):
                 constraints.add((perm[idx[2]], perm[idx[1]], perm[idx[0]]))
         constraints = list(constraints)
         if rng.randint(0, 99) < 50:
-            ci = rng.randint(0, m-1)
+            ci = rng.randint(0, m - 1)
             con = constraints[ci]
             if rng.randint(0, 99) < 50:
                 constraints[ci] = (con[1], con[0], con[2])
@@ -1770,10 +1851,10 @@ def verify_betweenness_generator(seed):
 def stepping_stones_generator(seed):
     rng = Random(seed)
     for n in islice(pyramid(5, 5, 5), 50):
-        m = rng.randint(2, n//2 + 5)
+        m = rng.randint(2, n // 2 + 5)
         ones = set()
-        x = n//2 + rng.randint(-1, 1)
-        y = n//2 + rng.randint(-1, 1)
+        x = n // 2 + rng.randint(-1, 1)
+        y = n // 2 + rng.randint(-1, 1)
         while len(ones) < m:
             ones.add((x, y))
             if rng.randint(0, 1):
@@ -1788,15 +1869,15 @@ def laser_aliens_generator(seed):
     rng = Random(seed)
     for n in islice(pyramid(3, 5, 1), 600):
         aliens = set()
-        x = rng.randint(0, n-1)
-        y = rng.randint(0, n-1)
-        m = rng.randint(max(1, n // 3), 3*n)
+        x = rng.randint(0, n - 1)
+        y = rng.randint(0, n - 1)
+        m = rng.randint(max(1, n // 3), 3 * n)
         while len(aliens) < m:
             aliens.add((x, y))
             if rng.randint(0, 1):
-                x = rng.randint(0, n-1)
+                x = rng.randint(0, n - 1)
             else:
-                y = rng.randint(0, n-1)
+                y = rng.randint(0, n - 1)
         yield n, sorted(aliens)
 
 
@@ -1821,12 +1902,12 @@ def collect_numbers_generator(seed):
         rng.shuffle(items)
         yield items
     # Just to make sure that you are not being a Shlemiel.
-    for n in range(10**6, 0, -10**5):
+    for n in range(10 ** 6, 0, -10 ** 5):
         perm = list(range(n))
         perm.reverse()
         for k in range(1000):
-            i1 = rng.randint(0, n-1)
-            i2 = rng.randint(0, n-1)
+            i1 = rng.randint(0, n - 1)
+            i2 = rng.randint(0, n - 1)
             perm[i1], perm[i2] = perm[i2], perm[i1]
         yield perm
 
@@ -1888,7 +1969,7 @@ def __110_forward(prev):
     n = len(prev)
     curr = [0 for _ in range(n)]
     for i in range(n):
-        curr[i] = __110(prev[(i-1) % n], prev[i], prev[(i+1) % n])
+        curr[i] = __110(prev[(i - 1) % n], prev[i], prev[(i + 1) % n])
     return curr
 
 
@@ -1898,8 +1979,8 @@ def reverse_110_generator(seed):
         state = __110_forward([rng.randint(0, 1) for _ in range(n)])
         yield state[:],
         for _ in range(5):
-            idx = rng.randint(0, n-1)
-            state[idx] = 1-state[idx]
+            idx = rng.randint(0, n - 1)
+            state[idx] = 1 - state[idx]
             yield state[:],
 
 
@@ -1908,10 +1989,10 @@ def candy_share_generator(seed):
     rng = Random(seed)
     for n in islice(pyramid(4, 2, 3), 2000):
         candies = [0 for _ in range(n)]
-        remain = rng.randint(3, n-1)
+        remain = rng.randint(3, n - 1)
         while remain > 0:
-            c = min(remain, rng.randint(1, n//10 + 1))
-            candies[rng.randint(0, n-1)] += c
+            c = min(remain, rng.randint(1, n // 10 + 1))
+            candies[rng.randint(0, n - 1)] += c
             remain -= c
         yield candies
 
@@ -1925,7 +2006,7 @@ def leibniz_generator(seed):
             e = rng.randint(-n, n)
         else:
             den = rng.randint(2, n)
-            num = rng.randint(1, den-1)
+            num = rng.randint(1, den - 1)
             sign = rng.choice([-1, 1])
             e = Fraction(sign * num, den)
         heads.append(e)
@@ -1935,7 +2016,7 @@ def leibniz_generator(seed):
             yield heads, pos
         count_until_increase += 1
         if count_until_increase == goal:
-            count_until_increase, goal, n, heads = 0, goal+1, n+1, []
+            count_until_increase, goal, n, heads = 0, goal + 1, n + 1, []
 
 
 def prominences_generator(seed):
@@ -1948,7 +2029,7 @@ def prominences_generator(seed):
     for k in range(1, 7):
         for p in permutations(range(k)):
             heights = [rng.randint(1, h)]
-            for _ in range(k-1):
+            for _ in range(k - 1):
                 heights.append(heights[-1] + rng.randint(1, h))
             yield [heights[i] for i in p],
         h += 2
@@ -1962,14 +2043,14 @@ def prominences_generator(seed):
             if rng.randint(0, 99) < 40:
                 change = -change
             ee = max(1, heights[-1] + change * rng.randint(1, scale))
-            ee = ee if ee != heights[-1] else ee+1
+            ee = ee if ee != heights[-1] else ee + 1
             heights.append(ee)
         while heights[-1] > scale:
             heights.append(heights[-1] - rng.randint(1, scale))
         yield heights
         count_until_increase += 1
         if count_until_increase == goal:
-            count_until_increase, goal, scale, n = 0, goal+4, scale+2, n+1
+            count_until_increase, goal, scale, n = 0, goal + 4, scale + 2, n + 1
 
 
 def brussels_choice_step_generator(seed):
@@ -1987,18 +2068,18 @@ def ryerson_letter_grade_generator():
 
 
 def is_ascending_generator(seed):
-    yield [1, 2, 2]    # Because students don't read instructions
+    yield [1, 2, 2]  # Because students don't read instructions
     rng = Random(seed)
     for i in range(200):
         for j in range(10):
-            items = [rng.randint(-(i+2), i+2)]
+            items = [rng.randint(-(i + 2), i + 2)]
             for k in range(i + 1):
-                items.append(items[-1] + rng.randint(0, 2*i + 1))
+                items.append(items[-1] + rng.randint(0, 2 * i + 1))
             yield items[:]
             if i > 2:
                 for k in range(rng.randint(0, 5)):
-                    idx = rng.randint(1, len(items)-1)
-                    items[idx-1], items[idx] = items[idx], items[idx-1]
+                    idx = rng.randint(1, len(items) - 1)
+                    items[idx - 1], items[idx] = items[idx], items[idx - 1]
                     yield items[:]
 
 
@@ -2016,11 +2097,11 @@ def safe_squares_generator(seed):
 
     # Some cases of filling or near filling the board.
     yield 10, [(x, x) for x in range(10)]
-    yield 10, [(x, 9-x) for x in range(10)]
+    yield 10, [(x, 9 - x) for x in range(10)]
     yield 10, [(x, x) for x in range(0, 10, 2)]
-    yield 10, [(9-x, x) for x in range(0, 10, 2)]
+    yield 10, [(9 - x, x) for x in range(0, 10, 2)]
     yield 10, [(x, x) for x in range(5)]
-    yield 10, [(x, 9-x) for x in range(6, 10)]
+    yield 10, [(x, 9 - x) for x in range(6, 10)]
 
     # Okay, let's do some bigger cases also.
     yield 42, [(17, 16), (1, 40), (36, 22)]
@@ -2031,12 +2112,12 @@ def safe_squares_generator(seed):
     # On to fuzzing...
     rng = Random(seed)
     for i in range(1000):
-        n = rng.randint(2, 3 + i//20)
-        pn = rng.randint(0, n+2)
+        n = rng.randint(2, 3 + i // 20)
+        pn = rng.randint(0, n + 2)
         pieces = set()
         while len(pieces) < pn:
-            px = rng.randint(0, n-1)
-            py = rng.randint(0, n-1)
+            px = rng.randint(0, n - 1)
+            py = rng.randint(0, n - 1)
             if (px, py) not in pieces:
                 pieces.add((px, py))
         yield n, list(pieces)
@@ -2058,7 +2139,7 @@ def first_preceded_by_smaller_generator(seed):
         for _ in range(n):
             items.append(items[-1] + rng.randint(0, scale))
         rng.shuffle(items)
-        yield items, rng.randint(1, n//2)
+        yield items, rng.randint(1, n // 2)
         scale += 1
 
 
@@ -2074,11 +2155,11 @@ def reverse_ascending_sublists_generator(seed):
     s, p = 3, 50
     for n in islice(pyramid(3, 5, 3), 2000):
         d, items = rng.choice([-1, +1]), [rng.randint(-s, s)]
-        for _ in range(n-1):
+        for _ in range(n - 1):
             items.append(items[-1] + d * rng.randint(1, s))
             d = -d if rng.randint(0, 99) < p else d
         yield items
-        s, p = s+1, (p+3) % 100
+        s, p = s + 1, (p + 3) % 100
 
 
 def give_change_generator(seed):
@@ -2095,7 +2176,7 @@ def give_change_generator(seed):
             amount = 1
             while amount < 5 * use[0]:
                 yield amount, use[:]
-                amount += rng.randint(1, 2 + 2*amount//3)
+                amount += rng.randint(1, 2 + 2 * amount // 3)
 
 
 def bridge_hand_generator(seed):
@@ -2198,7 +2279,7 @@ def collapse_intervals_generator(seed):
         items = []
         for _ in range(n):
             items.append(curr)
-            if rng.randint(0, 99) < max(5, 20 - n//2):
+            if rng.randint(0, 99) < max(5, 20 - n // 2):
                 curr += rng.randint(2, n)
             else:
                 curr += 1
@@ -2210,7 +2291,7 @@ def __no_repeated_digits(n, allowed):
     for i in range(4):
         if n[i] not in allowed:
             return False
-        for j in range(i+1, 4):
+        for j in range(i + 1, 4):
             if n[i] == n[j]:
                 return False
     return True
@@ -2227,8 +2308,8 @@ def bulls_and_cows_generator(seed):
             if __no_repeated_digits(guess, allowed):
                 bulls = rng.randint(0, 3)
                 cows = rng.randint(0, 3)
-                cows = min(cows, 4-bulls)  # ensure bulls + cows <= 4
-                if not(bulls == 3 and cows == 1):  # impossible
+                cows = min(cows, 4 - bulls)  # ensure bulls + cows <= 4
+                if not (bulls == 3 and cows == 1):  # impossible
                     result.append((guess, bulls, cows))
         yield result
 
@@ -2236,16 +2317,16 @@ def bulls_and_cows_generator(seed):
 def can_balance_generator(seed):
     rng = Random(seed)
     for n in islice(pyramid(3, 4, 3), 1000):
-        items, moms, s = [[], []], [0, 0], 2*n
+        items, moms, s = [[], []], [0, 0], 2 * n
         for i in range(n):
             # Lucky enough to find balance, so yield it out.
             if i > 0 and moms[0] == moms[1] and items[0] != items[1]:
                 yield items[0][::-1] + [rng.randint(1, s)] + items[1]
             side = 0 if moms[1] > moms[0] else 1
-            other = 1-side
+            other = 1 - side
             if rng.randint(0, 99) < 25:
                 side, other = other, side
-            m = len(items[side])+1
+            m = len(items[side]) + 1
             diff = moms[other] - moms[side]
             if diff > 0 and diff % m == 0 and rng.randint(0, 99) < 30:
                 v = diff // m
@@ -2285,36 +2366,21 @@ def josephus_generator(seed):
 
 
 def balanced_ternary_generator(seed):
-    yield 0    # Important edge case
+    yield 0  # Important edge case
     for i in range(30):
-        v = 3**i
+        v = 3 ** i
         yield v,
-        yield v+1,
+        yield v + 1,
         yield -v,
-        yield -v-1,
+        yield -v - 1,
     for v in islice(scale_random(seed, 3, 10), 3000):
         yield v,
         yield -v,
 
 
-__names = [
-    "hu", "oh", "eye", "kro", "atz", "put",
-    "ross", "rachel", "monica", "phoebe", "joey", "chandler",
-    "johndorian", "elliot", "turk", "carla", "perry", "bob",
-    "eddie", "joy", "jeff", "steph", "allison", "doug",
-    "jules", "ellie", "laurie", "travis", "grayson", "andy",
-    "donald", "melania", "hillary", "barack", "bill", "kamala",
-    "mxuzptlk", "ouagadougou", "oumoumou", "auervaara",
-    "britain", "germany", "france", "canada", "exit",
-    "urban", "zuauaua", "aueiosh", "knickerbocker",
-    "keihanaikukauakahihuliheekahaunaele",
-    "llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch"
-]
-
-
 def brangelina_generator():
     n = len(__names)
-    for i in range((n * (n-1)) // 2):
+    for i in range((n * (n - 1)) // 2):
         first = __names[i % n]
         second = __names[(i + i // n + 1) % n]
         yield first, second
@@ -2353,13 +2419,13 @@ def sort_by_digit_count_generator(seed):
         items = []
         for _ in range(n):
             if len(items) < 2 or rng.randint(0, 99) > p:
-                items.append(random_int(rng, rng.randint(1, 10+n//2), 70))
+                items.append(random_int(rng, rng.randint(1, 10 + n // 2), 70))
             else:
                 m = [d for d in str(rng.choice(items))]
                 rng.shuffle(m)
                 if rng.randint(0, 99) < 30:
                     d = rng.choice("0123456789")
-                    m[rng.randint(0, len(m)-1)] = d
+                    m[rng.randint(0, len(m) - 1)] = d
                 items.append(int("".join(m)))
         yield items,
 
@@ -2388,7 +2454,7 @@ def losing_trick_count_generator(seed):
 def riffle_generator(seed):
     rng = Random(seed)
     for i in range(1000):
-        items = [rng.randint(-i*i, i*i) for _ in range(2*i)]
+        items = [rng.randint(-i * i, i * i) for _ in range(2 * i)]
         yield items[:], True
         yield items, False
 
@@ -2452,11 +2518,11 @@ def only_odd_digits_generator(seed):
     for n in islice(pyramid(1, 5, 2), 4000):
         num = 0
         for i in range(n):
-            num = 10*num + rng.choice([1, 3, 5, 7, 9])
+            num = 10 * num + rng.choice([1, 3, 5, 7, 9])
         yield num,
         for _ in range(2):
             p = rng.randint(0, n)
-            num += (10**p) * rng.randint(1, 9)
+            num += (10 ** p) * rng.randint(1, 9)
             yield num,
 
 
@@ -2468,7 +2534,7 @@ def lattice_paths_generator(seed):
         x = n + rng.randint(0, 3)
         y = n + rng.randint(0, 3)
         tabu = set()
-        m = rng.randint(n, 2*n)
+        m = rng.randint(n, 2 * n)
         while len(tabu) < m:
             xx, yy = x, y
             while (xx, yy) == (x, y) or (xx, yy) == (0, 0):
@@ -2504,9 +2570,9 @@ def count_squares_generator(seed):
             if rng.randint(0, 99) < 40:
                 dx = rng.randint(1, n)
                 dy = rng.randint(-3, n)
-                pts.add((x+dx, y+dy))
-                pts.add((x+dy, y-dx))
-                pts.add((x+dx+dy, y-dx+dy))
+                pts.add((x + dx, y + dy))
+                pts.add((x + dy, y - dx))
+                pts.add((x + dx + dy, y - dx + dy))
         yield sorted(pts)
 
 
@@ -2517,9 +2583,9 @@ def three_summers_generator(seed):
     for i in range(200):
         count_until_increase += 1
         if count_until_increase == goal:
-            count_until_increase, goal = 0, goal+5
+            count_until_increase, goal = 0, goal + 5
             items = [rng.randint(1, 2 + i)]
-        items.append(items[-1] + rng.randint(1, 2 + i*i))
+        items.append(items[-1] + rng.randint(1, 2 + i * i))
         if len(items) > 2:
             for _ in range(3):
                 goal = sum(rng.sample(items, 3))
@@ -2544,7 +2610,7 @@ def ztalloc_generator(seed):
                 n = 3 * n + 1
                 pat.append('u')
         while rng.randint(0, 99) < 50:
-            i = rng.randint(0, len(pat)-1)
+            i = rng.randint(0, len(pat) - 1)
             pat[i] = 'u' if pat[i] == 'd' else 'd'
         yield ''.join(pat),
 
@@ -2559,7 +2625,7 @@ def sum_of_distinct_cubes_generator(seed):
 
 def seven_zero_generator(seed):
     yield from [(7,), (70,), (7700,), (77770,), (7000000,)]
-    yield from [(2860,), (1001,), (2**20,), (2**10 - 1,)]
+    yield from [(2860,), (1001,), (2 ** 20,), (2 ** 10 - 1,)]
     rng = Random(seed)
     m = 2
     for _ in range(200):
@@ -2577,12 +2643,12 @@ def remove_after_kth_generator(seed):
             p2 = rng.randint(0, len(items) - 1)
             items[p1], items[p2] = items[p2], items[p1]
         else:
-            new = rng.randint(-i*i, i*i + 1)
+            new = rng.randint(-i * i, i * i + 1)
         items.append(new)
-        yield items[:], rng.randint(1, 2 + i//100)
+        yield items[:], rng.randint(1, 2 + i // 100)
         count_until_increase += 1
         if count_until_increase == goal:
-            count_until_increase, goal, items = 0, goal+5, []
+            count_until_increase, goal, items = 0, goal + 5, []
 
 
 def __qwerty_dist():
@@ -2615,24 +2681,24 @@ def autocorrect_word_generator():
 
 def pyramid_blocks_generator(seed):
     ns = scale_random(seed, 3, 10)
-    ms = scale_random(seed+1, 3, 10)
-    hs = scale_random(seed+2, 2, 15)
+    ms = scale_random(seed + 1, 3, 10)
+    hs = scale_random(seed + 2, 2, 15)
     yield from islice(zip(ns, ms, hs), 500)
 
 
 def is_cyclops_generator(seed):
     rng = Random(seed)
     for n in islice(pyramid(1, 3, 1), 1000):
-        d = rng.randint(1, n+2)
+        d = rng.randint(1, n + 2)
         if d % 2 == 0 and rng.randint(0, 99) < 80:
             d += 1
-        m, num = d//2, 0
+        m, num = d // 2, 0
         for i in range(d):
             if i == m:
                 digit = rng.choice("0000000000000000000123456789")
             else:
                 digit = rng.choice("123456789" if rng.randint(0, 99) < 90 else "00123456789")
-            num = 10*num + int(digit)
+            num = 10 * num + int(digit)
         yield num,
 
 
@@ -2692,7 +2758,7 @@ def taxi_zum_zum_generator(seed):
     for _ in range(6000):
         count_until_increase += 1
         if count_until_increase == goal:
-            count_until_increase, goal, moves = 0, goal+2, []
+            count_until_increase, goal, moves = 0, goal + 2, []
         moves += rng.choice(poss)
         yield moves,
 
@@ -2703,7 +2769,7 @@ def count_growlers_generator(seed):
     for _ in range(5000):
         count_until_increase += 1
         if count_until_increase == goal:
-            count_until_increase, goal, animals = 0, goal+2, []
+            count_until_increase, goal, animals = 0, goal + 2, []
         animals.append(rng.choice(['cat', 'tac', 'dog', 'god']))
         yield animals[:]
 
@@ -2718,8 +2784,8 @@ def tukeys_ninthers_generator(seed):
             step, goal = 0, goal * 3
             n += 1
             items, c = [], 0
-            r = (i // 100)**2 + 2
-            for _ in range(3**n):
+            r = (i // 100) ** 2 + 2
+            for _ in range(3 ** n):
                 c += rng.randint(1, r)
                 items.append(c)
         rng.shuffle(items)
@@ -2737,7 +2803,7 @@ def max_checkers_capture_generator(seed):
     rng = Random(seed)
     for n in islice(pyramid(8, 3, 1), 1000):
         pieces = set()
-        a, b = max(2, (n*n)//8), max(3, (n*n)//3)
+        a, b = max(2, (n * n) // 8), max(3, (n * n) // 3)
         k = rng.randint(a, b)
         px, py = __checker_pos(n, rng)
         while len(pieces) < k:
@@ -2745,7 +2811,7 @@ def max_checkers_capture_generator(seed):
                 px, py = __checker_pos(n, rng)
             else:
                 dx, dy = rng.choice([(-2, 0), (2, 0), (0, 2), (2, 0)])
-                px, py = (px+dx) % n, (py+dy) % n
+                px, py = (px + dx) % n, (py + dy) % n
             pieces.add((px, py))
         (x, y) = __checker_pos(n, rng)
         while (x, y) in pieces:
@@ -2756,7 +2822,7 @@ def max_checkers_capture_generator(seed):
 def collatzy_distance_generator(seed):
     rng = Random(seed)
     for a in range(200):
-        b = rng.randint(1, a+5)
+        b = rng.randint(1, a + 5)
         yield a, b
 
 
@@ -2844,16 +2910,16 @@ def count_dominators_generator(seed):
     rng = Random(seed)
     r = 4
     for n in islice(pyramid(2, 3, 4), 3000):
-        items = [rng.randint(-(r*r), r*r) for _ in range(n)]
+        items = [rng.randint(-(r * r), r * r) for _ in range(n)]
         yield items
         r += 1
     # Just to make sure that you are not being a Shlemiel.
-    for n in range(10**6, 0, -10**5):
+    for n in range(10 ** 6, 0, -10 ** 5):
         perm = list(range(n))
         perm.reverse()
         for k in range(50):
-            i1 = rng.randint(0, n-1)
-            i2 = rng.randint(0, n-1)
+            i1 = rng.randint(0, n - 1)
+            i2 = rng.randint(0, n - 1)
             perm[i1], perm[i2] = perm[i2], perm[i1]
         yield perm
 
@@ -2874,7 +2940,7 @@ def bulgarian_solitaire_generator(seed):
     rng = Random(seed)
     for k in range(2, 30):
         for i in range(2 + 2 * k):
-            items, total = [], (k * (k+1)) // 2
+            items, total = [], (k * (k + 1)) // 2
             while total > 0:
                 if total > 5 and (len(items) < k + i or rng.randint(0, 99) < 40):
                     p = rng.randint(1, 5)
@@ -2890,12 +2956,12 @@ def manhattan_skyline_generator(seed):
     scale = 1
     for (i, n) in enumerate(islice(pyramid(1, 3, 2), 3000)):
         towers = []
-        w = n*n + 5
-        max_area = w*w // 10
+        w = n * n + 5
+        max_area = w * w // 10
         for k in range(n):
             s = rng.randint(1, w)
-            e = s + rng.randint(1, n+1)
-            max_height = 1 + max_area // (e-s)
+            e = s + rng.randint(1, n + 1)
+            max_height = 1 + max_area // (e - s)
             h = rng.randint(1, max_height)
             off = rng.randint(0, 2 + scale // 4)
             towers.append((s * scale + off, e * scale + off, h * scale))
@@ -2908,24 +2974,24 @@ def fractran_generator(seed):
     rng = Random(seed)
     count_until_increase, goal, prog, n = 0, 5, [], 1
     for i in range(500):
-        num = rng.randint(1, 10+i)
-        den = rng.randint(1, 10+i)
+        num = rng.randint(1, 10 + i)
+        den = rng.randint(1, 10 + i)
         prog.append((num, den))
-        k = rng.randint(0, len(prog)-1)
+        k = rng.randint(0, len(prog) - 1)
         prog[k], prog[-1] = prog[-1], prog[k]
         n = rng.randint(2, 10)
         yield n, prog[:], 10
         count_until_increase += 1
         if count_until_increase == goal:
-            count_until_increase, goal, prog = 0, goal+1, []
+            count_until_increase, goal, prog = 0, goal + 1, []
 
 
 def scylla_or_charybdis_generator(seed):
     rng = Random(seed)
     for n in range(2, 40):
-        for i in range(2, 2*n, 2):
+        for i in range(2, 2 * n, 2):
             pos, result, = 0, ''
-            for j in range(n*i):
+            for j in range(n * i):
                 if pos == n - 1:
                     move = '-'
                 elif pos == -n + 1:
@@ -2947,7 +3013,7 @@ def count_overlapping_disks_generator(seed):
     rng = Random(seed)
     count_until_increase, goal, max_r = 0, 5, 10
     for n in range(1, 250, 2):
-        d, m = 40*n, rng.randint(8*n, 12*n)
+        d, m = 40 * n, rng.randint(8 * n, 12 * n)
         disks = set()
         while len(disks) < m:
             x = rng.randint(-d, d)
@@ -2958,7 +3024,7 @@ def count_overlapping_disks_generator(seed):
         yield disks
         count_until_increase += 1
         if count_until_increase == goal:
-            count_until_increase, goal = 0, goal+2
+            count_until_increase, goal = 0, goal + 2
             max_r += 5
 
 
@@ -2967,14 +3033,14 @@ def arithmetic_progression_generator(seed):
     i = 3
     for n, p in islice(zip(pyramid(10, 2, 2), cycle([10, 20, 30, 90])), 2000):
         elements = set()
-        start = rng.randint(1, i+3)
-        step = rng.randint(1, i+2)
+        start = rng.randint(1, i + 3)
+        step = rng.randint(1, i + 2)
         while len(elements) < n:
             elements.add(start)
             start += step
             if rng.randint(0, 99) < p:
-                start = rng.randint(1, i*i + 3)
-                step = rng.randint(1, i+2)
+                start = rng.randint(1, i * i + 3)
+                step = rng.randint(1, i + 2)
         yield sorted(elements),
         i += 1
 
@@ -2999,7 +3065,7 @@ def eliminate_neighbours_generator(seed):
         yield items[:]
         count_until_increase += 1
         if count_until_increase == goal:
-            count_until_increase, goal = 0, goal+3
+            count_until_increase, goal = 0, goal + 3
             m = 8 + i // 50
             items = list(range(1, m))
         items.append(m)
@@ -3007,9 +3073,9 @@ def eliminate_neighbours_generator(seed):
         j = rng.randint(0, len(items) - 1)
         items[j], items[-1] = items[-1], items[j]
     for n in range(100, 1501):
-        items = [i+1 for i in range(n)]
-        i1 = rng.randint(0, n//2)
-        i2 = rng.randint(0, n//2)
+        items = [i + 1 for i in range(n)]
+        i1 = rng.randint(0, n // 2)
+        i2 = rng.randint(0, n // 2)
         items[i1], items[i2] = items[i2], items[i1]
         yield items[:]
         yield list(reversed(items))
@@ -3024,7 +3090,7 @@ def wythoff_array_generator(seed):
     curr, step = 1, 1
     for _ in range(300):
         yield curr
-        curr += rng.randint(1, 4*step)
+        curr += rng.randint(1, 4 * step)
         step += 1
 
 
@@ -3033,10 +3099,10 @@ def hourglass_flips_generator(seed):
     for _ in range(50):
         glasses, curr = [], rng.randint(6, 11)
         for j in range(rng.randint(2, 4)):
-            low = 0 if rng.randint(0, 99) < 60 else rng.randint(5, max(6, curr//2))
+            low = 0 if rng.randint(0, 99) < 60 else rng.randint(5, max(6, curr // 2))
             glasses.append((curr, low))
             curr += rng.randint(1, 5)
-        t = rng.randint(curr+2, 2*curr)
+        t = rng.randint(curr + 2, 2 * curr)
         yield glasses, t
 
 
@@ -3052,7 +3118,7 @@ def knight_jump_generator(seed):
         end = [x + y * rng.choice([-1, 1])
                for (x, y) in zip(start, steps)]
         if rng.randint(1, 100) < 50:
-            end[rng.randint(0, k-1)] += 1
+            end[rng.randint(0, k - 1)] += 1
         steps.sort(reverse=True)
         yield tuple(steps), tuple(start), tuple(end)
 
@@ -3064,7 +3130,7 @@ def frog_collision_time_generator(seed):
         c = [rng.randint(-10, 10) for _ in range(6)]
         if c[2:4] == c[4:6] or c[2:4] == [0, 0] or c[4:6] == [0, 0]:
             continue
-        t = rng.randint(1, 2 + 2**(instance_count // 100))
+        t = rng.randint(1, 2 + 2 ** (instance_count // 100))
         x1, y1 = c[0] + t * c[2], c[1] + t * c[3]
         x2, y2 = c[0] + t * c[4], c[1] + t * c[5]
         if rng.randint(1, 100) < 30:
@@ -3084,22 +3150,22 @@ def spread_the_coins_generator(seed):
     for n in islice(pyramid(5, 3, 2), 500):
         coins = [0 for _ in range(n)]
         coins[-1] = 1
-        m = rng.randint(2*n, 3*n)
+        m = rng.randint(2 * n, 3 * n)
         while m > 0:
             c = rng.randint(1, 4)
-            i = rng.randint(0, n-1)
+            i = rng.randint(0, n - 1)
             coins[i] += c
             m -= c
         u = rng.randint(2, 2 + max(coins) // 2)
-        left = rng.randint(1, u-1)
-        yield coins, left, u-left
+        left = rng.randint(1, u - 1)
+        yield coins, left, u - left
 
 
 def group_and_skip_generator(seed):
     rng = Random(seed)
     for n in islice(scale_random(seed, 2, 10), 400):
-        b = rng.randint(1, max(2, n//100))
-        a = rng.randint(b+1, 2*b+1)
+        b = rng.randint(1, max(2, n // 100))
+        a = rng.randint(b + 1, 2 * b + 1)
         yield n, a, b
 
 
@@ -3109,10 +3175,10 @@ def nearest_polygonal_number_generator(seed):
     curr = 20
     for i in range(250):
         for j in range(15):
-            curr = curr + rng.randint(1, curr//10)
-            s = rng.randint(3, i+3)
+            curr = curr + rng.randint(1, curr // 10)
+            s = rng.randint(3, i + 3)
             yield curr, s
-        curr = curr*2
+        curr = curr * 2
 
 
 def subtract_square_generator(seed):
@@ -3120,9 +3186,9 @@ def subtract_square_generator(seed):
     for i in range(1, 9):
         curr = rng.randint(1, 10)
         query = []
-        for j in range(2*i):
+        for j in range(2 * i):
             query.append(curr)
-            curr = (4*curr)//3 + rng.randint(1, max(3, curr//3))
+            curr = (4 * curr) // 3 + rng.randint(1, max(3, curr // 3))
         yield query
 
 
@@ -3133,7 +3199,7 @@ def duplicate_digit_bonus_generator(seed):
         yield random_int(rng, n, 60)
         count_until_increase += 1
         if count_until_increase == goal:
-            count_until_increase, goal, n = 0, goal+5, n+1
+            count_until_increase, goal, n = 0, goal + 5, n + 1
 
 
 def hitting_integer_powers_generator(seed):
@@ -3147,7 +3213,7 @@ def hitting_integer_powers_generator(seed):
                 a = a * p
             if rng.randint(0, 99) < 20:
                 b = b * p
-        yield a, b, 10**(rng.randint(1, min(4, n)))
+        yield a, b, 10 ** (rng.randint(1, min(4, n)))
 
 
 def permutation_cycles_generator(seed):
@@ -3158,7 +3224,7 @@ def permutation_cycles_generator(seed):
     # Fuzz test some longer permutations
     rng = Random(seed)
     for n in islice(pyramid(6, 2, 3), 1000):
-        for _ in range(n//2):
+        for _ in range(n // 2):
             perm = list(range(n))
             rng.shuffle(perm)
             yield perm
@@ -3193,7 +3259,7 @@ def trips_fill_generator(seed):
     for i in range(130):
         n, pat, c = 3 + i // 20, '', 0
         for _ in range(n):
-            if rng.randint(0, 99) < 100 - 15 * (c+2):
+            if rng.randint(0, 99) < 100 - 15 * (c + 2):
                 pat += '*'
                 c += 1
             else:
@@ -3235,7 +3301,7 @@ def oware_move_generator(seed):
         to_sow = rng.randint(0, 6 * k * k * k * k)
         sown = 0
         board = [0 for _ in range(2 * k)]
-        while sown*sown < to_sow:
+        while sown * sown < to_sow:
             pos = rng.randint(0, 2 * k - 1)
             board[pos] += 1
             sown += 1
@@ -3293,19 +3359,19 @@ def reach_corner_generator(seed):
     for _ in range(5000):
         count_until_increase += 1
         if count_until_increase == goal:
-            count_until_increase, goal, nn, aliens = 0, goal+1, nn+1, []
+            count_until_increase, goal, nn, aliens = 0, goal + 1, nn + 1, []
             n = rng.randint(4, nn - 3)
             m = rng.randint(nn - n + 2, nn)
             if n % 2 == 0 and m % 2 == 0:
                 m += 1
-        ex = rng.randint(0, n-1)
-        ey = rng.randint(0, m-1)
+        ex = rng.randint(0, n - 1)
+        ey = rng.randint(0, m - 1)
         if (ex, ey) not in aliens:
             aliens.append((ex, ey))
         x, y = ex, ey
         while (x, y) in aliens:
-            x = rng.randint(0, n-1)
-            y = rng.randint(0, m-1)
+            x = rng.randint(0, n - 1)
+            y = rng.randint(0, m - 1)
         yield x, y, n, m, aliens[:]
 
 
@@ -3315,15 +3381,15 @@ def bulgarian_cycle_generator(seed):
     for _ in range(300):
         piles.append(rng.randint(1, n))
         piles.append(rng.randint(1, n))
-        pos = rng.randint(0, len(piles)-1)
+        pos = rng.randint(0, len(piles) - 1)
         piles[-1] += piles[pos]
         del piles[pos]
         yield piles[:]
         count_until_increase += 1
         if count_until_increase == goal:
-            count_until_increase, goal, n, piles = 0, goal+2, n+1, []
+            count_until_increase, goal, n, piles = 0, goal + 2, n + 1, []
     for n in range(10, 30):
-        yield [(i-1)*(i-2) for i in range(n)]
+        yield [(i - 1) * (i - 2) for i in range(n)]
 
 
 def colour_trio_generator(seed):
@@ -3350,30 +3416,30 @@ def schmalz_generator():
     yield "Don't judge each day by the harvest you reap but by the seeds that you plant.",
     yield "The future belongs to those who believe in the beauty of their dreams.",
     yield "Tell me and I forget. Teach me and I remember. Involve me and I learn.",
-    yield "The best and most beautiful things in the world cannot be seen or even touched " +\
+    yield "The best and most beautiful things in the world cannot be seen or even touched " + \
           "— they must be felt with the heart."
     yield "It is during our darkest moments that we must focus to see the light.",
-    yield "Who's the leader of the club that's made for you and me? T-R-I-C-K-Y M-O-U-S-E! Tricky Mouse! " +\
+    yield "Who's the leader of the club that's made for you and me? T-R-I-C-K-Y M-O-U-S-E! Tricky Mouse! " + \
           "TRICKY MOUSE! Tricky Mouse! TRICKY MOUSE! Forever let us hold our Hammers high! High! High! High!",
     yield "What puny mortal can comprehend the Mighty Mind of Galactus?",
     yield "To crush your enemies, to see them driven before you, and hear the lamentation of their women.",
     yield "Everything that irritates us about others can lead us to an understanding of ourselves.",
     yield "Trying to define yourself is like trying to bite your own teeth.",
-    yield "Inability to accept the mystic experience is more than an intellectual handicap. Lack of " +\
+    yield "Inability to accept the mystic experience is more than an intellectual handicap. Lack of " + \
           "awareness of the basic unity of organism and environment is a serious and dangerous hallucination."
     yield '“Evil” read backwards is “live.” Demon est deus inversus.'
     yield "想像一下清晨的多維蜘蛛網，上面佈滿了露珠",
     yield "Өндөг бол эго, шувуу бол чөлөөлөгдсөн Би юм.",
     yield "Mỗi người trong chúng ta đều là một khẩu độ mà qua đó toàn bộ vũ trụ nhìn ra.",
     yield "“Ukufuna chiyani? Nchiyani chimakupangitsa iwe kuyabwa? Kodi mukufuna mutakhala bwanji?”",
-    yield "Chīwit mī xyū̀ nı ch̀wng welā nī̂ thèānận læa nı k̄hṇa nī̂ k̆ mị̀mī thī̀ s̄îns̄ud læa pĕn " +\
-          "ni rạn dr̒ s̄ảh̄rạb ch̀wng welā pạccubạn nận lĕk māk k̀xn thī̀ reā ca wạd dị̂ mạn k̆ h̄āy pị " +\
+    yield "Chīwit mī xyū̀ nı ch̀wng welā nī̂ thèānận læa nı k̄hṇa nī̂ k̆ mị̀mī thī̀ s̄îns̄ud læa pĕn " + \
+          "ni rạn dr̒ s̄ảh̄rạb ch̀wng welā pạccubạn nận lĕk māk k̀xn thī̀ reā ca wạd dị̂ mạn k̆ h̄āy pị " + \
           "tæ̀ k̆ yạng mī xyū̀ tlxd pị"
-    yield "Do not suppose, however, that we are merely a society of lotus-eaters, lolling on divans " +\
+    yield "Do not suppose, however, that we are merely a society of lotus-eaters, lolling on divans " + \
           "and cuddling lovely women."
-    yield "Agus tuiscint lochtach ar fhéiniúlacht againn, gníomhaímid ar bhealach atá mí-oiriúnach dár " +\
+    yield "Agus tuiscint lochtach ar fhéiniúlacht againn, gníomhaímid ar bhealach atá mí-oiriúnach dár " + \
           "dtimpeallacht nádúrtha."
-    yield "Fa tsy misy fifaliana amin'ny faharetana mandrakizay. "\
+    yield "Fa tsy misy fifaliana amin'ny faharetana mandrakizay. " \
           + "Irintsika fotsiny izany satria foana ny ankehitriny."
     yield "àáâäæãåāèéêëēėęîïíīįìôöòóœøōõûüùúū"
     yield "!@#$%^&*(){}:;'[]'"
@@ -3381,11 +3447,11 @@ def schmalz_generator():
 
 
 def count_troikas_generator(seed):
-    yield from [[], [42], [42, 17], [17, 42], [-5, 0], [10**42]]
+    yield from [[], [42], [42, 17], [17, 42], [-5, 0], [10 ** 42]]
     scale, rng = 4, Random(seed)
     for n, p in islice(zip(pyramid(3, 2, 1), cycle([30, 50, 70])), 6000):
         items = [rng.randint(-scale, scale)]
-        for _ in range(n-1):
+        for _ in range(n - 1):
             items.append(rng.choice(items) if rng.randint(0, 99) < p else rng.randint(-scale, scale))
         yield items
         scale += 1
@@ -3404,12 +3470,12 @@ def count_corners_generator(seed, slices=4000):
             h = rng.randint(1, 2 + n // 2)
             if rng.randint(0, 99) < 80:
                 points.add((x, y))
-            points.add((x+h, y))
-            points.add((x, y+h))
+            points.add((x + h, y))
+            points.add((x, y + h))
             if rng.randint(0, 99) < 50:
-                x = x+h
+                x = x + h
             else:
-                y = y+h
+                y = y + h
         yield sorted(points)
 
 
@@ -3423,14 +3489,14 @@ testcases = [
     # "ceafc55f58a4f921582cf6fcd2c856851fca7444541e5024d1"
     # ),
     (
-     "arithmetic_progression",
-     arithmetic_progression_generator(fixed_seed),
-     "ace4b9a278f796dd09b2922f8b533de7747b7c0cda4f11bd067cc13133ba804b"
+        "arithmetic_progression",
+        arithmetic_progression_generator(fixed_seed),
+        "ace4b9a278f796dd09b2922f8b533de7747b7c0cda4f11bd067cc13133ba804b"
     ),
     (
-     "count_overlapping_disks",
-     count_overlapping_disks_generator(fixed_seed),
-     "a36b35b4312b28abdb6d9faa56889840bf8bcadb5c943a2dc96f066b215b84cf"
+        "count_overlapping_disks",
+        count_overlapping_disks_generator(fixed_seed),
+        "a36b35b4312b28abdb6d9faa56889840bf8bcadb5c943a2dc96f066b215b84cf"
     ),
     # Removed from problem set November 26, 2021
     # (
@@ -3439,44 +3505,44 @@ testcases = [
     # "856627cc444098c9386367d5f250c0e2cddbf3ef0ecec3ba11"
     # ),
     (
-     "scylla_or_charybdis",
-     scylla_or_charybdis_generator(fixed_seed),
-     "b1536ef2e3dcfbd98ae4b1bb054358953a45702bb6767afc2bce3a28a229c54a"
+        "scylla_or_charybdis",
+        scylla_or_charybdis_generator(fixed_seed),
+        "b1536ef2e3dcfbd98ae4b1bb054358953a45702bb6767afc2bce3a28a229c54a"
     ),
     (
-     "fractran",
-     fractran_generator(fixed_seed),
-     "5ef5b21286fe7565e53230868d4240d41224a4543122ec0d5df5158b4e795dc5"
+        "fractran",
+        fractran_generator(fixed_seed),
+        "5ef5b21286fe7565e53230868d4240d41224a4543122ec0d5df5158b4e795dc5"
     ),
     (
-     "manhattan_skyline",
-     manhattan_skyline_generator(fixed_seed),
-     "cfea0db5924def2f2ecf66a69ee11a079b4d6a59f15edbd3130a2c81e2477991"
+        "manhattan_skyline",
+        manhattan_skyline_generator(fixed_seed),
+        "cfea0db5924def2f2ecf66a69ee11a079b4d6a59f15edbd3130a2c81e2477991"
     ),
     (
-     "bulgarian_solitaire",
-     bulgarian_solitaire_generator(fixed_seed),
-     "819172713ddd3d5a8e596b249284a52b851b3f78d6a468b1672d10991c6d92af"
+        "bulgarian_solitaire",
+        bulgarian_solitaire_generator(fixed_seed),
+        "819172713ddd3d5a8e596b249284a52b851b3f78d6a468b1672d10991c6d92af"
     ),
     (
-     "sum_of_distinct_cubes",
-     sum_of_distinct_cubes_generator(fixed_seed),
-     "d1ed5e8a0688116c7536b01804d09378a13559a0d6a9427ddf47e3dc45fbfb66"
+        "sum_of_distinct_cubes",
+        sum_of_distinct_cubes_generator(fixed_seed),
+        "d1ed5e8a0688116c7536b01804d09378a13559a0d6a9427ddf47e3dc45fbfb66"
     ),
     (
-     "tukeys_ninthers",
-     tukeys_ninthers_generator(fixed_seed),
-     "801d96631e1064d6bd8903f3e716bb397fa1c785877ee4e9031f0519ee5b59bb"
+        "tukeys_ninthers",
+        tukeys_ninthers_generator(fixed_seed),
+        "801d96631e1064d6bd8903f3e716bb397fa1c785877ee4e9031f0519ee5b59bb"
     ),
     (
-     "optimal_crag_score",
-     optimal_crag_score_generator(fixed_seed),
-     "5cf0e2ae4582c041343a113fcd4cb413c27f44ee8f4fafc6b30e60a54482ff7d"
+        "optimal_crag_score",
+        optimal_crag_score_generator(fixed_seed),
+        "5cf0e2ae4582c041343a113fcd4cb413c27f44ee8f4fafc6b30e60a54482ff7d"
     ),
     (
-     "count_dominators",
-     count_dominators_generator(fixed_seed),
-     "53b2c8e9856b9a822a2bddebc3ecb5d1d5b3149fc05a0571515fe0984e5276b9"
+        "count_dominators",
+        count_dominators_generator(fixed_seed),
+        "53b2c8e9856b9a822a2bddebc3ecb5d1d5b3149fc05a0571515fe0984e5276b9"
     ),
     # Removed from problem set December 9, 2021
     # (
@@ -3485,29 +3551,29 @@ testcases = [
     #  "6174fc0fd7c0c5b2a9bcb99a82799736ea3ab2f5f1525b8c10"
     # ),
     (
-     "substitution_words",
-     substitution_words_generator(),
-     "4cf3cd3ba0607db9ba11ec0e240391bc1e78ad62edb541d26025f8efa922cbb8"
+        "substitution_words",
+        substitution_words_generator(),
+        "4cf3cd3ba0607db9ba11ec0e240391bc1e78ad62edb541d26025f8efa922cbb8"
     ),
     (
-     "taxi_zum_zum",
-     taxi_zum_zum_generator(fixed_seed),
-     "1612df18e6970e45150e741342232a413905b0e4cc84dd994ffde44a84b613f4"
+        "taxi_zum_zum",
+        taxi_zum_zum_generator(fixed_seed),
+        "1612df18e6970e45150e741342232a413905b0e4cc84dd994ffde44a84b613f4"
     ),
     (
-     "midnight",
-     midnight_generator(fixed_seed),
-     "92890d7f13631c829d087322d0b3e6764b81063256c026ab3f9a00ae9372f963"
+        "midnight",
+        midnight_generator(fixed_seed),
+        "92890d7f13631c829d087322d0b3e6764b81063256c026ab3f9a00ae9372f963"
     ),
     (
-     "crag_score",
-     crag_score_generator(),
-     "ea62d9694e079b948a8b622c8f6dfd2aeebddeebc59c57572163678a6bdedc1e"
+        "crag_score",
+        crag_score_generator(),
+        "ea62d9694e079b948a8b622c8f6dfd2aeebddeebc59c57572163678a6bdedc1e"
     ),
     (
-     "unscramble",
-     unscramble_generator(fixed_seed),
-     "de2b7b1ddb8bd0c74243635ed26cfebc41d2870be2ed469043de23a7eb2dd557"
+        "unscramble",
+        unscramble_generator(fixed_seed),
+        "de2b7b1ddb8bd0c74243635ed26cfebc41d2870be2ed469043de23a7eb2dd557"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -3516,14 +3582,14 @@ testcases = [
     # "69130744180a37dae42a668f28a3aa95dd53522662e058f2cf"
     # ),
     (
-     "van_eck",
-     van_eck_generator(fixed_seed),
-     "2938012254caba60ec8e648da870e1456d2347ea0769b8accb3c4631566f740b"
+        "van_eck",
+        van_eck_generator(fixed_seed),
+        "2938012254caba60ec8e648da870e1456d2347ea0769b8accb3c4631566f740b"
     ),
     (
-     "domino_cycle",
-     domino_cycle_generator(fixed_seed),
-     "63ad8f4f4cf4a1ee9f7949fb8be6c173aac5ecf19b998418fb4f8c3e9a9decda"
+        "domino_cycle",
+        domino_cycle_generator(fixed_seed),
+        "63ad8f4f4cf4a1ee9f7949fb8be6c173aac5ecf19b998418fb4f8c3e9a9decda"
     ),
     # Removed from problem set August 10, 2021
     # (
@@ -3532,19 +3598,19 @@ testcases = [
     # "49f103a7ad2c26d800d61e8645f967408a18c37cc6303a9dfc"
     # ),
     (
-     "nearest_smaller",
-     nearest_smaller_generator(fixed_seed),
-     "2406ed6b299d216019f22442d380270dff41e10fb3860276d265351b4dea08dd"
+        "nearest_smaller",
+        nearest_smaller_generator(fixed_seed),
+        "2406ed6b299d216019f22442d380270dff41e10fb3860276d265351b4dea08dd"
     ),
     (
-     "collatzy_distance",
-     collatzy_distance_generator(fixed_seed),
-     "ff638c3269c9418841d6a7f0ecf0fadb0ed02677f3b56078e09ede7ec0384f63"
+        "collatzy_distance",
+        collatzy_distance_generator(fixed_seed),
+        "ff638c3269c9418841d6a7f0ecf0fadb0ed02677f3b56078e09ede7ec0384f63"
     ),
     (
-     "max_checkers_capture",
-     max_checkers_capture_generator(fixed_seed),
-     "1547f0eb0829ff5882178f480e8c5d24f016c5c1d95038b898f17c073c3913ee"
+        "max_checkers_capture",
+        max_checkers_capture_generator(fixed_seed),
+        "1547f0eb0829ff5882178f480e8c5d24f016c5c1d95038b898f17c073c3913ee"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -3553,9 +3619,9 @@ testcases = [
     # "7e6257c998d5842ec41699b8b51748400a15e539083e5a0a20"
     # ),
     (
-     "count_growlers",
-     count_growlers_generator(fixed_seed),
-     "3f96234a4b959581978facb1a8f44f732b5af745be4685fc963a6412a4d0932e"
+        "count_growlers",
+        count_growlers_generator(fixed_seed),
+        "3f96234a4b959581978facb1a8f44f732b5af745be4685fc963a6412a4d0932e"
     ),
     # Removed from problem set August 10, 2020
     # (
@@ -3564,9 +3630,9 @@ testcases = [
     #  "dfbf6a28719818c747e2c8e888ff853c2862fa8d99683c0815"
     # ),
     (
-     "words_with_letters",
-     words_with_letters_generator(),
-     "2bb1d006c2549038711d9d61b96d551865662872f58ffb58fe97de18f3b69124"
+        "words_with_letters",
+        words_with_letters_generator(),
+        "2bb1d006c2549038711d9d61b96d551865662872f58ffb58fe97de18f3b69124"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -3575,14 +3641,14 @@ testcases = [
     # "c79db2f41e798a652e3742ef2a2b29801f0b3e52f4e285aa4e"
     # ),
     (
-     "line_with_most_points",
-     line_with_most_points_generator(fixed_seed),
-     "9f94d2d0edd59893f0750ddeae816051baf6c71c9d1536049ed3b2a4f3888467"
+        "line_with_most_points",
+        line_with_most_points_generator(fixed_seed),
+        "9f94d2d0edd59893f0750ddeae816051baf6c71c9d1536049ed3b2a4f3888467"
     ),
     (
-     "count_maximal_layers",
-     count_maximal_layers_generator(fixed_seed),
-     "950e939df6b497881a6a3dea3c2a92ac5362ff2aee2841801da38eb45867902c"
+        "count_maximal_layers",
+        count_maximal_layers_generator(fixed_seed),
+        "950e939df6b497881a6a3dea3c2a92ac5362ff2aee2841801da38eb45867902c"
     ),
     # Removed from problem set October 29, 2021
     # (
@@ -3591,34 +3657,34 @@ testcases = [
     # "e571beecc69a7ac9235ba8911deef92b367e1badb9cff87f58"
     # ),
     (
-     "extract_increasing",
-     extract_increasing_generator(fixed_seed),
-     "0de18680245264367ed256c32f0563e620c700771ac5f2cf976eafe3afe4f828"
+        "extract_increasing",
+        extract_increasing_generator(fixed_seed),
+        "0de18680245264367ed256c32f0563e620c700771ac5f2cf976eafe3afe4f828"
     ),
     (
-     "is_cyclops",
-     is_cyclops_generator(fixed_seed),
-     "48f88b82c6a22f4c51d22652f989909ffef8b98d28eb40cf57bd4a25050c853a"
+        "is_cyclops",
+        is_cyclops_generator(fixed_seed),
+        "48f88b82c6a22f4c51d22652f989909ffef8b98d28eb40cf57bd4a25050c853a"
     ),
     (
-     "pyramid_blocks",
-     pyramid_blocks_generator(fixed_seed),
-     "3bb8f8af87869b58ada39ca72e33b084524d70896619f89d91847533b89021c7"
+        "pyramid_blocks",
+        pyramid_blocks_generator(fixed_seed),
+        "3bb8f8af87869b58ada39ca72e33b084524d70896619f89d91847533b89021c7"
     ),
     (
-     "autocorrect_word",
-     autocorrect_word_generator(),
-     "93742a7a15938b9184bf93cc493699b49ff8bfe07529e42d581985b23106ac47"
+        "autocorrect_word",
+        autocorrect_word_generator(),
+        "93742a7a15938b9184bf93cc493699b49ff8bfe07529e42d581985b23106ac47"
     ),
     (
-     "remove_after_kth",
-     remove_after_kth_generator(fixed_seed),
-     "3b89af0dce7e41c2fc6a851e4a35bb76f8845c5f6929ba6ade97c58d92fc3c07"
+        "remove_after_kth",
+        remove_after_kth_generator(fixed_seed),
+        "3b89af0dce7e41c2fc6a851e4a35bb76f8845c5f6929ba6ade97c58d92fc3c07"
     ),
     (
-     "seven_zero",
-     seven_zero_generator(fixed_seed),
-     "907ec1aed8dde0ef69efc30a876af3adda28787e8c3cf67e8c0c47fa858ee9bc"
+        "seven_zero",
+        seven_zero_generator(fixed_seed),
+        "907ec1aed8dde0ef69efc30a876af3adda28787e8c3cf67e8c0c47fa858ee9bc"
     ),
     # Removed from problem set December 10, 2020
     # (
@@ -3627,9 +3693,9 @@ testcases = [
     #  "b75370cf5c3d2c307585937311af34e8a7ad44ea82c032786d"
     # ),
     (
-     "sum_of_two_squares",
-     sum_of_two_squares_generator(fixed_seed),
-     "93086670c2c63510741e58329a83fe42cc469762ca26c74130bbdf120f52e6f8"
+        "sum_of_two_squares",
+        sum_of_two_squares_generator(fixed_seed),
+        "93086670c2c63510741e58329a83fe42cc469762ca26c74130bbdf120f52e6f8"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -3638,34 +3704,34 @@ testcases = [
     # "b8b08a8a1a5fd687c49c5f7147fd35bc16d4c3ac88328ada64"
     # ),
     (
-     "reverse_vowels",
-     schmalz_generator(),
-     "db4e408209986ba0ebb9b4ebbd1b4dc170d6cafd3cfc936e9fdc218b620ae57c"
+        "reverse_vowels",
+        schmalz_generator(),
+        "db4e408209986ba0ebb9b4ebbd1b4dc170d6cafd3cfc936e9fdc218b620ae57c"
     ),
     (
-     "riffle",
-     riffle_generator(fixed_seed),
-     "3f5df69d458a0f72fee992fda34c18139891dcc3a63d2fe3725c600767f1da48"
+        "riffle",
+        riffle_generator(fixed_seed),
+        "3f5df69d458a0f72fee992fda34c18139891dcc3a63d2fe3725c600767f1da48"
     ),
     (
-     "ztalloc",
-     ztalloc_generator(fixed_seed),
-     "b1c4615a2b3b086a26dd8c5211f065c8227d9c138dd9bd51422c177f4ca03b14"
+        "ztalloc",
+        ztalloc_generator(fixed_seed),
+        "b1c4615a2b3b086a26dd8c5211f065c8227d9c138dd9bd51422c177f4ca03b14"
     ),
     (
-     "losing_trick_count",
-     losing_trick_count_generator(fixed_seed),
-     "c6244de2ad61ce0665114dd006b9b7d2731465d0c28780fb54fb1673d31802cf"
+        "losing_trick_count",
+        losing_trick_count_generator(fixed_seed),
+        "c6244de2ad61ce0665114dd006b9b7d2731465d0c28780fb54fb1673d31802cf"
     ),
     (
-     "postfix_evaluate",
-     postfix_evaluate_generator(fixed_seed),
-     "47fb1c90b9198315bd27fb26ab2a7b3ca99d8e94e05f12c93d9594aa68089dd6"
+        "postfix_evaluate",
+        postfix_evaluate_generator(fixed_seed),
+        "47fb1c90b9198315bd27fb26ab2a7b3ca99d8e94e05f12c93d9594aa68089dd6"
     ),
     (
-     "three_summers",
-     three_summers_generator(fixed_seed),
-     "94e6dc029d76368aae6979a3abbc18be5c1aff83ff8c753b65c47ec30e3cb89c"
+        "three_summers",
+        three_summers_generator(fixed_seed),
+        "94e6dc029d76368aae6979a3abbc18be5c1aff83ff8c753b65c47ec30e3cb89c"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -3686,19 +3752,19 @@ testcases = [
     # "ac64825e938d5a3104ea4662b216285f05a071cde8fd82c6fd"
     # ),
     (
-     "count_squares",
-     count_squares_generator(fixed_seed),
-     "cb1021c7a7e1cea05e4eb7b861df761e0d9fe94c03297f2b937726aa2f14f4d6"
+        "count_squares",
+        count_squares_generator(fixed_seed),
+        "cb1021c7a7e1cea05e4eb7b861df761e0d9fe94c03297f2b937726aa2f14f4d6"
     ),
     (
-     "count_carries",
-     count_carries_generator(fixed_seed),
-     "13888e39b86ee15b225635228719e51f229d73aa08ff57e764b69364ebd862e5"
+        "count_carries",
+        count_carries_generator(fixed_seed),
+        "13888e39b86ee15b225635228719e51f229d73aa08ff57e764b69364ebd862e5"
     ),
     (
-     "lattice_paths",
-     lattice_paths_generator(fixed_seed),
-     "5aab78160181125a6944933dbe70acde133ae2a739798a0ce7abfb9596a28436"
+        "lattice_paths",
+        lattice_paths_generator(fixed_seed),
+        "5aab78160181125a6944933dbe70acde133ae2a739798a0ce7abfb9596a28436"
     ),
     # Removed from problem set September 16, 2022
     # (
@@ -3707,29 +3773,29 @@ testcases = [
     #  "98fb3c9e30908ea6c2654d64d3c68ca2538927be529d75ddfe"
     # ),
     (
-     "only_odd_digits",
-     only_odd_digits_generator(fixed_seed),
-     "7775acef5b1e64bb996c997e4a0942d52cadde64987af514b2decda660f84792"
+        "only_odd_digits",
+        only_odd_digits_generator(fixed_seed),
+        "7775acef5b1e64bb996c997e4a0942d52cadde64987af514b2decda660f84792"
     ),
     (
-     "squares_intersect",
-     squares_intersect_generator(fixed_seed),
-     "fb5f90845deddea1350fa81af5a228b18a2f4922f21ce36f725d54329b89c58f"
+        "squares_intersect",
+        squares_intersect_generator(fixed_seed),
+        "fb5f90845deddea1350fa81af5a228b18a2f4922f21ce36f725d54329b89c58f"
     ),
     (
-     "rooks_with_friends",
-     rooks_with_friends_generator(fixed_seed),
-     "865f129cec84fdf07bad9e7fcdfa85541746c58402871ae89e2f3f62dfce4abe"
+        "rooks_with_friends",
+        rooks_with_friends_generator(fixed_seed),
+        "865f129cec84fdf07bad9e7fcdfa85541746c58402871ae89e2f3f62dfce4abe"
     ),
     (
-     "safe_squares_rooks",
-     safe_squares_generator(fixed_seed),
-     "c5c1536e0b1eebc92f5def4f1d7be4116a8a0cb48d754f2234463fc0d8a8bbf7"
+        "safe_squares_rooks",
+        safe_squares_generator(fixed_seed),
+        "c5c1536e0b1eebc92f5def4f1d7be4116a8a0cb48d754f2234463fc0d8a8bbf7"
     ),
     (
-     "safe_squares_bishops",
-     safe_squares_generator(fixed_seed),
-     "7dc0f6070c0d360dbbb8a9fa35f1c205c4dc7319f07dd1780b31280dcdce8da4"
+        "safe_squares_bishops",
+        safe_squares_generator(fixed_seed),
+        "7dc0f6070c0d360dbbb8a9fa35f1c205c4dc7319f07dd1780b31280dcdce8da4"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -3744,9 +3810,9 @@ testcases = [
     # "9e81bfae626ddf36655f4d3c2c36208d646eee416c18671ec1"
     # ),
     (
-     "count_and_say",
-     count_and_say_generator(fixed_seed),
-     "c5f25cecc498f5cba0f944bb7a8c47be7d78a5cac4797d9d282ebba489482b18"
+        "count_and_say",
+        count_and_say_generator(fixed_seed),
+        "c5f25cecc498f5cba0f944bb7a8c47be7d78a5cac4797d9d282ebba489482b18"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -3755,14 +3821,14 @@ testcases = [
     # "e0e49c2c4d5ad7580fe42a71a411e8449d84c9bfd2a2b13df3"
     # ),
     (
-     "first_preceded_by_smaller",
-     first_preceded_by_smaller_generator(fixed_seed),
-     "7d123860240c7b8614de16f232213a81568ffd167b7cb4e8de70d6fc943dc240"
+        "first_preceded_by_smaller",
+        first_preceded_by_smaller_generator(fixed_seed),
+        "7d123860240c7b8614de16f232213a81568ffd167b7cb4e8de70d6fc943dc240"
     ),
     (
-     "words_with_given_shape",
-     words_with_given_shape_generator(),
-     "9a0e08fcee10575eb6ef12de7bc5820b82b2383822beb69d2782bdace6b1894c"
+        "words_with_given_shape",
+        words_with_given_shape_generator(),
+        "9a0e08fcee10575eb6ef12de7bc5820b82b2383822beb69d2782bdace6b1894c"
     ),
     # Removed from problem set August 10, 2020
     # (
@@ -3771,9 +3837,9 @@ testcases = [
     #  "fbb31e68d216d7430c47a3e3ac9eb0d4240ef2ae698eb2ded4"
     # ),
     (
-     "fibonacci_sum",
-     fibonacci_sum_generator(fixed_seed),
-     "e7058a191e5dbc3a8f69f302fa5f6180e8b4d4c688f6028792576010dcb3c16b"
+        "fibonacci_sum",
+        fibonacci_sum_generator(fixed_seed),
+        "e7058a191e5dbc3a8f69f302fa5f6180e8b4d4c688f6028792576010dcb3c16b"
     ),
     # Removed from the problem set August 10, 2021
     # (
@@ -3782,14 +3848,14 @@ testcases = [
     #  "be5d5249b396c259bde5338de73ae4d29831314d6c0fb9e369"
     #  ),
     (
-     "bridge_hand_shorthand",
-     bridge_hand_generator(fixed_seed),
-     "c6beb2fd767be441a88b1869f7cdcbae9a6b232c07165e790483bf1fe57ac699"
+        "bridge_hand_shorthand",
+        bridge_hand_generator(fixed_seed),
+        "c6beb2fd767be441a88b1869f7cdcbae9a6b232c07165e790483bf1fe57ac699"
     ),
     (
-     "milton_work_point_count",
-     milton_work_point_count_generator(fixed_seed),
-     "3ff47252837a5ba8078c64e07791759067a37f940270915bf423e550635e615a"
+        "milton_work_point_count",
+        milton_work_point_count_generator(fixed_seed),
+        "3ff47252837a5ba8078c64e07791759067a37f940270915bf423e550635e615a"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -3798,19 +3864,19 @@ testcases = [
     # "978ce1599544e991c1cdc5824a762ffbed54ebcee76ca87821"
     # ),
     (
-     "count_divisibles_in_range",
-     count_divisibles_in_range_generator(fixed_seed),
-     "2a260582841eb49f1ac4ae871e844a9551f2f6ad8702b1989eb765ad53ee48be"
+        "count_divisibles_in_range",
+        count_divisibles_in_range_generator(fixed_seed),
+        "2a260582841eb49f1ac4ae871e844a9551f2f6ad8702b1989eb765ad53ee48be"
     ),
     (
-     "sort_by_digit_count",
-     sort_by_digit_count_generator(fixed_seed),
-     "089d0fe98f13d333f85969a574dec245e433a9e30610a4d9255bb39960aa173f"
+        "sort_by_digit_count",
+        sort_by_digit_count_generator(fixed_seed),
+        "089d0fe98f13d333f85969a574dec245e433a9e30610a4d9255bb39960aa173f"
     ),
     (
-     "is_perfect_power",
-     is_perfect_power_generator(fixed_seed),
-     "36d9afbc5b7bb20be5f356ffb674f6bbe7be65a8e8dd697ef5cb79a8e9a7cc7d"
+        "is_perfect_power",
+        is_perfect_power_generator(fixed_seed),
+        "36d9afbc5b7bb20be5f356ffb674f6bbe7be65a8e8dd697ef5cb79a8e9a7cc7d"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -3825,9 +3891,9 @@ testcases = [
     #  "62d8c78ec1a5a7bdc9e30655380f59f59a64daacc8a272a29b"
     # ),
     (
-     "frequency_sort",
-     frequency_sort_generator(fixed_seed),
-     "7cf98bb630901b746d4765edaaea5d5d2ea011e1271c7214111a52c9725fe8fd"
+        "frequency_sort",
+        frequency_sort_generator(fixed_seed),
+        "7cf98bb630901b746d4765edaaea5d5d2ea011e1271c7214111a52c9725fe8fd"
     ),
     # Removed from problem set September 14, 2022
     # (
@@ -3836,19 +3902,19 @@ testcases = [
     #  "3ade63a194b40ff5aa1b53642eee754d30f2ab48ef77330540"
     # ),
     (
-     "brangelina",
-     brangelina_generator(),
-     "f864cef7d1d71768b2efa0334e963d517290440401d98a8e85e71134a7e12c1f"
+        "brangelina",
+        brangelina_generator(),
+        "f864cef7d1d71768b2efa0334e963d517290440401d98a8e85e71134a7e12c1f"
     ),
     (
-     "balanced_ternary",
-     balanced_ternary_generator(fixed_seed),
-     "0bfc0a405796217f5e5c11dec59016f14f031e3f2ca671597399b10c5d5120d8"
+        "balanced_ternary",
+        balanced_ternary_generator(fixed_seed),
+        "0bfc0a405796217f5e5c11dec59016f14f031e3f2ca671597399b10c5d5120d8"
     ),
     (
-     "josephus",
-     josephus_generator(fixed_seed),
-     "6c39a1339f51ec7b8a29cf0a27636b6ba6be7527b75e89bac9e52ebc9ce9becf"
+        "josephus",
+        josephus_generator(fixed_seed),
+        "6c39a1339f51ec7b8a29cf0a27636b6ba6be7527b75e89bac9e52ebc9ce9becf"
     ),
     # Removed from problem set December 17, 2020
     # (
@@ -3863,9 +3929,9 @@ testcases = [
     # "1d06f1ef0547d8441800f2dc19aa430396a0f2e8bc414e6775"
     # ),
     (
-     "fibonacci_word",
-     fibonacci_word_generator(fixed_seed),
-     "95864b4e4dad5eb33d6004cb0f8092428629d4b51608f78abb1b0229525ed1e1"
+        "fibonacci_word",
+        fibonacci_word_generator(fixed_seed),
+        "95864b4e4dad5eb33d6004cb0f8092428629d4b51608f78abb1b0229525ed1e1"
     ),
     # Removed from problem set September 1, 2021
     # (
@@ -3874,14 +3940,14 @@ testcases = [
     # "6495896d5e3f0ed9c7f924b9f8c5c99a78700b1a5a1a6f8f98"
     # ),
     (
-     "calkin_wilf",
-     calkin_wilf_generator(fixed_seed),
-     "fd39bebe2f409e102aa1ca8de00d520ad8d3ec9f1af9a1ad0ddcc0c4721c05d5"
+        "calkin_wilf",
+        calkin_wilf_generator(fixed_seed),
+        "fd39bebe2f409e102aa1ca8de00d520ad8d3ec9f1af9a1ad0ddcc0c4721c05d5"
     ),
     (
-     "can_balance",
-     can_balance_generator(fixed_seed),
-     "14b7ed0b83e01874f5dd13aaad48289fe3fc9930862418b9e463c659f46f1f9a"
+        "can_balance",
+        can_balance_generator(fixed_seed),
+        "14b7ed0b83e01874f5dd13aaad48289fe3fc9930862418b9e463c659f46f1f9a"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -3890,9 +3956,9 @@ testcases = [
     # "c352ce01918d0d47ca13adedf25556e5fd4ab1f672e07bc52f"
     # ),
     (
-     "bulls_and_cows",
-     bulls_and_cows_generator(fixed_seed),
-     "e00ca4cd1996a51ef5cd5588a7facd0a00f2e3f3946d5f4e96e70b65ba261ba0"
+        "bulls_and_cows",
+        bulls_and_cows_generator(fixed_seed),
+        "e00ca4cd1996a51ef5cd5588a7facd0a00f2e3f3946d5f4e96e70b65ba261ba0"
     ),
     # Removed from problem set October 21, 2021
     # (
@@ -3901,19 +3967,19 @@ testcases = [
     # "05f94fe36b66db7c2164895d2b1dc5668fa35696cd6add7bf3"
     # ),
     (
-     "collapse_intervals",
-     collapse_intervals_generator(fixed_seed),
-     "674bb82e2076379450296d830efa0337b4a3f9068a06ea0795d79662ea4f123f"
+        "collapse_intervals",
+        collapse_intervals_generator(fixed_seed),
+        "674bb82e2076379450296d830efa0337b4a3f9068a06ea0795d79662ea4f123f"
     ),
     (
-     "expand_intervals",
-     expand_intervals_generator(fixed_seed),
-     "9a5a583c154073b7b308135aec7d8861bf527dff7e8b9a770e182ce166b6102d"
+        "expand_intervals",
+        expand_intervals_generator(fixed_seed),
+        "9a5a583c154073b7b308135aec7d8861bf527dff7e8b9a770e182ce166b6102d"
     ),
     (
-     "reverse_ascending_sublists",
-     reverse_ascending_sublists_generator(fixed_seed),
-     "099f999f059490e61c57e0845388f76f5dcbeda16be6aa422640750dcd4081a0"
+        "reverse_ascending_sublists",
+        reverse_ascending_sublists_generator(fixed_seed),
+        "099f999f059490e61c57e0845388f76f5dcbeda16be6aa422640750dcd4081a0"
     ),
     # Removed from problem set September 1, 2021
     # (
@@ -3934,14 +4000,14 @@ testcases = [
     # "242fac179412d7ad82bebadbd74ac7d0044b33942a714870b9"
     # ),
     (
-     "ryerson_letter_grade",
-     ryerson_letter_grade_generator(),
-     "b9b86a019c4502be825b0ed52c187f9a29106a08fbbb1ffcc67d483544a87e2f"
+        "ryerson_letter_grade",
+        ryerson_letter_grade_generator(),
+        "b9b86a019c4502be825b0ed52c187f9a29106a08fbbb1ffcc67d483544a87e2f"
     ),
     (
-     "is_ascending",
-     is_ascending_generator(fixed_seed),
-     "a58079cfe1caa6768c9b9a2afb5f6ec3cf3e55526ab06578af3885213c3b8648"
+        "is_ascending",
+        is_ascending_generator(fixed_seed),
+        "a58079cfe1caa6768c9b9a2afb5f6ec3cf3e55526ab06578af3885213c3b8648"
     ),
     # Removed from problem set December 24, 2020
     # (
@@ -3950,14 +4016,14 @@ testcases = [
     #  "7c4ba46364765cb0679f609d428bbbae8ba0df440b001c4162"
     # ),
     (
-     "give_change",
-     give_change_generator(fixed_seed),
-     "5c38f097ab4b39598124d3983a58a10301e012ee156ac05f1a3ad8b84c53a59e"
+        "give_change",
+        give_change_generator(fixed_seed),
+        "5c38f097ab4b39598124d3983a58a10301e012ee156ac05f1a3ad8b84c53a59e"
     ),
     (
-     "winning_card",
-     winning_card_generator(fixed_seed),
-     "fefd8984c1559dfde64a3ecb0d3176f26e0cb4acc6ccc6f7ea584dadb45280c0"
+        "winning_card",
+        winning_card_generator(fixed_seed),
+        "fefd8984c1559dfde64a3ecb0d3176f26e0cb4acc6ccc6f7ea584dadb45280c0"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -3966,14 +4032,14 @@ testcases = [
     # "d37917aab58ce06778d3f667f6c348d1e30ee67271d9d1de60"
     # ),
     (
-     "bridge_hand_shape",
-     bridge_hand_generator(fixed_seed),
-     "29e963cc7715f89d9a7f133e2a620702502f8eb5583d119dda6d58be58266102"
+        "bridge_hand_shape",
+        bridge_hand_generator(fixed_seed),
+        "29e963cc7715f89d9a7f133e2a620702502f8eb5583d119dda6d58be58266102"
     ),
     (
-     "hand_shape_distribution",
-     hand_shape_distribution_generator(fixed_seed),
-     "b9780dbc6fbe7a317c1e3b7a88acc599a85e5baaac692cb6ccc117a272ccd06b"
+        "hand_shape_distribution",
+        hand_shape_distribution_generator(fixed_seed),
+        "b9780dbc6fbe7a317c1e3b7a88acc599a85e5baaac692cb6ccc117a272ccd06b"
     ),
     # Removed from problem set April 20, 2020
     # (
@@ -3982,27 +4048,27 @@ testcases = [
     # "919973a60cc556525aa38082a607f9981e83e5a58944d084af"
     # ),
     (
-     "possible_words",
-     possible_words_generator(fixed_seed),
-     "20d9ac2f97454ae01d482447057d4f2b2b5c001feefd781f7e02a532a694dbfb"
+        "possible_words",
+        possible_words_generator(fixed_seed),
+        "20d9ac2f97454ae01d482447057d4f2b2b5c001feefd781f7e02a532a694dbfb"
     ),
 
     # New additions to the problem set in 2020.
 
     (
-     "cookie",
-     cookie_generator(fixed_seed),
-     "e805e6415e06998231e26f5b5949ffae9f06782a5397573c8b6ff6c6358ccf61"
+        "cookie",
+        cookie_generator(fixed_seed),
+        "e805e6415e06998231e26f5b5949ffae9f06782a5397573c8b6ff6c6358ccf61"
     ),
     (
-     "eliminate_neighbours",
-     eliminate_neighbours_generator(fixed_seed),
-     "24333594d079471cf6696e8b660c11fc586029a178a9879c2349d154635c6aff"
+        "eliminate_neighbours",
+        eliminate_neighbours_generator(fixed_seed),
+        "24333594d079471cf6696e8b660c11fc586029a178a9879c2349d154635c6aff"
     ),
     (
-     "counting_series",
-     counting_series_generator(fixed_seed),
-     "cc67f4cef01c34c136a902ffea23a9df4e21b1991c491964bf89dc940067f569"
+        "counting_series",
+        counting_series_generator(fixed_seed),
+        "cc67f4cef01c34c136a902ffea23a9df4e21b1991c491964bf89dc940067f569"
     ),
     # Removed from problem set December 9, 2021
     # (
@@ -4023,39 +4089,39 @@ testcases = [
     #  "a1dcac70c093c0ba7fcfeae6d9d9655accb1cf871617f2a874"
     # ),
     (
-     "wythoff_array",
-     wythoff_array_generator(fixed_seed),
-     "c334655a56811e0a0a3e47b2492215b13839c6fe60cfd8e9a65c784bcf3bb76d"
+        "wythoff_array",
+        wythoff_array_generator(fixed_seed),
+        "c334655a56811e0a0a3e47b2492215b13839c6fe60cfd8e9a65c784bcf3bb76d"
     ),
     (
-     "hourglass_flips",
-     hourglass_flips_generator(fixed_seed),
-     "d80394444051437c406c3ec73bd58d15c47d7a58c20dab5351af07607fb8ac3c"
+        "hourglass_flips",
+        hourglass_flips_generator(fixed_seed),
+        "d80394444051437c406c3ec73bd58d15c47d7a58c20dab5351af07607fb8ac3c"
     ),
     (
-     "knight_jump",
-     knight_jump_generator(fixed_seed),
-     "6a771380844685c2356a8a1eaf97376132aeb6f112bd6f68367a499579ae143a"
+        "knight_jump",
+        knight_jump_generator(fixed_seed),
+        "6a771380844685c2356a8a1eaf97376132aeb6f112bd6f68367a499579ae143a"
     ),
     (
-     "frog_collision_time",
-     frog_collision_time_generator(fixed_seed),
-     "2767a8f92c414656971210a1beeb83f20ad197d445897aff1076c7160574714f"
+        "frog_collision_time",
+        frog_collision_time_generator(fixed_seed),
+        "2767a8f92c414656971210a1beeb83f20ad197d445897aff1076c7160574714f"
     ),
     (
-     "spread_the_coins",
-     spread_the_coins_generator(fixed_seed),
-     "5a1629f90f295d59d177cb99ea2b24e2c257f97b673ff77a67e286ae03b7279e"
+        "spread_the_coins",
+        spread_the_coins_generator(fixed_seed),
+        "5a1629f90f295d59d177cb99ea2b24e2c257f97b673ff77a67e286ae03b7279e"
     ),
     (
-     "group_and_skip",
-     group_and_skip_generator(fixed_seed),
-     "d08b0f53bff20bc4904c534a41ca6a3c7e28519dcf9185553f3ad5e88d820bba"
+        "group_and_skip",
+        group_and_skip_generator(fixed_seed),
+        "d08b0f53bff20bc4904c534a41ca6a3c7e28519dcf9185553f3ad5e88d820bba"
     ),
     (
-     "nearest_polygonal_number",
-     nearest_polygonal_number_generator(fixed_seed),
-     "3f4d94c36ae95bf184c292a197d42171344586d464c2e111028bda005f2286f6"
+        "nearest_polygonal_number",
+        nearest_polygonal_number_generator(fixed_seed),
+        "3f4d94c36ae95bf184c292a197d42171344586d464c2e111028bda005f2286f6"
     ),
     # Removed from problem set July 8, 2020
     # (
@@ -4064,9 +4130,9 @@ testcases = [
     # "177465906587f4bb545d546d9b9e4324a4fcbc46c2d3ec4a97"
     # ),
     (
-     "subtract_square",
-     subtract_square_generator(fixed_seed),
-     "4eedead71c2894be2e31e19bcf47a5a0786d70f6249a0274f2c2f14370b35990"
+        "subtract_square",
+        subtract_square_generator(fixed_seed),
+        "4eedead71c2894be2e31e19bcf47a5a0786d70f6249a0274f2c2f14370b35990"
     ),
     # Removed from problem set December 9, 2021
     # (
@@ -4075,9 +4141,9 @@ testcases = [
     # "151d96f12b67f953fae52a539f669a46b734c537ed19e3ad7b"
     # ),
     (
-     "duplicate_digit_bonus",
-     duplicate_digit_bonus_generator(fixed_seed),
-     "7ad86f9210f78edbc645b2f9373f8f3f2cad9d2eaaa08fc0887c9e686c0b1fd5"
+        "duplicate_digit_bonus",
+        duplicate_digit_bonus_generator(fixed_seed),
+        "7ad86f9210f78edbc645b2f9373f8f3f2cad9d2eaaa08fc0887c9e686c0b1fd5"
     ),
     # Removed from problem set September 30, 2021
     # (
@@ -4086,102 +4152,102 @@ testcases = [
     #  "ade953572b3bf2540d892ae5d6c8912cd691305a494e3d009b"
     # ),
     (
-     "hitting_integer_powers",
-     hitting_integer_powers_generator(fixed_seed),
-     "0d432b33fafce7477ca095a96d427fdddbc49fbe8e771d4f3d7ae87d51453559"
+        "hitting_integer_powers",
+        hitting_integer_powers_generator(fixed_seed),
+        "0d432b33fafce7477ca095a96d427fdddbc49fbe8e771d4f3d7ae87d51453559"
     ),
     (
-     "permutation_cycles",
-     permutation_cycles_generator(fixed_seed),
-     "995c65239a22ee31d77c32a7269f8848b694461e5b18c8d5c1f6ea37d7d19a85"
+        "permutation_cycles",
+        permutation_cycles_generator(fixed_seed),
+        "995c65239a22ee31d77c32a7269f8848b694461e5b18c8d5c1f6ea37d7d19a85"
     ),
     (
-     "word_height",
-     word_height_generator(fixed_seed),
-     "b5454c6d98c944459ad0509a5648643feab90152f189922f36cba4763ec04e9a"
+        "word_height",
+        word_height_generator(fixed_seed),
+        "b5454c6d98c944459ad0509a5648643feab90152f189922f36cba4763ec04e9a"
     ),
     (
-     "mcculloch",
-     mcculloch_generator(fixed_seed),
-     "43549317567a9c4fdd7acaa31c7684daef2c4f3b934ed63a3fe2130a0d8325b5"
+        "mcculloch",
+        mcculloch_generator(fixed_seed),
+        "43549317567a9c4fdd7acaa31c7684daef2c4f3b934ed63a3fe2130a0d8325b5"
     ),
     (
-     "trips_fill",
-     trips_fill_generator(fixed_seed),
-     "de71d54a6b5ef0aafca5fb50a6db63afb7a8744f434cc2f2a32cc2c274e8a037"
+        "trips_fill",
+        trips_fill_generator(fixed_seed),
+        "de71d54a6b5ef0aafca5fb50a6db63afb7a8744f434cc2f2a32cc2c274e8a037"
     ),
     (
-     "is_left_handed",
-     is_left_handed_generator(),
-     "5e8e432654b8352e1d293f1013c2832a029eadacb65ded537e78f0a3f48d2878"
+        "is_left_handed",
+        is_left_handed_generator(),
+        "5e8e432654b8352e1d293f1013c2832a029eadacb65ded537e78f0a3f48d2878"
     ),
     (
-     "brussels_choice_step",
-     brussels_choice_step_generator(fixed_seed),
-     "30bf08918175513337d24274aa783820c4442617e8aa78969f0dcae32ae2206a"
+        "brussels_choice_step",
+        brussels_choice_step_generator(fixed_seed),
+        "30bf08918175513337d24274aa783820c4442617e8aa78969f0dcae32ae2206a"
     ),
     (
-     "balanced_centrifuge",
-     balanced_centrifuge_generator(fixed_seed),
-     "2c81e311e4547c8f797955107aa6d2ae9d862c15ca61eaaad0cf364776bba8b8"
+        "balanced_centrifuge",
+        balanced_centrifuge_generator(fixed_seed),
+        "2c81e311e4547c8f797955107aa6d2ae9d862c15ca61eaaad0cf364776bba8b8"
     ),
     (
-     "lunar_multiply",
-     lunar_multiply_generator(fixed_seed),
-     "411dfa9dc8637871c4a257df54043301308ec7c3c09ab8ac3ca2b54561256e14"
+        "lunar_multiply",
+        lunar_multiply_generator(fixed_seed),
+        "411dfa9dc8637871c4a257df54043301308ec7c3c09ab8ac3ca2b54561256e14"
     ),
     (
-     "oware_move",
-     oware_move_generator(fixed_seed),
-     "7bb8b1b98cc604baf4e71970520efacca01698de168f20628dda2aa48dd8ea5e"
+        "oware_move",
+        oware_move_generator(fixed_seed),
+        "7bb8b1b98cc604baf4e71970520efacca01698de168f20628dda2aa48dd8ea5e"
     ),
     (
-     "conjugate_regular",
-     conjugate_regular_generator(),
-     "132c4df527db578df034041f0cfd63eda6c98f452b9d8eb460b999558726c3ac"
+        "conjugate_regular",
+        conjugate_regular_generator(),
+        "132c4df527db578df034041f0cfd63eda6c98f452b9d8eb460b999558726c3ac"
     ),
 
     # New additions to the problem set in 2021.
 
     (
-     "reach_corner",
-     reach_corner_generator(fixed_seed),
-     "0255ef6a81a2989825f1070f5b44ab9c0ccadcb796e34bffd05b76deb5a5d07d"
+        "reach_corner",
+        reach_corner_generator(fixed_seed),
+        "0255ef6a81a2989825f1070f5b44ab9c0ccadcb796e34bffd05b76deb5a5d07d"
     ),
     (
-     "bulgarian_cycle",
-     bulgarian_cycle_generator(fixed_seed),
-     "59be2b964195790855c6028c7296c9c894e90420677d3f065ac2fe5f92a477c7"
+        "bulgarian_cycle",
+        bulgarian_cycle_generator(fixed_seed),
+        "59be2b964195790855c6028c7296c9c894e90420677d3f065ac2fe5f92a477c7"
     ),
     (
-     "prominences",
-     prominences_generator(fixed_seed),
-     "3287e282781effcbb0bb54f99a69f79b3a06c420e2639539e5195e6b1465ea41"
+        "prominences",
+        prominences_generator(fixed_seed),
+        "3287e282781effcbb0bb54f99a69f79b3a06c420e2639539e5195e6b1465ea41"
     ),
     (
-     "leibniz",
-     leibniz_generator(fixed_seed),
-     "ef3258160b68e07f3b5af2d6560d68221be321c040293d4c5493f1e6ee7e8a48"
+        "leibniz",
+        leibniz_generator(fixed_seed),
+        "ef3258160b68e07f3b5af2d6560d68221be321c040293d4c5493f1e6ee7e8a48"
     ),
     (
-     "candy_share",
-     candy_share_generator(fixed_seed),
-     "5c83954002c783e3e283cf6d9a0b8500e179f15ba6a31eb4be4db1258daa4230"
+        "candy_share",
+        candy_share_generator(fixed_seed),
+        "5c83954002c783e3e283cf6d9a0b8500e179f15ba6a31eb4be4db1258daa4230"
     ),
     (
-     "reverse_110",
-     reverse_110_generator(fixed_seed),
-     "6ea230b01e444d4000336b51a2fffa43136fb8eba59e4124f2f73c137cb4502c"
+        "reverse_110",
+        reverse_110_generator(fixed_seed),
+        "6ea230b01e444d4000336b51a2fffa43136fb8eba59e4124f2f73c137cb4502c"
     ),
     (
-     "colour_trio",
-     colour_trio_generator(fixed_seed),
-     "d06b021c2742fd6e29c0617c705c3a17845a9eae5b028ad5bf2fa58718fbdbd6"
+        "colour_trio",
+        colour_trio_generator(fixed_seed),
+        "d06b021c2742fd6e29c0617c705c3a17845a9eae5b028ad5bf2fa58718fbdbd6"
     ),
     (
-     "wordomino",
-     wordomino_generator(),
-     "5b081cc381ec8ddaa382d8450def04b53255ee62b67356f690a7eafa9efb98a5"
+        "wordomino",
+        wordomino_generator(),
+        "5b081cc381ec8ddaa382d8450def04b53255ee62b67356f690a7eafa9efb98a5"
     ),
     # Removed from problem set April 18, 2022
     # (
@@ -4190,119 +4256,119 @@ testcases = [
     # "e36c779db6a77037f4e0c11363e4377a1dfe773cb0c7af8617"
     # ),
     (
-     "count_troikas",
-     count_troikas_generator(fixed_seed),
-     "9d593bfe53a18d6a6e8e355a27fa5c82efb999cf2198e60e794e3f51e16c85df"
+        "count_troikas",
+        count_troikas_generator(fixed_seed),
+        "9d593bfe53a18d6a6e8e355a27fa5c82efb999cf2198e60e794e3f51e16c85df"
     ),
     (
-     "count_corners",
-     count_corners_generator(fixed_seed),
-     "d48250dd2102d522025cc1f7ae8db9ea645c274eb366ab0c646f3cf8c0655a27"
+        "count_corners",
+        count_corners_generator(fixed_seed),
+        "d48250dd2102d522025cc1f7ae8db9ea645c274eb366ab0c646f3cf8c0655a27"
     ),
     (
-     "cut_corners",
-     count_corners_generator(fixed_seed, 1500),
-     "19cf15c0b8970c57145f2fdc4c4cad646a30d56c74c53857145310e2dddf6010"
+        "cut_corners",
+        count_corners_generator(fixed_seed, 1500),
+        "19cf15c0b8970c57145f2fdc4c4cad646a30d56c74c53857145310e2dddf6010"
     ),
     (
-     "domino_tile",
-     domino_tile_generator(fixed_seed),
-     "d995b963593be92f0e3068ae9f2286159b24d03a49efb416a8c288c95c93c6c2"
+        "domino_tile",
+        domino_tile_generator(fixed_seed),
+        "d995b963593be92f0e3068ae9f2286159b24d03a49efb416a8c288c95c93c6c2"
     ),
     (
-     "collect_numbers",
-     collect_numbers_generator(fixed_seed),
-     "99afb2b51423f6223f4b51c09914f81cf6a6d12ad536e8b08bf51309c80ca798"
+        "collect_numbers",
+        collect_numbers_generator(fixed_seed),
+        "99afb2b51423f6223f4b51c09914f81cf6a6d12ad536e8b08bf51309c80ca798"
     ),
     (
-     "cut_into_squares",
-     cut_into_squares_generator(fixed_seed),
-     "fb698d6bcd2422488b6ab1acb491740e4a56f0c20e61f6ccd4f69d65f0371529"
+        "cut_into_squares",
+        cut_into_squares_generator(fixed_seed),
+        "fb698d6bcd2422488b6ab1acb491740e4a56f0c20e61f6ccd4f69d65f0371529"
     ),
 
     # New additions to the problem set in 2022.
 
     (
-     "laser_aliens",
-     laser_aliens_generator(fixed_seed),
-     "64186671716042ed9238ea75d0104cbb932a0e37e0275303f83d953a95534693"
+        "laser_aliens",
+        laser_aliens_generator(fixed_seed),
+        "64186671716042ed9238ea75d0104cbb932a0e37e0275303f83d953a95534693"
     ),
     (
-     "stepping_stones",
-     stepping_stones_generator(fixed_seed),
-     "c4ac30082fa34bc0f947fc1ddf3964c92dce0acac4e7a945dec84237124d28a4"
+        "stepping_stones",
+        stepping_stones_generator(fixed_seed),
+        "c4ac30082fa34bc0f947fc1ddf3964c92dce0acac4e7a945dec84237124d28a4"
     ),
     (
-     "verify_betweenness",
-     verify_betweenness_generator(fixed_seed),
-     "16b9176a15ffd0a8da7cbd5a125627fa68b6eca4ad01523515b95b0c8092f342"
+        "verify_betweenness",
+        verify_betweenness_generator(fixed_seed),
+        "16b9176a15ffd0a8da7cbd5a125627fa68b6eca4ad01523515b95b0c8092f342"
     ),
     (
-     "illuminate_all",
-     illuminate_all_generator(fixed_seed),
-     "2b21126bfe7cc7abbfd45d6a9da7d2899a7db69bce0ffac0958d33fce3dcc7e1"
+        "illuminate_all",
+        illuminate_all_generator(fixed_seed),
+        "2b21126bfe7cc7abbfd45d6a9da7d2899a7db69bce0ffac0958d33fce3dcc7e1"
     ),
     (
-     "best_clubs",
-     best_clubs_generator(fixed_seed),
-     "cf82279e4ea8b4e1bd79d62c00243a210076bfb3d59dff4b0516520ff77e02f4"
+        "best_clubs",
+        best_clubs_generator(fixed_seed),
+        "cf82279e4ea8b4e1bd79d62c00243a210076bfb3d59dff4b0516520ff77e02f4"
     ),
     (
-     "both_ways",
-     both_ways_generator(fixed_seed),
-     "9bfb5ef40a0c6347cd8594aa443a10462194792cd36089acae5a00071bbeb534"
+        "both_ways",
+        both_ways_generator(fixed_seed),
+        "9bfb5ef40a0c6347cd8594aa443a10462194792cd36089acae5a00071bbeb534"
     ),
     (
-     "staircase",
-     staircase_generator(fixed_seed),
-     "20ceca8a5fea22f23dfba0b567555aeb5a8dc4553f03bf34b7fbb121de9d5f9e"
+        "staircase",
+        staircase_generator(fixed_seed),
+        "20ceca8a5fea22f23dfba0b567555aeb5a8dc4553f03bf34b7fbb121de9d5f9e"
     ),
     (
-     "ordinal_transform",
-     ordinal_transform_generator(fixed_seed),
-     "de7f04aa8f6ea61b43a89bf9cce0dc594f856d7fdc7963ba12273dc09eb47568"
+        "ordinal_transform",
+        ordinal_transform_generator(fixed_seed),
+        "de7f04aa8f6ea61b43a89bf9cce0dc594f856d7fdc7963ba12273dc09eb47568"
     ),
     (
-     "liang_hyphenation",
-     liang_hyphenation_generator(fixed_seed),
-     "4feb99e374834a18f50671da2b86ed65cd52143d60f59a7afe5ca2f849a01130"
+        "liang_hyphenation",
+        liang_hyphenation_generator(fixed_seed),
+        "4feb99e374834a18f50671da2b86ed65cd52143d60f59a7afe5ca2f849a01130"
     ),
     (
-     "othello_moves",
-     othello_moves_generator(fixed_seed),
-     "27e5957347ee99a7bd9d9925926bf6c96698c80229a2fdc7df76a42325edc47f"
+        "othello_moves",
+        othello_moves_generator(fixed_seed),
+        "27e5957347ee99a7bd9d9925926bf6c96698c80229a2fdc7df76a42325edc47f"
     ),
     (
-     "count_morse",
-     count_morse_generator(fixed_seed),
-     "f3db0082e241aa3c398d6da6597ec1e0f3a65a3bba71e31929194b5a694e4400"
+        "count_morse",
+        count_morse_generator(fixed_seed),
+        "f3db0082e241aa3c398d6da6597ec1e0f3a65a3bba71e31929194b5a694e4400"
     ),
     (
-     "count_sevens",
-     count_sevens_generator(fixed_seed),
-     "c056bb61e603b5e66c1772fa72178e54e42441176b13b7ef387567313a79e81a"
+        "count_sevens",
+        count_sevens_generator(fixed_seed),
+        "c056bb61e603b5e66c1772fa72178e54e42441176b13b7ef387567313a79e81a"
     ),
     (
-     "count_deadwood",
-     count_deadwood_generator(fixed_seed),
-     "dd44068ef82650c1919652ddc808ad9798ece75f1196305a3a9e3a006bf47f6e"
+        "count_deadwood",
+        count_deadwood_generator(fixed_seed),
+        "dd44068ef82650c1919652ddc808ad9798ece75f1196305a3a9e3a006bf47f6e"
     ),
     (
-     "addition_chain",
-     addition_chain_generator(),
-     "a2c9dfa8a7598ce1d2bd607ec8b2320b58257af7f185b6430d67e896014b30d2"
+        "addition_chain",
+        addition_chain_generator(),
+        "a2c9dfa8a7598ce1d2bd607ec8b2320b58257af7f185b6430d67e896014b30d2"
     ),
 
     # Additional Python problems, created starting in 2023.
     (
-     "queen_captures_all",
-     queen_captures_all_generator(fixed_seed),
-     "d3eecf7c5a9907d43e07bc74ad3bb8b5c754cd84298cd6c8a037d26570c1ce45"
+        "queen_captures_all",
+        queen_captures_all_generator(fixed_seed),
+        "d3eecf7c5a9907d43e07bc74ad3bb8b5c754cd84298cd6c8a037d26570c1ce45"
     ),
     (
-     "is_chess_960",
-     is_chess_960_generator(fixed_seed),
-     "4d9b0e6c631904cf993e4736fba5c0a5bd5fd87001468f36622fb316fd1d1827"
+        "is_chess_960",
+        is_chess_960_generator(fixed_seed),
+        "4d9b0e6c631904cf993e4736fba5c0a5bd5fd87001468f36622fb316fd1d1827"
     ),
     # Removed from problem set June 10, 2023
     # (
@@ -4311,332 +4377,352 @@ testcases = [
     #  "8569238f186e3c9fb947bfcebaa57f3d48d9a9a8727e94a4176a04f49ebc53fe"
     # ),
     (
-     "sum_of_consecutive_squares",
-     sum_of_consecutive_squares_generator(fixed_seed),
-     "be57860970677e4893ad158413f08c747210e0d893ebfaaf7ff2d0d22f487a6c"
+        "sum_of_consecutive_squares",
+        sum_of_consecutive_squares_generator(fixed_seed),
+        "be57860970677e4893ad158413f08c747210e0d893ebfaaf7ff2d0d22f487a6c"
     ),
     (
-     "topswops",
-     topswops_generator(fixed_seed),
-     "7829077541c4e84225ee30e742da1296d6c0225555736621eb5259769ebb2704"
+        "topswops",
+        topswops_generator(fixed_seed),
+        "7829077541c4e84225ee30e742da1296d6c0225555736621eb5259769ebb2704"
     ),
     (
-     "costas_array",
-     costas_array_generator(fixed_seed),
-     "6c9c0cfc7444d56bc21418d6776512e06da634998ed3012849e1b0bba048d221"
+        "costas_array",
+        costas_array_generator(fixed_seed),
+        "6c9c0cfc7444d56bc21418d6776512e06da634998ed3012849e1b0bba048d221"
     ),
     (
-     "mian_chowla",
-     mian_chowla_generator(),
-     "fd77ebaf2b8835e626ff9e25a1d757bca6b7186af3d6cf925113b1732e92e392"
+        "mian_chowla",
+        mian_chowla_generator(),
+        "fd77ebaf2b8835e626ff9e25a1d757bca6b7186af3d6cf925113b1732e92e392"
     ),
     (
-     "lindenmayer",
-     lindenmayer_generator(fixed_seed),
-     "7c9f332799d297bdbff7b3a3222285356f2435edc70ccacc17dd9856bc0df830"
+        "lindenmayer",
+        lindenmayer_generator(fixed_seed),
+        "7c9f332799d297bdbff7b3a3222285356f2435edc70ccacc17dd9856bc0df830"
     ),
     (
-     "word_board",
-     word_board_generator(fixed_seed),
-     "875a9c2a17d746676aea8c376ea7d82cf729abb8799d3200fd6afaa7f1c02a4a"
+        "word_board",
+        word_board_generator(fixed_seed),
+        "875a9c2a17d746676aea8c376ea7d82cf729abb8799d3200fd6afaa7f1c02a4a"
     ),
     (
-     "bowling_score",
-     bowling_score_generator(fixed_seed),
-     "336d1ceb26198d467fddcdc21fa36c0995d8d5fa10985b3281d3f0b90cd768bb"
+        "bowling_score",
+        bowling_score_generator(fixed_seed),
+        "336d1ceb26198d467fddcdc21fa36c0995d8d5fa10985b3281d3f0b90cd768bb"
     ),
     (
-     "knight_survival",
-     knight_survival_generator(fixed_seed),
-     "0c1a661f8c2414a0945139d9c25aef4502927c71434a84b344724d609e41c1a8"
+        "knight_survival",
+        knight_survival_generator(fixed_seed),
+        "0c1a661f8c2414a0945139d9c25aef4502927c71434a84b344724d609e41c1a8"
     ),
     (
-     "accumulate_dice",
-     accumulate_dice_generator(fixed_seed),
-     "0807db5f5be2ccf6dfc4c2ce8cf0e9e9a123ea2fc658a085bea1d6a563d22faa"
+        "accumulate_dice",
+        accumulate_dice_generator(fixed_seed),
+        "0807db5f5be2ccf6dfc4c2ce8cf0e9e9a123ea2fc658a085bea1d6a563d22faa"
     ),
     (
-     "largest_ones_square",
-     largest_ones_square_generator(fixed_seed),
-     "b1d5012a603e85405d5148203940811110a150066243afc742aad3eab6ab5a4c"
+        "largest_ones_square",
+        largest_ones_square_generator(fixed_seed),
+        "b1d5012a603e85405d5148203940811110a150066243afc742aad3eab6ab5a4c"
     ),
     (
-     "count_odd_sum_sublists",
-     count_odd_sum_sublists_generator(fixed_seed),
-     "d3bcb659e3925df3b243b0c26889a9dc8bdc45221b0650c3c109a8461f6e9340"
+        "count_odd_sum_sublists",
+        count_odd_sum_sublists_generator(fixed_seed),
+        "d3bcb659e3925df3b243b0c26889a9dc8bdc45221b0650c3c109a8461f6e9340"
     ),
     (
-     "multiplicative_persistence",
-     multiplicative_persistence_generator(fixed_seed),
-     "9113edadf34a5c6f66c9dae8fa101e90a64754fff952922fbb0ee70538b34415"
+        "multiplicative_persistence",
+        multiplicative_persistence_generator(fixed_seed),
+        "9113edadf34a5c6f66c9dae8fa101e90a64754fff952922fbb0ee70538b34415"
     ),
     (
-     "bus_travel",
-     bus_travel_generator(fixed_seed),
-     "ec65407429c27a358eee332724a024cdae1a71dda4706a83dc7f77df4ea6fbab"
+        "bus_travel",
+        bus_travel_generator(fixed_seed),
+        "ec65407429c27a358eee332724a024cdae1a71dda4706a83dc7f77df4ea6fbab"
     ),
     (
-     "has_majority",
-     has_majority_generator(fixed_seed),
-     "e8578d6ff24dc3a2532e247e5d95f1730871c71e26c7a0e15837a6ba5d69e8de"
+        "has_majority",
+        has_majority_generator(fixed_seed),
+        "e8578d6ff24dc3a2532e247e5d95f1730871c71e26c7a0e15837a6ba5d69e8de"
     ),
     (
-     "card_row_game",
-     card_row_game_generator(fixed_seed),
-     "698fc8231b8cd745cb3223c986eec39f32a03426059971d6466ee9a72fe01a0c"
+        "card_row_game",
+        card_row_game_generator(fixed_seed),
+        "698fc8231b8cd745cb3223c986eec39f32a03426059971d6466ee9a72fe01a0c"
     ),
     (
-     "smetana_interpreter",
-     smetana_interpreter_generator(fixed_seed),
-     "46a70fa3ccff41c5cd08cf247513228a54113e4ca54ab18c5b4ec57a60c159cc"
+        "smetana_interpreter",
+        smetana_interpreter_generator(fixed_seed),
+        "46a70fa3ccff41c5cd08cf247513228a54113e4ca54ab18c5b4ec57a60c159cc"
     ),
     (
-     "stalin_sort",
-     stalin_sort_generator(fixed_seed),
-     "ee869e50c9b9def412fadb0d142a8e601d9d550921d04a1736e3a99b98a8deba"
+        "stalin_sort",
+        stalin_sort_generator(fixed_seed),
+        "ee869e50c9b9def412fadb0d142a8e601d9d550921d04a1736e3a99b98a8deba"
     ),
     (
-     "insertion_sort_swaps",
-     stalin_sort_generator(fixed_seed),
-     "1c863b25d97baaaee165ee9a07e26b09ee6575634d5180a413836a14e6132d3b"
+        "insertion_sort_swaps",
+        stalin_sort_generator(fixed_seed),
+        "1c863b25d97baaaee165ee9a07e26b09ee6575634d5180a413836a14e6132d3b"
     ),
     (
-     "optimal_blackjack",
-     optimal_blackjack_generator(fixed_seed),
-     "205d163c94fb506e862b6b38b458cafb2659cb0ba2fcf9c53a507c1f1ad930e1"
+        "optimal_blackjack",
+        optimal_blackjack_generator(fixed_seed),
+        "205d163c94fb506e862b6b38b458cafb2659cb0ba2fcf9c53a507c1f1ad930e1"
     ),
     (
-     "blocking_pawns",
-     blocking_pawns_generator(fixed_seed),
-     "3d08794bf4533c633371fe69998e177660c6f5707241b3006d05bef2a2a524c7"
+        "blocking_pawns",
+        blocking_pawns_generator(fixed_seed),
+        "3d08794bf4533c633371fe69998e177660c6f5707241b3006d05bef2a2a524c7"
     ),
     (
-     "forbidden_digit",
-     forbidden_digit_generator(fixed_seed),
-     "6b39e16384361b0f4f2a6b026ac1b71c24d8ffc87317d9afd375b25a15c3af23"
+        "forbidden_digit",
+        forbidden_digit_generator(fixed_seed),
+        "6b39e16384361b0f4f2a6b026ac1b71c24d8ffc87317d9afd375b25a15c3af23"
     ),
     (
-     "break_bad",
-     break_bad_generator(fixed_seed),
-     "124006d47514ba14d9ef488020db56cefdc97fc79515b3c45e2b298ddd8eb2d1"
+        "break_bad",
+        break_bad_generator(fixed_seed),
+        "124006d47514ba14d9ef488020db56cefdc97fc79515b3c45e2b298ddd8eb2d1"
     ),
     (
-     "keypad_words",
-     keypad_words_generator(fixed_seed),
-     "3298e017820c3af9d0e3252b0b849bd7e5d96e45519ce9b748f9a324e25b5132"
+        "keypad_words",
+        keypad_words_generator(fixed_seed),
+        "3298e017820c3af9d0e3252b0b849bd7e5d96e45519ce9b748f9a324e25b5132"
     ),
     (
-     "abacaba",
-     abacaba_generator(fixed_seed),
-     "ea34964bd4c72b543da28e9d7044acd24423c297fdd6465314d6b5d04ea80e67"
+        "abacaba",
+        abacaba_generator(fixed_seed),
+        "ea34964bd4c72b543da28e9d7044acd24423c297fdd6465314d6b5d04ea80e67"
     ),
     (
-     "stern_brocot",
-     stern_brocot_generator(fixed_seed),
-     "9fa761f803fdf9a7c0359611cd0a62e91445e23e3f9754d5f746e5f787576a06"
+        "stern_brocot",
+        stern_brocot_generator(fixed_seed),
+        "9fa761f803fdf9a7c0359611cd0a62e91445e23e3f9754d5f746e5f787576a06"
     ),
     (
-     "discrete_rounding",
-     discrete_rounding_generator(),
-     "e8683699e3667c869320bc9e772206866c64fff5a4d34374fa9686b2b4ede827"
+        "discrete_rounding",
+        discrete_rounding_generator(),
+        "e8683699e3667c869320bc9e772206866c64fff5a4d34374fa9686b2b4ede827"
     ),
     (
-     "mu_torere_moves",
-     mu_torere_moves_generator(fixed_seed),
-     "a3a4ce73fcaad2dcc182c8c94181e817d0bebb47dabe566a39383e1f5ae45b16"
+        "mu_torere_moves",
+        mu_torere_moves_generator(fixed_seed),
+        "a3a4ce73fcaad2dcc182c8c94181e817d0bebb47dabe566a39383e1f5ae45b16"
     ),
     (
-     "count_palindromes",
-     count_palindromes_generator(fixed_seed),
-     "d169a14f48d28e5ec4ae28a03a2925d811abee9c1ef6f4472e156ff84f7e8980"
+        "count_palindromes",
+        count_palindromes_generator(fixed_seed),
+        "d169a14f48d28e5ec4ae28a03a2925d811abee9c1ef6f4472e156ff84f7e8980"
     ),
     (
-     "shotgun",
-     shotgun_generator(fixed_seed),
-     "0f203942549b6168cdc63cad802601252655a39e098fab2d396f52c07358cd80"
+        "shotgun",
+        shotgun_generator(fixed_seed),
+        "0f203942549b6168cdc63cad802601252655a39e098fab2d396f52c07358cd80"
     ),
     (
-     "langford_violations",
-     langford_violations_generator(fixed_seed),
-     "0bfac84d1229eee67f2b0056efa5121fc7b65618b33aa28504013e4465c6d6b3"
+        "langford_violations",
+        langford_violations_generator(fixed_seed),
+        "0bfac84d1229eee67f2b0056efa5121fc7b65618b33aa28504013e4465c6d6b3"
     ),
     (
-     "hofstadter_figure_figure",
-     hofstadter_figure_figure_generator(),
-     "c2250ce763119b3bade3a84b3afb98915b7be968e4f6c25c40d7df88a21122c9"
+        "hofstadter_figure_figure",
+        hofstadter_figure_figure_generator(),
+        "c2250ce763119b3bade3a84b3afb98915b7be968e4f6c25c40d7df88a21122c9"
     ),
     (
-     "kimberling_expulsion",
-     kimberling_expulsion_generator(fixed_seed),
-     "48771e32d9ca5633aa8185357a15ab815706e0fcb91d5ba0b4302a38530a1ba0"
+        "kimberling_expulsion",
+        kimberling_expulsion_generator(fixed_seed),
+        "48771e32d9ca5633aa8185357a15ab815706e0fcb91d5ba0b4302a38530a1ba0"
     ),
     (
-     "repetition_resistant",
-     repetition_resistant_generator(),
-     "d7f292d22b9b223aabc3b3e8f9a7c512d082474f379408f69b755f380308622e"
+        "repetition_resistant",
+        repetition_resistant_generator(),
+        "d7f292d22b9b223aabc3b3e8f9a7c512d082474f379408f69b755f380308622e"
     ),
     (
-     "tog_comparison",
-     tog_comparison_generator(fixed_seed),
-     "f55e23dcfc75636d3aa85e525e7b3132a1f7ae2e4c412adc01bc8be93adcada3"
+        "tog_comparison",
+        tog_comparison_generator(fixed_seed),
+        "f55e23dcfc75636d3aa85e525e7b3132a1f7ae2e4c412adc01bc8be93adcada3"
     ),
     (
-     "trip_plan",
-     trip_plan_generator(fixed_seed),
-     "e014b488d173342b34ec6527275855dadff78b45adb6b3900f188e549d96c4ba"
+        "trip_plan",
+        trip_plan_generator(fixed_seed),
+        "e014b488d173342b34ec6527275855dadff78b45adb6b3900f188e549d96c4ba"
     ),
     (
-     "bridge_score",
-     bridge_score_generator(fixed_seed),
-     "b4ba8ca19871247542d172a16c065e7f41598ada7551b54088acb928278d5476"
+        "bridge_score",
+        bridge_score_generator(fixed_seed),
+        "b4ba8ca19871247542d172a16c065e7f41598ada7551b54088acb928278d5476"
     ),
     (
-     "squares_total_area",
-     squares_total_area_generator(fixed_seed),
-     "6cf12847fd4a49b76e773364d435a433079433b18be903cc0163a13b123a7052"
+        "squares_total_area",
+        squares_total_area_generator(fixed_seed),
+        "6cf12847fd4a49b76e773364d435a433079433b18be903cc0163a13b123a7052"
     ),
     (
-     "fewest_boxes",
-     fewest_boxes_generator(fixed_seed),
-     "db346b93869969e0c9f496115b5ce894911c23e6f9d9a20ac3e4cc20c7875100"
+        "fewest_boxes",
+        fewest_boxes_generator(fixed_seed),
+        "db346b93869969e0c9f496115b5ce894911c23e6f9d9a20ac3e4cc20c7875100"
     ),
     (
-     "des_chiffres",
-     des_chiffres_generator(fixed_seed),
-     "1f3dfbcdfbc56462ea786672124615ee2e480fb47c8a4c141c3c9b25436cab00"
+        "des_chiffres",
+        des_chiffres_generator(fixed_seed),
+        "1f3dfbcdfbc56462ea786672124615ee2e480fb47c8a4c141c3c9b25436cab00"
     ),
     (
-     "cube_tower",
-     cube_tower_generator(fixed_seed),
-     "a729ad1e589e0870ae4c708b86c2c24ea496d11819e6c551ca7a35645b23e265"
+        "cube_tower",
+        cube_tower_generator(fixed_seed),
+        "a729ad1e589e0870ae4c708b86c2c24ea496d11819e6c551ca7a35645b23e265"
     ),
     (
-     "tr",
-     tr_generator(fixed_seed),
-     "92039e11e76854a376b7c548520fa50277bfc023c3a5f8c9fc00b6d1886231f1"
+        "tr",
+        tr_generator(fixed_seed),
+        "92039e11e76854a376b7c548520fa50277bfc023c3a5f8c9fc00b6d1886231f1"
     ),
     (
-     "digit_partition",
-     digit_partition_generator(fixed_seed),
-     "6b1bdd849118a4405ebc7fc3f66f7082c56be26c9fb3e39ca26278c8967dcf15"
+        "digit_partition",
+        digit_partition_generator(fixed_seed),
+        "6b1bdd849118a4405ebc7fc3f66f7082c56be26c9fb3e39ca26278c8967dcf15"
     ),
     (
-     "measure_balsam",
-     measure_balsam_generator(fixed_seed),
-     "a15cdb98d1c1c6ccebc5ef47610f29d6b0cdf97ddd93baf642b148ce5718707e"
+        "measure_balsam",
+        measure_balsam_generator(fixed_seed),
+        "a15cdb98d1c1c6ccebc5ef47610f29d6b0cdf97ddd93baf642b148ce5718707e"
     ),
     (
-     "count_distinct_substrings",
-     count_distinct_substrings_generator(fixed_seed),
-     "0ea1c4446e997cf3395947bf66a01525147ab06083891da579f370d706c4b225"
+        "count_distinct_substrings",
+        count_distinct_substrings_generator(fixed_seed),
+        "0ea1c4446e997cf3395947bf66a01525147ab06083891da579f370d706c4b225"
     ),
     (
-     "mmu_lru",
-     mmu_generator(fixed_seed),
-     "1cf6e3ac363dcd3b59df1ff53cf9abdd84487747f51d32f8af4cd34f1d40e35a"
+        "mmu_lru",
+        mmu_generator(fixed_seed),
+        "1cf6e3ac363dcd3b59df1ff53cf9abdd84487747f51d32f8af4cd34f1d40e35a"
     ),
     (
-     "mmu_optimal",
-     mmu_generator(fixed_seed),
-     "fb6b9c3578fcd78de3953e650ea321eba4466950985b5ce56649c6a43e1eb3e1"
+        "mmu_optimal",
+        mmu_generator(fixed_seed),
+        "fb6b9c3578fcd78de3953e650ea321eba4466950985b5ce56649c6a43e1eb3e1"
     ),
     (
-     "vector_add_reach",
-     vector_add_reach_generator(fixed_seed),
-     "a4da54deb5b13790eb6d081e4126cfa43005e2c004fdc5184d4e182e8c919a3b"
+        "vector_add_reach",
+        vector_add_reach_generator(fixed_seed),
+        "a4da54deb5b13790eb6d081e4126cfa43005e2c004fdc5184d4e182e8c919a3b"
     ),
     (
-     "tower_of_babel",
-     tower_of_babel_generator(fixed_seed),
-     "60ed0f633b21e9ed353972241cff02fa09ff29e9425888374395959ad182281e"
+        "tower_of_babel",
+        tower_of_babel_generator(fixed_seed),
+        "60ed0f633b21e9ed353972241cff02fa09ff29e9425888374395959ad182281e"
     ),
     (
-     "parking_lot_permutation",
-     parking_lot_permutation_generator(fixed_seed),
-     "2033e14ea8323502638b89793d35bf53720a091c5eb0680eafac7e900b81b4f8"
+        "parking_lot_permutation",
+        parking_lot_permutation_generator(fixed_seed),
+        "2033e14ea8323502638b89793d35bf53720a091c5eb0680eafac7e900b81b4f8"
     ),
     (
-     "gijswijt",
-     gijswijt_generator(fixed_seed),
-     "61727e9c59198b85f3ef3e61074a5c9b33782cd9d2ca184d70aef543f4c10877"
+        "gijswijt",
+        gijswijt_generator(fixed_seed),
+        "61727e9c59198b85f3ef3e61074a5c9b33782cd9d2ca184d70aef543f4c10877"
     ),
     (
-     "markov_distance",
-     markov_distance_generator(fixed_seed),
-     "68ada2f65a1bd602fbe361a9327cb59c88cc28ee0dc7671af9b0db2bb3d17ece"
+        "markov_distance",
+        markov_distance_generator(fixed_seed),
+        "68ada2f65a1bd602fbe361a9327cb59c88cc28ee0dc7671af9b0db2bb3d17ece"
     ),
     (
-     "count_unicolour_rectangles",
-     count_unicolour_rectangles_generator(fixed_seed),
-     "14b4467fc57c884e0a583c7659985bdd8a0c84e095ef1b581586d00f7609e126"
+        "count_unicolour_rectangles",
+        count_unicolour_rectangles_generator(fixed_seed),
+        "14b4467fc57c884e0a583c7659985bdd8a0c84e095ef1b581586d00f7609e126"
     ),
     (
-     "max_product",
-     max_product_generator(fixed_seed),
-     "639791d496fd80720d4986925a37937dfb5a8cd3025c651677796c917abca2c9"
+        "max_product",
+        max_product_generator(fixed_seed),
+        "639791d496fd80720d4986925a37937dfb5a8cd3025c651677796c917abca2c9"
     ),
     (
-     "goodstein",
-     goodstein_generator(fixed_seed),
-     "cf10c309927110702b1ad430a88e59d78b8e389f51f66b616d88770e35ba5f48"
+        "goodstein",
+        goodstein_generator(fixed_seed),
+        "cf10c309927110702b1ad430a88e59d78b8e389f51f66b616d88770e35ba5f48"
     ),
     (
-     "prize_strings",
-     prize_strings_generator(fixed_seed),
-     "bf65f0be4387fca6f16e89e30257d62e5924d5173a11d44d4b62296e9e04a168"
+        "prize_strings",
+        prize_strings_generator(fixed_seed),
+        "bf65f0be4387fca6f16e89e30257d62e5924d5173a11d44d4b62296e9e04a168"
     ),
     (
-     "nice_sequence",
-     nice_sequence_generator(fixed_seed),
-     "4b8d06baba51031db34501b056beded81f15c8ab83f47985c79c715fb2958aca"
+        "nice_sequence",
+        nice_sequence_generator(fixed_seed),
+        "4b8d06baba51031db34501b056beded81f15c8ab83f47985c79c715fb2958aca"
     ),
     (
-     "game_with_multiset",
-     game_with_multiset_generator(fixed_seed),
-     "bea9a0fed502f5967a175bf0f2f0dc83269043c419f17da309c9179c435593fb"
+        "game_with_multiset",
+        game_with_multiset_generator(fixed_seed),
+        "bea9a0fed502f5967a175bf0f2f0dc83269043c419f17da309c9179c435593fb"
     ),
     (
-     "carryless_multiplication",
-     carryless_multiplication_generator(fixed_seed),
-     "4a8271e20c0925d77b221278c0dbb23408887a52c70e2a80a5722366551db923"
+        "carryless_multiplication",
+        carryless_multiplication_generator(fixed_seed),
+        "4a8271e20c0925d77b221278c0dbb23408887a52c70e2a80a5722366551db923"
     ),
 
     # New additions to the problem set in 2024.
 
     (
-     "reversenacci",
-     reversenacci_generator(fixed_seed),
-     "2142cca26a02e73bcf5ddd13766f394930d679081f6c9c003901003285cfd577"
+        "reversenacci",
+        reversenacci_generator(fixed_seed),
+        "2142cca26a02e73bcf5ddd13766f394930d679081f6c9c003901003285cfd577"
     ),
     (
-     "kayles",
-     kayles_generator(fixed_seed),
-     "1f346bcd31387e134394072470e5c460ab8f1b342ed5ddf1a93be28e99f618b3"
+        "kayles",
+        kayles_generator(fixed_seed),
+        "1f346bcd31387e134394072470e5c460ab8f1b342ed5ddf1a93be28e99f618b3"
     ),
     (
-     "greedy_egyptian",
-     greedy_egyptian_generator(fixed_seed),
-     "be7ba3e90b7c410b4eecfbcd88ecbdfc133cf22ac80dd77212927b6a0a773738"
+        "greedy_egyptian",
+        greedy_egyptian_generator(fixed_seed),
+        "be7ba3e90b7c410b4eecfbcd88ecbdfc133cf22ac80dd77212927b6a0a773738"
     ),
     (
-     "minimal_egyptian",
-     minimal_egyptian_generator(fixed_seed),
-     "752f2bbdabaa37bb900a7642026cc257d22571ee8c09fd72949df0b9ef92c7a4"
+        "minimal_egyptian",
+        minimal_egyptian_generator(fixed_seed),
+        "752f2bbdabaa37bb900a7642026cc257d22571ee8c09fd72949df0b9ef92c7a4"
     ),
     (
-     "carving_egyptian",
-     islice(greedy_egyptian_generator(fixed_seed), 3000),
-     "b21cc8f569c9dba1598df800132a0663ec753de87fbde79c5077e9b843447b4a"
+        "carving_egyptian",
+        islice(greedy_egyptian_generator(fixed_seed), 3000),
+        "b21cc8f569c9dba1598df800132a0663ec753de87fbde79c5077e9b843447b4a"
     ),
     (
-     "super_tiny_rng",
-     super_tiny_rng_generator(fixed_seed),
-     "79462fa344225685a68470f3b8f08f017b629d46af69f1292187076b339b4d70"
+        "super_tiny_rng",
+        super_tiny_rng_generator(fixed_seed),
+        "79462fa344225685a68470f3b8f08f017b629d46af69f1292187076b339b4d70"
     ),
     (
-     "van_der_corput",
-     van_der_corput_generator(fixed_seed),
-     "309c5f9f5ba1e72b5b4673f3e5e44af9376c8c5eb79d6338d8dac13e38b08ae7"
+        "van_der_corput",
+        van_der_corput_generator(fixed_seed),
+        "309c5f9f5ba1e72b5b4673f3e5e44af9376c8c5eb79d6338d8dac13e38b08ae7"
+    ),
+    (
+        "count_cigarettes",
+        count_cigarettes_generator(fixed_seed),
+        "df769dd9a0edb86107562b18451edb0bc056c6c2687170f0d2cdd139bab297a9"
+    ),
+    (
+        "is_string_shuffle",
+        is_string_shuffle_generator(fixed_seed),
+        "40bfe12ca770ab65453e07048ff1c434088fe72c80b121f1c96dbffb15cf8e3b"
+    ),
+    (
+        "str_rts",
+        str_rts_generator(fixed_seed),
+        "0ba14cdd99e695c668965b0e68481b59de992976d8cfab55505259ddb3ccc955"
+    ),
+    (
+        "lowest_common_dominator",
+        lowest_common_dominator_generator(fixed_seed),
+        "91ab36011499d313b00ccf4914c5cd9882edb4005651444ce18db035a1e39ed6"
     )
 ]
 
@@ -4739,5 +4825,5 @@ def discrepancy(teacher, student, test_cases, stop_at_first=False, print_all=Fal
 
 run_all()
 
-
-#discrepancy(labs109.max_product2, labs109.max_product, max_product_generator(fixed_seed), print_all=True)
+# teacher student generator
+# discrepancy(labs109.str_rts, labs109.str_rts2, str_rts_generator(fixed_seed), stop_at_first=True)
