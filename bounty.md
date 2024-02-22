@@ -506,7 +506,7 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
-   <td>Vitrach Itky Leda
+   <td>Vidrach Itky Leda
    </td>
    <td>
    </td>
