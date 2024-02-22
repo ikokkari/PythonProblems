@@ -9,6 +9,7 @@
 from hashlib import sha256
 from time import time
 from itertools import islice, permutations, zip_longest, cycle, product, count, chain
+from math import isqrt
 from random import Random
 import gzip
 import os.path
@@ -33,7 +34,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "February 18, 2024"
+version = "February 21, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -321,6 +322,15 @@ def pyramid(n=1, goal=5, inc=1):
 
 # XXX Test case generators for the individual functions.
 
+def itky_leda_generator(seed):
+    yield [[1, 0], [0, 1]],
+    yield [[1, 2, 4, 3], [3, 4, 1, 2], [3, 1, 2, 3], [2, 3, 1, 2]],
+    rng = Random(seed)
+    for n in islice(pyramid(3, 6, 7), 300):
+        yield [[n - 1 - isqrt(rng.randint(0, n*n-1)) for _ in range(n)] for _ in range(n)],
+        yield [[isqrt(rng.randint(0, n*n-1)) for _ in range(n)] for _ in range(n)],
+
+
 def lowest_common_dominator_generator(seed):
     rng = Random(seed)
     m = 2
@@ -335,7 +345,7 @@ def str_rts_generator(seed):
     for text in ["", "x", "abcd", "bb", "aaa", "hahahexoxehah", "abcdefgfoooof", "bxuzazuxbzuzax"]:
         yield text,
     rng = Random(seed)
-    for n in islice(pyramid(10, 2, 2), 2500):
+    for n in islice(pyramid(10, 2, 2), 7500):
         text = ""
         while len(text) < n:
             if len(text) < 3 or rng.randint(0, 100) < 50:
@@ -4717,12 +4727,17 @@ testcases = [
     (
         "str_rts",
         str_rts_generator(fixed_seed),
-        "0ba14cdd99e695c668965b0e68481b59de992976d8cfab55505259ddb3ccc955"
+        "8c726ce515c552eaca2e31bc5dbe4ffbc5b39bc2b0a0fdafbba807e2430ac399"
     ),
     (
         "lowest_common_dominator",
         lowest_common_dominator_generator(fixed_seed),
         "91ab36011499d313b00ccf4914c5cd9882edb4005651444ce18db035a1e39ed6"
+    ),
+    (
+        "itky_leda",
+        itky_leda_generator(fixed_seed),
+        "f7d61d769bc947f9245312a3afde7f504a2305c07d6ebd2ecd46d4d083f29fd2"
     )
 ]
 
