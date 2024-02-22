@@ -506,6 +506,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Vitrach Itky Leda
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Casinos hate this Toronto man!
    </td>
    <td>
