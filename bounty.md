@@ -386,6 +386,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
    </tr>
    <tr>
+   <td>Balsam for the code 
+   </td>
+   <td>Nam Nguyen, March 6, 2024
+   </td>
+  </tr>
+   <tr>
    <td>Nice sequence 
    </td>
    <td>
@@ -436,7 +442,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Tower of cubes
    </td>
-   <td>
+   <td>Nam Nguyen, March 6, 2024
    </td>
   </tr>
    <tr>
@@ -478,7 +484,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Tower of Babel
    </td>
-   <td>
+   <td>Nam Nguyen, March 6, 2024
    </td>
   </tr>
    <tr>
@@ -532,7 +538,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Blocking pawns
    </td>
-   <td>
+   <td>Nam Nguyen, March 6, 2024
    </td>
   </tr>
    <tr>
