@@ -176,6 +176,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Arrow walk with me
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Count unicolour rectangles
    </td>
    <td>
@@ -485,6 +491,12 @@ Starting March 2023, the author started creating another set of Python problems,
    <td>Tower of Babel
    </td>
    <td>Nam Nguyen, March 6, 2024
+   </td>
+  </tr>
+   <tr>
+   <td>Make a list self-describing
+   </td>
+   <td>
    </td>
   </tr>
    <tr>
