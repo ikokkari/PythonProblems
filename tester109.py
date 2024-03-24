@@ -34,7 +34,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "February 21, 2024"
+version = "March 24, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -321,6 +321,32 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def self_describe_generator(seed):
+    yield [1],
+    yield [1, 2],
+    yield [1, 2, 3],
+    yield [2, 2, 5, 5, 5, 5],
+    yield [1, 4, 4, 4],
+    rng = Random(seed)
+    for (n, p) in islice(zip(pyramid(3, 4, 5), cycle([10, 40, 80])), 2000):
+        m = rng.randint(3, n)
+        items = []
+        for _ in range(n):
+            if len(items) > 1 and rng.randint(0, 99) < p:
+                x = rng.choice(items)
+            else:
+                x = rng.randint(1, m)
+            items.append(x)
+        yield items,
+
+
+def arrow_walk_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(3, 2, 2), 5000):
+        board = [rng.choice("<>") for _ in range(n)]
+        yield "".join(board), rng.choice(range(n))
+
 
 def itky_leda_generator(seed):
     yield [[1, 0], [0, 1]],
@@ -2917,6 +2943,8 @@ def substitution_words_generator():
 
 
 def count_dominators_generator(seed):
+    for f in permutations([-1, -2, -3]):
+        yield list(f),
     rng = Random(seed)
     r = 4
     for n in islice(pyramid(2, 3, 4), 3000):
@@ -3552,7 +3580,7 @@ testcases = [
     (
         "count_dominators",
         count_dominators_generator(fixed_seed),
-        "53b2c8e9856b9a822a2bddebc3ecb5d1d5b3149fc05a0571515fe0984e5276b9"
+        "80709f7af6ccc56e23033b1f5b0754e262de3d1f9f70716bbb528be3e5116062"
     ),
     # Removed from problem set December 9, 2021
     # (
@@ -4738,6 +4766,16 @@ testcases = [
         "itky_leda",
         itky_leda_generator(fixed_seed),
         "f7d61d769bc947f9245312a3afde7f504a2305c07d6ebd2ecd46d4d083f29fd2"
+    ),
+    (
+        "arrow_walk",
+        arrow_walk_generator(fixed_seed),
+        "0c07aa91e80a5f207853c6134686bb354c6ad3b5d86ba594a0e3926f77beb746"
+    ),
+    (
+        "self_describe",
+        self_describe_generator(fixed_seed),
+        "958fc9e2ea82deb3df48d1ab3b5002aac5e380ec85a2a09adc2f02c033202eed"
     )
 ]
 
@@ -4841,4 +4879,4 @@ def discrepancy(teacher, student, test_cases, stop_at_first=False, print_all=Fal
 run_all()
 
 # teacher student generator
-# discrepancy(labs109.str_rts, labs109.str_rts2, str_rts_generator(fixed_seed), stop_at_first=True)
+#discrepancy(labs109.is_cyclops, is_cyclops, is_cyclops_generator(fixed_seed), stop_at_first=True)
