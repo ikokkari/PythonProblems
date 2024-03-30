@@ -436,7 +436,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Tailfins and hamburgers
    </td>
-   <td>
+   <td>Nam Nguyen, March 30, 2024
    </td>
    </tr>
    <tr>
