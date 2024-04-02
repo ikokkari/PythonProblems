@@ -502,7 +502,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Two pins, not three, Dolores
    </td>
-   <td>
+   <td>Matt Campeau, April 2, 2024
    </td>
   </tr>
    <tr>
