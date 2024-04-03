@@ -34,7 +34,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "March 24, 2024"
+version = "April 3, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -321,6 +321,23 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def domino_pop_generator(seed):
+    rng = Random(seed)
+    yield [(1, 2)],
+    yield [(2, 5), (5, 1)],
+    yield [(2, 4), (2, 4)],
+    for (n, p) in islice(zip(pyramid(3, 4, 4), cycle([25, 60, 75])), 600):
+        dominos = []
+        for _ in range(n):
+            if len(dominos) > 0 and rng.randint(0, 99) < p:
+                s1 = dominos[-1][1]
+            else:
+                s1 = rng.randint(0, 6)
+            s2 = rng.randint(0, 6)
+            dominos.append((s1, s2))
+        yield dominos,
+
 
 def self_describe_generator(seed):
     yield [1],
@@ -4776,7 +4793,13 @@ testcases = [
         "self_describe",
         self_describe_generator(fixed_seed),
         "958fc9e2ea82deb3df48d1ab3b5002aac5e380ec85a2a09adc2f02c033202eed"
+    ),
+    (
+        "domino_pop",
+        domino_pop_generator(fixed_seed),
+        "7319369eb09de750ff37c2dcdf981fb328e6383ccc10510ea79accececbd8c6d"
     )
+    # YYY
 ]
 
 
@@ -4878,5 +4901,6 @@ def discrepancy(teacher, student, test_cases, stop_at_first=False, print_all=Fal
 
 run_all()
 
+
 # teacher student generator
-#discrepancy(labs109.is_cyclops, is_cyclops, is_cyclops_generator(fixed_seed), stop_at_first=True)
+#discrepancy(labs109.des_chiffres, des_chiffres, des_chiffres_generator(fixed_seed), stop_at_first=True)
