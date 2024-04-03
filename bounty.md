@@ -470,6 +470,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Domino poppers
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Kimberling's expulsion sequence
    </td>
    <td>
