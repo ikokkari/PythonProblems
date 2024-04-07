@@ -176,6 +176,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Count possible triangles
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Arrow walk with me
    </td>
    <td>
@@ -398,6 +404,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Maximal disk placement 
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Nice sequence 
    </td>
    <td>
@@ -471,6 +483,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Domino poppers
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Longest zigzag subsequence
    </td>
    <td>
    </td>
@@ -551,6 +569,12 @@ Starting March 2023, the author started creating another set of Python problems,
    <td>Scatter her enemies
    </td>
    <td>Karel Tutsu, March 8, 2023
+   </td>
+  </tr>
+    <tr>
+   <td>Inverse pair sums
+   </td>
+   <td>
    </td>
   </tr>
    <tr>
