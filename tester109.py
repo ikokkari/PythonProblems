@@ -8,7 +8,7 @@
 
 from hashlib import sha256
 from time import time
-from itertools import islice, permutations, zip_longest, cycle, product, count, chain
+from itertools import islice, permutations, combinations, zip_longest, cycle, product, count, chain
 from math import isqrt
 from random import Random
 import gzip
@@ -34,7 +34,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "April 3, 2024"
+version = "April 7, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -322,12 +322,74 @@ def pyramid(n=1, goal=5, inc=1):
 
 # XXX Test case generators for the individual functions.
 
+def pair_sums_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(3, 3, 3), pyramid(4, 2, 1)), 150):
+        nums = [rng.randint(1, 3)]
+        for _ in range(n-1):
+            nums.append(nums[-1] + rng.randint(1, m))
+        sums = sorted(x+y for (x, y) in combinations(nums, 2))
+        yield n, sums
+
+
+def count_triangles_generator(seed):
+    rng = Random(seed)
+    yield [42],
+    yield [1, 2],
+    yield [1, 2, 3],
+    for n, d in islice(zip(pyramid(4, 1, 1), cycle([1, 2, 3, 2, 1])), 1000):
+        sides = [rng.randint(1, n)]
+        sides.append(sides[0] + rng.randint(1, n))
+        for _ in range(n-2):
+            sides.append(sides[-1] + d * rng.randint(1, sides[-1] - sides[-2]))
+        yield sides,
+
+
+def place_disks_generator(seed):
+    rng = Random(seed)
+    for (n, r) in islice(zip(pyramid(3, 2, 2), pyramid(2, 3, 4)), 300):
+        points, rr = set(), 2*r
+        x = rng.randint(1, r)
+        y = rng.randint(1, r)
+        while len(points) < n:
+            points.add((x, y))
+            x = abs(x + rng.randint(-rr, rr))
+            y = abs(y + rng.randint(-rr, rr))
+        yield list(points), r
+
+
+def longest_zigzag_generator(seed):
+    rng = Random(seed)
+    for n, r in islice(zip(pyramid(2, 2, 2), pyramid(4, 4, 4)), 2000):
+        items = [rng.randint(1, 2*r)]
+        for _ in range(n-1):
+            items.append(abs(items[-1] + rng.randint(-r, r)))
+        yield items,
+
+
+def median_filter_generator(seed):
+    yield [42], 7
+    yield [17, 19], 3
+    rng = Random(seed)
+    for (n, r, p) in islice(zip(pyramid(3, 2, 2), pyramid(4, 4, 5), cycle([10, 20, 30])), 3000):
+        m = rng.randint(-2*r, 2*r)
+        items = []
+        for _ in range(n):
+            d = rng.randint(-r, r)
+            items.append(m + (10 * d if rng.randint(0, 99) else d))
+            m += d
+        k = 3
+        while rng.randint(0, 99) < 30:
+            k += 2
+        yield items, k
+
+
 def domino_pop_generator(seed):
     rng = Random(seed)
     yield [(1, 2)],
     yield [(2, 5), (5, 1)],
     yield [(2, 4), (2, 4)],
-    for (n, p) in islice(zip(pyramid(3, 4, 4), cycle([25, 60, 75])), 600):
+    for (n, p) in islice(zip(pyramid(3, 4, 4), cycle([25, 60, 75])), 800):
         dominos = []
         for _ in range(n):
             if len(dominos) > 0 and rng.randint(0, 99) < p:
@@ -4797,7 +4859,32 @@ testcases = [
     (
         "domino_pop",
         domino_pop_generator(fixed_seed),
-        "7319369eb09de750ff37c2dcdf981fb328e6383ccc10510ea79accececbd8c6d"
+        "215a96c7117b4cb58d0f08fbda0925a7d9be9b98115481dc3308c0dd9ec6420c"
+    ),
+    (
+        "median_filter",
+        median_filter_generator(fixed_seed),
+        "212a511acbcaf77584e38428867e279e6527ac0d0d89f94664456a4897a4fd32"
+    ),
+    (
+        "longest_zigzag",
+        longest_zigzag_generator(fixed_seed),
+        "cd4a2b565263afc05117d1f5eb0364de5030653a592b4177524539ed8df59bfa"
+    ),
+    (
+        "place_disks",
+        place_disks_generator(fixed_seed),
+        "624d6ba514be7c4053d53688762ac94254fe5f75c2ce0dc7c97a7b639a9522de"
+    ),
+    (
+        "count_triangles",
+        count_triangles_generator(fixed_seed),
+        "53d4de8947aa9973485f85bc955921be6e55df0d001facf79deb402cbe8038a3"
+    ),
+    (
+        "pair_sums",
+        pair_sums_generator(fixed_seed),
+        "6304c144f259b9f4d54cac13413a52b14e05ddd38c52056da668d33cd5836550"
     )
     # YYY
 ]
