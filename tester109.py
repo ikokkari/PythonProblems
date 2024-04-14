@@ -34,7 +34,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "April 7, 2024"
+version = "April 13, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -53,6 +53,8 @@ timeout_cutoff = 20
 # How many test cases to record in the file for each function.
 testcase_cutoff = 400
 
+# Are the students allowed to create expected_answers file?
+can_create_expected = False
 
 # For instructors who want to add their own problems to this set:
 #
@@ -168,7 +170,7 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
                 break
         total_time = time() - start_time
         if total_time > timeout_cutoff:
-            print(f"TIMEOUT AT TEST CASE #{test_case_idx}. FUNCTION REJECTED AS TOO SLOW.")
+            print(f"TIMEOUT AFTER TEST CASE #{test_case_idx}. FUNCTION REJECTED AS TOO SLOW.")
             crashed = True
             break
     if not recorder:
@@ -221,12 +223,16 @@ def sort_by_source(testcases_):
 
 def test_all_functions(module, testcases_, recorder=None, known=None):
     if recorder:
-        print("\nRECORDING THE RESULTS OF INSTRUCTOR MODEL SOLUTIONS.")
-        print("IF YOU ARE A STUDENT, YOU SHOULD NOT BE SEEING THIS")
-        print(f"MESSAGE!!! ENSURE THAT THE FILE {expected_answers_file} FROM")
-        print("WHEREVER YOU DOWNLOADED THIS AUTOMATED TESTER IS ALSO")
-        print("PROPERLY PLACED IN THIS VERY SAME WORKING DIRECTORY!!!\n")
-        print(f"Recording {testcase_cutoff} test cases per problem.\n")
+        if can_create_expected:
+            print("\nRECORDING THE RESULTS OF INSTRUCTOR MODEL SOLUTIONS.")
+            print("IF YOU ARE A STUDENT, YOU SHOULD NOT BE SEEING THIS")
+            print(f"MESSAGE!!! ENSURE THAT THE FILE {expected_answers_file} FROM")
+            print("WHEREVER YOU DOWNLOADED THIS AUTOMATED TESTER IS ALSO")
+            print("PROPERLY PLACED IN THIS VERY SAME WORKING DIRECTORY!!!\n")
+            print(f"Recording {testcase_cutoff} test cases per problem.\n")
+        else:
+            print("Download the correct expected_answers file in this same directory.")
+            exit(1)
     accepted_count, total = 0, 0
     if recorder:
         print(f"{version_prefix}{version}", file=recorder)
@@ -321,6 +327,19 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def pair_swaps_generator(seed):
+    for n in range(1, 7):
+        for p in permutations(range(n)):
+            yield list(p),
+    rng = Random(seed)
+    items = list(range(8))
+    for n in islice(pyramid(8, 5, 5), 10000):
+        if len(items) < n:
+            items.append(n-1)
+        rng.shuffle(items)
+        yield items[:]
+
 
 def pair_sums_generator(seed):
     rng = Random(seed)
@@ -4885,8 +4904,12 @@ testcases = [
         "pair_sums",
         pair_sums_generator(fixed_seed),
         "6304c144f259b9f4d54cac13413a52b14e05ddd38c52056da668d33cd5836550"
+    ),
+    (
+        "pair_swaps",
+        pair_swaps_generator(fixed_seed),
+        "a500f72b1baabdcbc57e721bf7f155f1da007adeaef4ba662619b7481d0772f7"
     )
-    # YYY
 ]
 
 
