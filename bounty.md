@@ -544,7 +544,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>SMETANA interpreter
    </td>
-   <td>
+   <td>Abdul Rahman Al Nabulsi, April 15, 2024
    </td>
   </tr>
    <tr>
