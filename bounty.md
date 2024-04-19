@@ -170,6 +170,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Deterministic finite automata
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>The parking lot is full
    </td>
    <td>
@@ -183,6 +189,18 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Arrow walk with me
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Median filter
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Nondeterministic finite automata
    </td>
    <td>
    </td>
@@ -249,6 +267,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Van der Corput sequence
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Condorcet election
    </td>
    <td>
    </td>
@@ -446,6 +470,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>The remains
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Count sublists with odd sums
    </td>
    <td>Karel Tutsu, August 30, 2023
@@ -489,6 +519,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Domino poppers
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Balance of power
    </td>
    <td>
    </td>
