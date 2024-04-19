@@ -9,7 +9,7 @@
 from hashlib import sha256
 from time import time
 from itertools import islice, permutations, combinations, zip_longest, cycle, product, count, chain
-from math import isqrt
+from math import isqrt, gcd
 from random import Random
 import gzip
 import os.path
@@ -34,7 +34,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "April 13, 2024"
+version = "April 18, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -51,10 +51,10 @@ function_prefix = '<****>'
 timeout_cutoff = 20
 
 # How many test cases to record in the file for each function.
-testcase_cutoff = 400
+testcase_cutoff = 300
 
 # Are the students allowed to create expected_answers file?
-can_create_expected = False
+can_record = False
 
 # For instructors who want to add their own problems to this set:
 #
@@ -223,16 +223,12 @@ def sort_by_source(testcases_):
 
 def test_all_functions(module, testcases_, recorder=None, known=None):
     if recorder:
-        if can_create_expected:
-            print("\nRECORDING THE RESULTS OF INSTRUCTOR MODEL SOLUTIONS.")
-            print("IF YOU ARE A STUDENT, YOU SHOULD NOT BE SEEING THIS")
-            print(f"MESSAGE!!! ENSURE THAT THE FILE {expected_answers_file} FROM")
-            print("WHEREVER YOU DOWNLOADED THIS AUTOMATED TESTER IS ALSO")
-            print("PROPERLY PLACED IN THIS VERY SAME WORKING DIRECTORY!!!\n")
-            print(f"Recording {testcase_cutoff} test cases per problem.\n")
-        else:
-            print("Download the correct expected_answers file in this same directory.")
-            exit(1)
+        print("\nRECORDING THE RESULTS OF INSTRUCTOR MODEL SOLUTIONS.")
+        print("IF YOU ARE A STUDENT, YOU SHOULD NOT BE SEEING THIS")
+        print(f"MESSAGE!!! ENSURE THAT THE FILE {expected_answers_file} FROM")
+        print("WHEREVER YOU DOWNLOADED THIS AUTOMATED TESTER IS ALSO")
+        print("PROPERLY PLACED IN THIS VERY SAME WORKING DIRECTORY!!!\n")
+        print(f"Recording {testcase_cutoff} test cases per problem.\n")
     accepted_count, total = 0, 0
     if recorder:
         print(f"{version_prefix}{version}", file=recorder)
@@ -327,6 +323,66 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def condorcet_election_generator(seed):
+    rng = Random(seed)
+    for c, n in islice(zip(pyramid(2, 5, 7 ), pyramid(1, 1, 1)), 800):
+        ballot = rng.sample(range(c), c)
+        ballots = []
+        while len(ballots) < n:
+            ballots.append(ballot[:])
+            for _ in range(rng.randint(0, 3)):
+                i = rng.randint(0, c-1)
+                j = rng.randint(0, c-1)
+                ballot[i], ballot[j] = ballot[j], ballot[i]
+        yield ballots,
+
+
+def nfa_generator(seed):
+    rng = Random(seed)
+
+    def sample(n):
+        if rng.randint(0, 99) < 20:
+            return []
+        else:
+            return rng.sample(range(0, n), n - isqrt(isqrt(rng.randint(1, n*n*n*n))))
+
+    for n, m in islice(zip(pyramid(2, 3, 4), pyramid(2, 5, 5)), 1000):
+        alpha = lows[:m]
+        rules = {(s, c): sample(n) for s in range(n) for c in alpha}
+        text = random_string(alpha, rng.randint(n, 2 * n), rng)
+        yield rules, text
+
+
+def dfa_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(2, 3, 4), pyramid(2, 5, 5)), 1000):
+        alpha = lows[:m]
+        rules = {(s, c):rng.randint(0, n-1) for s in range(n) for c in alpha}
+        text = random_string(alpha, rng.randint(n, 2*n), rng)
+        yield rules, text
+
+
+def repeating_decimal_generator(seed):
+    for s in range(2, 500):
+        for n in range(s//2 + 1, s):
+            if gcd(s-n, n) == 1:
+                yield s-n, n
+
+
+def shapley_shubik_generator(seed):
+    yield [1, 1, 1, 1, 1], 3
+    yield [4, 1, 1, 1], 4
+    yield [3, 1, 1, 1], 4
+    rng = Random(seed)
+    m = 5
+    for n in islice(pyramid(3, 2, 2), 50):
+        weight = sorted([rng.randint(1, m) for _ in range(n)], reverse = True)
+        s = sum(weight) // 4
+        quota = rng.randint(2*s+1, 3*s)
+        yield weight, quota
+        m += 1
+
 
 def pair_swaps_generator(seed):
     for n in range(1, 7):
@@ -4909,9 +4965,35 @@ testcases = [
         "pair_swaps",
         pair_swaps_generator(fixed_seed),
         "a500f72b1baabdcbc57e721bf7f155f1da007adeaef4ba662619b7481d0772f7"
+    ),
+    (
+        "shapley_shubik",
+        shapley_shubik_generator(fixed_seed),
+        "63fccfb0bb0a4f597c6a7ddc64964c636ef5d101568cb9c54538b96d93afabdf"
+    ),
+    (
+        "repeating_decimal",
+        repeating_decimal_generator(fixed_seed),
+        "31b2f0a173417aa2c3a290cb8711b6d5010e69d3ce22b611b59bb334df47d1c5"
+    ),
+    (
+        "dfa",
+        dfa_generator(fixed_seed),
+        "b1f19542fe54a7ef7992c5ce4834bd3293cc74635e147f381afd15c4814a6154"
+    ),
+    (
+        "nfa",
+        nfa_generator(fixed_seed),
+        "cd6773bc72eb8399618a937604d264e732e32b64399598fb7d11bb80ffb87a12"
+    ),
+    (
+        "condorcet_election",
+        condorcet_election_generator(fixed_seed),
+        "fd57f0fef51bf6082dba7e43e70781f46a063663664e1b64ff95f378ea120718"
     )
 ]
 
+# YYY
 
 def run_all():
     print(f"109 Python Problems tester, {version}, Ilkka Kokkarinen.")
@@ -4954,8 +5036,14 @@ def run_all():
                     test_all_functions(labs109, testcases, known=known)
             else:
                 # If the record file doesn't exist, record the model answers.
-                with gzip.open(expected_answers_file, 'wt') as rf:
-                    test_all_functions(labs109, testcases, recorder=rf)
+                if can_record:
+                    with gzip.open(expected_answers_file, 'wt') as rf:
+                        test_all_functions(labs109, testcases, recorder=rf)
+                else:
+                    print("You are missing the expected_answers file. Please download this file")
+                    print("from the same place where you got this tester script from, to allow")
+                    print("this tester to emit proper bug reports for test cases.")
+                    test_all_functions(labs109, testcases)
         else:
             print("Testing functions without using recorded expected answers.")
             test_all_functions(labs109, testcases, known=None)
