@@ -586,7 +586,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>The sharpest axes
    </td>
-   <td>
+   <td>Ahn Nam Nguyen, April 24, 2024
    </td>
   </tr>
    <tr>
