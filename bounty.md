@@ -544,7 +544,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Kimberling's repetition-resistant sequence
    </td>
-   <td>
+   <td>Nam Nguyen, May 1, 2024
    </td>
   </tr>
    <tr>
@@ -562,7 +562,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Make a list self-describing
    </td>
-   <td>
+   <td>Nam Nguyen, May 1, 2024
    </td>
   </tr>
    <tr>
@@ -592,7 +592,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Vidrach Itky Leda
    </td>
-   <td>
+   <td>Nam Nguyen, May 1, 2024
    </td>
   </tr>
    <tr>
