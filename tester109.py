@@ -34,7 +34,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "April 18, 2024"
+version = "May 1, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -324,6 +324,11 @@ def pyramid(n=1, goal=5, inc=1):
 
 # XXX Test case generators for the individual functions.
 
+def lychrel_generator():
+    for n, giveup in zip(range(100, 20000), pyramid(100, 5, 5)):
+        yield n, giveup
+
+
 def condorcet_election_generator(seed):
     rng = Random(seed)
     for c, n in islice(zip(pyramid(2, 5, 7 ), pyramid(1, 1, 1)), 800):
@@ -423,9 +428,9 @@ def count_triangles_generator(seed):
 def place_disks_generator(seed):
     rng = Random(seed)
     for (n, r) in islice(zip(pyramid(3, 2, 2), pyramid(2, 3, 4)), 300):
-        points, rr = set(), 2*r
-        x = rng.randint(1, r)
-        y = rng.randint(1, r)
+        points, rr = set(), 3*r
+        x = rng.randint(-rr, rr)
+        y = rng.randint(-rr, rr)
         while len(points) < n:
             points.add((x, y))
             x = abs(x + rng.randint(-rr, rr))
@@ -4949,7 +4954,7 @@ testcases = [
     (
         "place_disks",
         place_disks_generator(fixed_seed),
-        "624d6ba514be7c4053d53688762ac94254fe5f75c2ce0dc7c97a7b639a9522de"
+        "a70244b21edec2d56007356b453a0ce4da992257bf9f439202ff01180c39a677"
     ),
     (
         "count_triangles",
@@ -4990,6 +4995,11 @@ testcases = [
         "condorcet_election",
         condorcet_election_generator(fixed_seed),
         "fd57f0fef51bf6082dba7e43e70781f46a063663664e1b64ff95f378ea120718"
+    ),
+    (
+        "lychrel",
+        lychrel_generator(),
+        "51834023cf1028fc8dbf344d6f3d9d855df27f823f0b4e7f784ca1bce6a9f2c6"
     )
 ]
 
