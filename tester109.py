@@ -34,7 +34,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "May 1, 2024"
+version = "May 21, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -323,6 +323,17 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def square_lamps_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(3, 2, 2), 3000):
+        flips = []
+        for _ in range(rng.randint(n, 3*n)):
+            i = rng.randint(1, n)
+            sign = rng.choice([-1, 1])
+            flips.append(i * sign)
+        yield n, flips
+
 
 def lychrel_generator():
     for n, giveup in zip(range(100, 20000), pyramid(100, 5, 5)):
@@ -5000,6 +5011,11 @@ testcases = [
         "lychrel",
         lychrel_generator(),
         "51834023cf1028fc8dbf344d6f3d9d855df27f823f0b4e7f784ca1bce6a9f2c6"
+    ),
+    (
+        "square_lamps",
+        square_lamps_generator(fixed_seed),
+        "db49769d88b3326d3d0c3ee93f8f1c894a0c8f56ec55036bab36ad70f20fab55"
     )
 ]
 
