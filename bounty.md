@@ -224,6 +224,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Square lamplighter
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Longest mirrored substring
    </td>
    <td>
