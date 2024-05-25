@@ -34,7 +34,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "May 21, 2024"
+version = "May 24, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -323,6 +323,47 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def infected_cells_generator(seed):
+    yield [(0, 0), (1, 1), (1, 3), (3, 2)],
+    rng = Random(seed)
+    for n in islice(pyramid(2, 2, 2), 2000):
+        infected = set()
+        x = rng.randint(-n, n)
+        y = rng.randint(-n, n)
+        while len(infected) < n:
+            infected.add((x, y))
+            if rng.randint(0, 99) < 20:
+                x = rng.randint(-n, n)
+                y = rng.randint(-n, n)
+            else:
+                x += rng.choice([-2, -1, -1, 0, 1, 1, 2])
+                y += rng.choice([-2, -1, -1, 0, 1, 1, 2])
+        yield list(infected),
+
+
+def knight_jam_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(2, 5, 6), 100):
+        knights = set()
+        while len(knights) < n:
+            x = rng.randint(0, 2 + n // 2)
+            y = rng.randint(0, 2 + n // 2)
+            knights.add((x, y))
+        yield knights, rng.randint(0, 1)
+
+
+def arithmetic_skip_generator(seed):
+    rng = Random(seed)
+    for n in range(6000):
+        yield rng.choice([-n, n]),
+
+
+def trip_flip_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(5, 5, 6), 1300):
+        yield [rng.randint(0, 3) for _ in range(n)],
+
 
 def square_lamps_generator(seed):
     rng = Random(seed)
@@ -5016,6 +5057,26 @@ testcases = [
         "square_lamps",
         square_lamps_generator(fixed_seed),
         "db49769d88b3326d3d0c3ee93f8f1c894a0c8f56ec55036bab36ad70f20fab55"
+    ),
+    (
+        "trip_flip",
+        trip_flip_generator(fixed_seed),
+        "4ca25906d4c84ec6df20467e45019f5e544b6c5bbc68c6b0725b36f2b3a82d67"
+    ),
+    (
+        "arithmetic_skip",
+        arithmetic_skip_generator(fixed_seed),
+        "57ee0ab04df9acaf8dcc7930a534b8fa54333a4be71c18ea089dae3edbaf08dd"
+    ),
+    (
+        "knight_jam",
+        knight_jam_generator(fixed_seed),
+        "a2373eb6a800bb78e2f92a3087be34afd1928929d01d2905b72a94dd050691e5"
+    ),
+    (
+        "infected_cells",
+        infected_cells_generator(fixed_seed),
+        "e573d964f51ce3e60426b26785c87a5b909bb4a301410707235c7f57f951f8a8"
     )
 ]
 
