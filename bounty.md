@@ -368,6 +368,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Arithmetic skip
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Carving Egyptian fractions
    </td>
    <td>
@@ -377,6 +383,12 @@ Starting March 2023, the author started creating another set of Python problems,
    <td>Largest square of ones
    </td>
    <td>Maxim Olatoye, June 15, 2023
+   </td>
+  </tr>
+   <tr>
+   <td>Infection affection
+   </td>
+   <td>
    </td>
   </tr>
    <tr>
@@ -437,6 +449,12 @@ Starting March 2023, the author started creating another set of Python problems,
    <td>Balsam for the code 
    </td>
    <td>Nam Nguyen, March 6, 2024
+   </td>
+  </tr>
+   <tr>
+   <td>Flip those trips
+   </td>
+   <td>
    </td>
   </tr>
    <tr>
@@ -575,6 +593,12 @@ Starting March 2023, the author started creating another set of Python problems,
    <td>Two pins, not three, Dolores
    </td>
    <td>Matt Campeau, April 2, 2024
+   </td>
+  </tr>
+   <tr>
+   <td>Knight jam
+   </td>
+   <td>
    </td>
   </tr>
    <tr>
