@@ -674,7 +674,7 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
-   <td>A Lindenmayer system, bigly
+   <td>Oppenhoppenheimereimer
    </td>
    <td>John Hodgins, April 20, 2023
    </td>
