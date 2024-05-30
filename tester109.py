@@ -17,6 +17,7 @@ import string
 from sys import version_info, exit
 import labs109
 from fractions import Fraction
+from datetime import date
 
 # During development, this dictionary contains the functions whose calls and
 # results you want to see first during the test run. Make each entry "name":N,
@@ -34,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "May 24, 2024"
+version = "May 29, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -323,6 +324,33 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def count_friday_13s_generator(seed):
+    rng = Random(seed)
+    days_in_month = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+    def random_date(n):
+        year = 2024 + rng.randint(-n, n)
+        month = rng.randint(1, 12)
+        is_leap_year = year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+        if rng.randint(0, 99) < 20:
+            day = rng.randint(12, 14)
+        elif month == 2 and is_leap_year:
+            day = rng.randint(1, 29)
+        else:
+            day = rng.randint(1, days_in_month[month])
+        return date(year, month, day)
+
+    for n in islice(pyramid(1, 2, 2), 3000):
+        start = random_date(n)
+        end = random_date(n)
+        yield (start, end) if start <= end else (end, start)
+
+
+def twos_and_threes_generator(seed):
+    for n in islice(scale_random(seed, 2, 2), 600):
+        yield n,
+
 
 def infected_cells_generator(seed):
     yield [(0, 0), (1, 1), (1, 3), (3, 2)],
@@ -5077,6 +5105,16 @@ testcases = [
         "infected_cells",
         infected_cells_generator(fixed_seed),
         "e573d964f51ce3e60426b26785c87a5b909bb4a301410707235c7f57f951f8a8"
+    ),
+    (
+        "twos_and_threes",
+        twos_and_threes_generator(fixed_seed),
+        "c5ba8b88236187abce068fab06424c08c78eff91f535c0541780e3c534c1d10b"
+    ),
+    (
+        "count_friday_13s",
+        count_friday_13s_generator(fixed_seed),
+        "3f446c580c97403da422f017c3a2d97985e0e53bcf6cd83e74cddca18ce36d74"
     )
 ]
 
