@@ -193,6 +193,11 @@ Starting March 2023, the author started creating another set of Python problems,
    <td>
    </td>
   </tr>
+   <td>Count Friday the Thirteenths
+   </td>
+   <td>
+   </td>
+  </tr>
    <tr>
    <td>Median filter
    </td>
@@ -231,6 +236,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Longest mirrored substring
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>And they walk in twos or threes or more
    </td>
    <td>
    </td>
