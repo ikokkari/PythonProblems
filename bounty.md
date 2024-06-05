@@ -235,6 +235,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Pairwise lamps
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Longest mirrored substring
    </td>
    <td>
@@ -242,6 +248,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>And they walk in twos or threes or more
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Lowest fraction between two fractions
    </td>
    <td>
    </td>
