@@ -325,6 +325,32 @@ def pyramid(n=1, goal=5, inc=1):
 
 # XXX Test case generators for the individual functions.
 
+def lowest_fraction_between_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(3, 1, 1), 3000):
+        a = rng.randint(1, 3*n)
+        b = n
+        if rng.randint(0, 99) < 50:
+            c = rng.randint(1, n)
+            d = rng.randint(n+1, n*n)
+        else:
+            c = rng.randint(a, a+2)
+            d = rng.randint(b-1, b+1)
+        first = Fraction(a, b)
+        second = first + Fraction(c, d)
+        first, second = min(first, second), max(first, second)
+        yield first, second
+
+
+def lamp_pairs_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(2, 1, 1), 500):
+        lamps = "".join([rng.choice("01") for _ in range(n)])
+        if lamps.count('0') % 2 == 1:
+            lamps += '0'
+        yield lamps,
+
+
 def count_friday_13s_generator(seed):
     rng = Random(seed)
     days_in_month = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -5115,6 +5141,16 @@ testcases = [
         "count_friday_13s",
         count_friday_13s_generator(fixed_seed),
         "3f446c580c97403da422f017c3a2d97985e0e53bcf6cd83e74cddca18ce36d74"
+    ),
+    (
+        "lamp_pairs",
+        lamp_pairs_generator(fixed_seed),
+        "d43f2304d11ccc50301aadbcfca56fa0844a9020b7f55524c3b2d1c6b42919ef"
+    ),
+    (
+        "lowest_fraction_between",
+        lowest_fraction_between_generator(fixed_seed),
+        "2c4d4408b05463320e31e0b12c1ab7f3e3a1850a14e77810cae229a3c598e896"
     )
 ]
 
