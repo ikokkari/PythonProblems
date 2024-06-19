@@ -170,6 +170,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Fastest code in the world
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Deterministic finite automata
    </td>
    <td>
@@ -634,6 +640,12 @@ Starting March 2023, the author started creating another set of Python problems,
    <td>SMETANA interpreter
    </td>
    <td>Abdul Rahman Al Nabulsi, April 15, 2024
+   </td>
+  </tr>
+   <tr>
+   <td>Probabilistic tic-tac-toe
+   </td>
+   <td>
    </td>
   </tr>
    <tr>
