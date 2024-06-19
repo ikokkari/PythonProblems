@@ -5198,7 +5198,7 @@ testcases = [
     (
         "jai_alai",
         jai_alai_generator(fixed_seed),
-        "5c1555e57a21f424e2ee67284d74c5caf7407136f5faf0ca093aec70e7143e09"
+        "00960c8cc9d2c39525d7e99d28c49ee78ed67871afa2b0dd452cde3a19a4371f"
     )
 ]
 

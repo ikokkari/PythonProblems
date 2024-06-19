@@ -14,6 +14,7 @@ from bisect import bisect_left
 from functools import lru_cache
 from itertools import combinations, chain, islice, count, product
 from datetime import date, timedelta
+from queue import Queue
 
 
 # Both lists __fibs and __primes will grow as some functions
@@ -93,13 +94,16 @@ def __fact(n):
 
 def jai_alai(n, results):
     ██████████████████████████████
-    ████████████████
+    ████████
+    ███████████████
+    █████████████████████
+        ████████████
     ██████████████████████
-        █████████████████████████████████████
+        ████████████████████████
         █████████████████
-        ███████████████████
-        ███████████████
-            ███████████████████
+            ███████████████████████████████████
+        █████████████████
+        █████████████████████
     █████████████
 
 
