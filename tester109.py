@@ -16,7 +16,7 @@ import os.path
 import string
 from sys import version_info, exit
 import labs109
-from fractions import Fraction
+from fractions import Fraction as F
 from datetime import date
 
 # During development, this dictionary contains the functions whose calls and
@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "May 29, 2024"
+version = "June 19, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -325,6 +325,44 @@ def pyramid(n=1, goal=5, inc=1):
 
 # XXX Test case generators for the individual functions.
 
+def jai_alai_generator(seed):
+    rng = Random(seed)
+    yield 2, 'WLWL'
+    yield 2, 'LLLLLL'
+    yield 4, 'WWWWWWWWW'
+    for n, m, p in islice(zip(pyramid(3, 15, 20), pyramid(4, 2, 2), cycle([30, 40, 50])), 2000):
+        results = [rng.choice('WL')]
+        for _ in range(m):
+            result = results[-1] if rng.randint(0, 99) < p else rng.choice('WL')
+            results.append(result)
+        yield n, "".join(results)
+
+
+def __random_frac(rng, p):
+    if rng.randint(0, 99) < p:
+        den = rng.randint(2, 10)
+        num = rng.randint(1, den)
+        return F(num, den)
+    else:
+        den = rng.randint(10, 100)
+        num = rng.randint(den // 2, den)
+        return F(num, den)
+
+
+def tic_tac_generator(seed):
+    rng = Random(seed)
+    for p in islice(cycle([10, 20, 30, 40]), 100):
+        board = [['.', '.', '.'], ['.', '.', '.'], ['.', '.', '.']]
+        probs = [[__random_frac(rng, p) for _ in range(3)] for _ in range(3)]
+        for _ in range(rng.randint(6, 8)):
+            row = rng.randint(0, 2)
+            col = rng.randint(0, 2)
+            mark = rng.choice("XO")
+            board[row][col] = mark
+        yield board[:], 'X', probs
+        yield board[:], 'O', probs
+
+
 def lowest_fraction_between_generator(seed):
     rng = Random(seed)
     for n in islice(pyramid(3, 1, 1), 3000):
@@ -336,8 +374,8 @@ def lowest_fraction_between_generator(seed):
         else:
             c = rng.randint(a, a+2)
             d = rng.randint(b-1, b+1)
-        first = Fraction(a, b)
-        second = first + Fraction(c, d)
+        first = F(a, b)
+        second = first + F(c, d)
         first, second = min(first, second), max(first, second)
         yield first, second
 
@@ -710,7 +748,7 @@ def greedy_egyptian_generator(seed):
     for n in islice(pyramid(3, 5, 6), 1000):
         for _ in range(n):
             a = rng.randint(2, b - 1)
-            yield Fraction(a, b),
+            yield F(a, b),
         b += 1
 
 
@@ -1191,7 +1229,7 @@ def stern_brocot_generator(seed):
     for n in islice(pyramid(3, 2, 2), 10000):
         den = rng.randint(n, 2 * n)
         num = rng.randint(1, 2 * den)
-        yield Fraction(num, den),
+        yield F(num, den),
 
 
 def abacaba_generator(seed):
@@ -2309,7 +2347,7 @@ def leibniz_generator(seed):
             den = rng.randint(2, n)
             num = rng.randint(1, den - 1)
             sign = rng.choice([-1, 1])
-            e = Fraction(sign * num, den)
+            e = F(sign * num, den)
         heads.append(e)
         if len(heads) > 3:
             p = rng.randint(1, min(10, len(heads) // 2))
@@ -5151,6 +5189,16 @@ testcases = [
         "lowest_fraction_between",
         lowest_fraction_between_generator(fixed_seed),
         "2c4d4408b05463320e31e0b12c1ab7f3e3a1850a14e77810cae229a3c598e896"
+    ),
+    (
+        "tic_tac",
+        tic_tac_generator(fixed_seed),
+        "f180ff8f423758cf6539bcee68d8ed442f832b0a312946b876d13f067bd7e2ed"
+    ),
+    (
+        "jai_alai",
+        jai_alai_generator(fixed_seed),
+        "5c1555e57a21f424e2ee67284d74c5caf7407136f5faf0ca093aec70e7143e09"
     )
 ]
 
