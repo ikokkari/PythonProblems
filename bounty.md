@@ -170,12 +170,6 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
-   <td>Fastest code in the world
-   </td>
-   <td>
-   </td>
-  </tr>
-   <tr>
    <td>Deterministic finite automata
    </td>
    <td>
@@ -206,6 +200,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Median filter
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Man of La Cancha
    </td>
    <td>
    </td>
@@ -560,6 +560,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Minimal Egyptian fractions
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Unity partition
    </td>
    <td>
    </td>
