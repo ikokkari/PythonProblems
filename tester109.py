@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "June 19, 2024"
+version = "June 21, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -118,7 +118,7 @@ def stringify_args(args, cutoff=2000):
 # the computed checksum instead. If recorder != None, print out the
 # arguments and the result returned from function into the recorder.
 
-def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expected_answers=None):
+def test_one_function(f, test_generator, expected_checksum=None, recorder=None, expected_answers=None):
     function_name, recorded, output_len = f.__name__, None, 0
     print(f"{function_name}: ", end="", flush=True)
     # How many results of function calls to print out.
@@ -128,7 +128,7 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
     if expected_answers:
         recorded = expected_answers.get(function_name, None)
     chk, start_time, crashed = sha256(), time(), False
-    for (test_case_idx, test_args) in enumerate(test_cases):
+    for (test_case_idx, test_args) in enumerate(test_generator(fixed_seed)):
         # Convert a singleton of any non-tuple into singleton tuple.
         if not isinstance(test_args, tuple):
             test_args = (test_args,)
@@ -203,9 +203,9 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
 # Sort the suite of test cases according to the order in which
 # they appear in the student source code.
 
-def sort_by_source(testcases_):
-    funcs, recognized = dict(), set(f for (f, _, _) in testcases_)
-    need_check = [f for (f, test, check) in testcases_ if check is None]
+def sort_by_source():
+    funcs, recognized = dict(), set(f for (f, _, _) in testcases)
+    need_check = [f for (f, test, check) in testcases if check is None]
     with open('labs109.py', 'r', encoding='utf-8') as source:
         for (line_no, line) in enumerate(source):
             if line.startswith("def "):
@@ -213,16 +213,15 @@ def sort_by_source(testcases_):
                 if function_name in funcs:  # Who knows how many future students this will save.
                     print(f"WARNING: MULTIPLE DEFINITION FOR {function_name}")
                 if function_name in recognized:
-                    funcs[
-                        function_name] = 0 if function_name in verbose_execution or function_name in need_check else line_no
-        testcases_.sort(key=lambda x: funcs.get(x[0], 9999999))
+                    funcs[function_name] = 0 if function_name in verbose_execution or function_name in need_check else line_no
+        testcases.sort(key=lambda x: funcs.get(x[0], 9999999))
     return sorted(funcs.keys())
 
 
 # Runs the tests for all functions in the suite, returning the
 # count of how many of those were implemented and passed the test.
 
-def test_all_functions(module, testcases_, recorder=None, known=None):
+def test_all_functions(module, recorder=None, known=None):
     if recorder:
         print("\nRECORDING THE RESULTS OF INSTRUCTOR MODEL SOLUTIONS.")
         print("IF YOU ARE A STUDENT, YOU SHOULD NOT BE SEEING THIS")
@@ -233,7 +232,7 @@ def test_all_functions(module, testcases_, recorder=None, known=None):
     accepted_count, total = 0, 0
     if recorder:
         print(f"{version_prefix}{version}", file=recorder)
-    for (f_name, test_cases, expected) in testcases_:
+    for (f_name, test_cases, expected) in testcases:
         try:
             f = module.__dict__[f_name]
         except KeyError:
@@ -246,7 +245,7 @@ def test_all_functions(module, testcases_, recorder=None, known=None):
         print("\nRecording model answers complete.")
     else:
         print(f"{accepted_count} out of {total} functions ", end="")
-        print(f"of {len(testcases_)} possible work.")
+        print(f"of {len(testcases)} possible work.")
     return accepted_count
 
 
@@ -324,6 +323,11 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def unity_partition_generator(seed):
+    for n in range(78, 200):
+        yield n,
+
 
 def jai_alai_generator(seed):
     rng = Random(seed)
@@ -468,7 +472,7 @@ def square_lamps_generator(seed):
         yield n, flips
 
 
-def lychrel_generator():
+def lychrel_generator(seed):
     for n, giveup in zip(range(100, 20000), pyramid(100, 5, 5)):
         yield n, giveup
 
@@ -1136,7 +1140,7 @@ def tog_comparison_generator(seed):
         yield first, first
 
 
-def repetition_resistant_generator():
+def repetition_resistant_generator(seed):
     yield from range(10000)
 
 
@@ -1149,7 +1153,7 @@ def kimberling_expulsion_generator(seed):
         start = end
 
 
-def hofstadter_figure_figure_generator():
+def hofstadter_figure_figure_generator(seed):
     for n in range(0, 100001):
         yield n,
 
@@ -1219,7 +1223,7 @@ def mu_torere_moves_generator(seed):
         board = "".join(board_l)
 
 
-def discrete_rounding_generator():
+def discrete_rounding_generator(seed):
     for n in range(1, 4000):
         yield n,
 
@@ -1532,7 +1536,7 @@ def lindenmayer_generator(seed):
             yield rules, n, rng.choice(alphabet)
 
 
-def mian_chowla_generator():
+def mian_chowla_generator(seed):
     yield from range(200)
 
 
@@ -1626,7 +1630,7 @@ def queen_captures_all_generator(seed):
         yield pieces[0], pieces[1:]
 
 
-def addition_chain_generator():
+def addition_chain_generator(seed):
     for n in range(1, 500):
         yield n, False
         yield n, True
@@ -2284,7 +2288,7 @@ def domino_tile_generator(seed):
         yield rows
 
 
-def wordomino_generator():
+def wordomino_generator(seed):
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
         words = [w.strip() for w in f if len(w) == 5]  # 4 chars + newline
 
@@ -2402,7 +2406,7 @@ def brussels_choice_step_generator(seed):
         yield num, min(a, b), min(max(a, b), 2 + min(a, b))
 
 
-def ryerson_letter_grade_generator():
+def ryerson_letter_grade_generator(seed):
     yield from range(0, 150)
 
 
@@ -2717,7 +2721,7 @@ def balanced_ternary_generator(seed):
         yield -v,
 
 
-def brangelina_generator():
+def brangelina_generator(seed):
     n = len(__names)
     for i in range((n * (n - 1)) // 2):
         first = __names[i % n]
@@ -2798,7 +2802,7 @@ def riffle_generator(seed):
         yield items, False
 
 
-def words_with_given_shape_generator():
+def words_with_given_shape_generator(seed):
     patterns = [  # Tactically chosen patterns to give reasonably short answers
         [1, 0, 0],
         [0, 0, 1],
@@ -3004,7 +3008,7 @@ def __qwerty_dist():
     return dist
 
 
-def autocorrect_word_generator():
+def autocorrect_word_generator(seed):
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
         words = [x.strip() for x in f]
     dist = __qwerty_dist()
@@ -3041,7 +3045,7 @@ def is_cyclops_generator(seed):
         yield num,
 
 
-def words_with_letters_generator():
+def words_with_letters_generator(seed):
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
         words = [x.strip() for x in f]
     for letters in ["smoom", "reflux", "byoam", "xxx", "aboba", "ubsub", "rentob", "whoa"]:
@@ -3218,7 +3222,7 @@ def unscramble_generator(seed):
             instance_count += 1
 
 
-def crag_score_generator():
+def crag_score_generator(seed):
     yield from [list(p) for p in product([1, 2, 3, 4, 5, 6], repeat=3)]
 
 
@@ -3237,7 +3241,7 @@ def midnight_generator(seed):
         yield dice,
 
 
-def substitution_words_generator():
+def substitution_words_generator(seed):
     with open('words_sorted.txt', 'r', encoding='utf-8') as f:
         words = [x.strip() for x in f]
     for pattern in ["LLRR", "ABACAB", "NONONO", "WW", "HEYYEAH", "YAHHAY", "RAUMAA", "INTELLIGENCE",
@@ -3609,7 +3613,7 @@ def trips_fill_generator(seed):
         yield words3, pat, []
 
 
-def is_left_handed_generator():
+def is_left_handed_generator(seed):
     for d in product([1, 6], [2, 5], [3, 4]):
         for p in permutations(list(d)):
             yield list(p),
@@ -3677,7 +3681,7 @@ __subjects = ['yo', 'tú', 'él', 'ella', 'usted', 'nosotros', 'nosotras',
 __tenses = ['presente', 'pretérito', 'imperfecto', 'futuro']
 
 
-def conjugate_regular_generator():
+def conjugate_regular_generator(seed):
     for verbs in zip_longest(__ar, __er, __ir):
         for verb in verbs:
             if verb:  # != None
@@ -3743,7 +3747,7 @@ def colour_trio_generator(seed):
             items = rng.choice('ryb')
 
 
-def schmalz_generator():
+def schmalz_generator(seed):
     yield "Uncle Egg White and Obi-Wan Tsukenobi are the very best of the enterprising rear.",
     yield "Spread love everywhere you go. Let no one ever come to you without leaving happier.",
     yield "When you reach the end of your rope, tie a knot in it and hang on.",
@@ -3798,7 +3802,7 @@ def count_troikas_generator(seed):
         scale += 1
 
 
-def count_corners_generator(seed, slices=4000):
+def count_corners_generator(seed, slices=3000):
     rng = Random(seed)
     for n in islice(pyramid(3, 4, 3), slices):
         points = set()
@@ -3831,89 +3835,89 @@ testcases = [
     # ),
     (
         "arithmetic_progression",
-        arithmetic_progression_generator(fixed_seed),
+        arithmetic_progression_generator,
         "ace4b9a278f796dd09b2922f8b533de7747b7c0cda4f11bd067cc13133ba804b"
     ),
     (
         "count_overlapping_disks",
-        count_overlapping_disks_generator(fixed_seed),
+        count_overlapping_disks_generator,
         "a36b35b4312b28abdb6d9faa56889840bf8bcadb5c943a2dc96f066b215b84cf"
     ),
     # Removed from problem set November 26, 2021
     # (
     # "fractional_fit",
-    # fractional_fit_generator(fixed_seed),
+    # fractional_fit_generator,
     # "856627cc444098c9386367d5f250c0e2cddbf3ef0ecec3ba11"
     # ),
     (
         "scylla_or_charybdis",
-        scylla_or_charybdis_generator(fixed_seed),
+        scylla_or_charybdis_generator,
         "b1536ef2e3dcfbd98ae4b1bb054358953a45702bb6767afc2bce3a28a229c54a"
     ),
     (
         "fractran",
-        fractran_generator(fixed_seed),
+        fractran_generator,
         "5ef5b21286fe7565e53230868d4240d41224a4543122ec0d5df5158b4e795dc5"
     ),
     (
         "manhattan_skyline",
-        manhattan_skyline_generator(fixed_seed),
+        manhattan_skyline_generator,
         "cfea0db5924def2f2ecf66a69ee11a079b4d6a59f15edbd3130a2c81e2477991"
     ),
     (
         "bulgarian_solitaire",
-        bulgarian_solitaire_generator(fixed_seed),
+        bulgarian_solitaire_generator,
         "819172713ddd3d5a8e596b249284a52b851b3f78d6a468b1672d10991c6d92af"
     ),
     (
         "sum_of_distinct_cubes",
-        sum_of_distinct_cubes_generator(fixed_seed),
+        sum_of_distinct_cubes_generator,
         "d1ed5e8a0688116c7536b01804d09378a13559a0d6a9427ddf47e3dc45fbfb66"
     ),
     (
         "tukeys_ninthers",
-        tukeys_ninthers_generator(fixed_seed),
+        tukeys_ninthers_generator,
         "801d96631e1064d6bd8903f3e716bb397fa1c785877ee4e9031f0519ee5b59bb"
     ),
     (
         "optimal_crag_score",
-        optimal_crag_score_generator(fixed_seed),
+        optimal_crag_score_generator,
         "5cf0e2ae4582c041343a113fcd4cb413c27f44ee8f4fafc6b30e60a54482ff7d"
     ),
     (
         "count_dominators",
-        count_dominators_generator(fixed_seed),
+        count_dominators_generator,
         "80709f7af6ccc56e23033b1f5b0754e262de3d1f9f70716bbb528be3e5116062"
     ),
     # Removed from problem set December 9, 2021
     # (
     #  "forbidden_substrings",
-    #  forbidden_substrings_generator(),
+    #  forbidden_substrings_generator(seed),
     #  "6174fc0fd7c0c5b2a9bcb99a82799736ea3ab2f5f1525b8c10"
     # ),
     (
         "substitution_words",
-        substitution_words_generator(),
+        substitution_words_generator,
         "4cf3cd3ba0607db9ba11ec0e240391bc1e78ad62edb541d26025f8efa922cbb8"
     ),
     (
         "taxi_zum_zum",
-        taxi_zum_zum_generator(fixed_seed),
+        taxi_zum_zum_generator,
         "1612df18e6970e45150e741342232a413905b0e4cc84dd994ffde44a84b613f4"
     ),
     (
         "midnight",
-        midnight_generator(fixed_seed),
+        midnight_generator,
         "92890d7f13631c829d087322d0b3e6764b81063256c026ab3f9a00ae9372f963"
     ),
     (
         "crag_score",
-        crag_score_generator(),
+        crag_score_generator,
         "ea62d9694e079b948a8b622c8f6dfd2aeebddeebc59c57572163678a6bdedc1e"
     ),
     (
         "unscramble",
-        unscramble_generator(fixed_seed),
+        unscramble_generator,
         "de2b7b1ddb8bd0c74243635ed26cfebc41d2870be2ed469043de23a7eb2dd557"
     ),
     # Removed from problem set April 20, 2020
@@ -3924,33 +3928,33 @@ testcases = [
     # ),
     (
         "van_eck",
-        van_eck_generator(fixed_seed),
+        van_eck_generator,
         "2938012254caba60ec8e648da870e1456d2347ea0769b8accb3c4631566f740b"
     ),
     (
         "domino_cycle",
-        domino_cycle_generator(fixed_seed),
+        domino_cycle_generator,
         "63ad8f4f4cf4a1ee9f7949fb8be6c173aac5ecf19b998418fb4f8c3e9a9decda"
     ),
     # Removed from problem set August 10, 2021
     # (
     # "double_trouble",
-    #  double_trouble_generator(fixed_seed),
+    #  double_trouble_generator,
     # "49f103a7ad2c26d800d61e8645f967408a18c37cc6303a9dfc"
     # ),
     (
         "nearest_smaller",
-        nearest_smaller_generator(fixed_seed),
+        nearest_smaller_generator,
         "2406ed6b299d216019f22442d380270dff41e10fb3860276d265351b4dea08dd"
     ),
     (
         "collatzy_distance",
-        collatzy_distance_generator(fixed_seed),
+        collatzy_distance_generator,
         "ff638c3269c9418841d6a7f0ecf0fadb0ed02677f3b56078e09ede7ec0384f63"
     ),
     (
         "max_checkers_capture",
-        max_checkers_capture_generator(fixed_seed),
+        max_checkers_capture_generator,
         "1547f0eb0829ff5882178f480e8c5d24f016c5c1d95038b898f17c073c3913ee"
     ),
     # Removed from problem set April 20, 2020
@@ -3961,18 +3965,18 @@ testcases = [
     # ),
     (
         "count_growlers",
-        count_growlers_generator(fixed_seed),
+        count_growlers_generator,
         "3f96234a4b959581978facb1a8f44f732b5af745be4685fc963a6412a4d0932e"
     ),
     # Removed from problem set August 10, 2020
     # (
     #  "kempner",
-    #  kempner_generator(),
+    #  kempner_generator(seed),
     #  "dfbf6a28719818c747e2c8e888ff853c2862fa8d99683c0815"
     # ),
     (
         "words_with_letters",
-        words_with_letters_generator(),
+        words_with_letters_generator,
         "2bb1d006c2549038711d9d61b96d551865662872f58ffb58fe97de18f3b69124"
     ),
     # Removed from problem set April 20, 2020
@@ -3983,48 +3987,48 @@ testcases = [
     # ),
     (
         "line_with_most_points",
-        line_with_most_points_generator(fixed_seed),
+        line_with_most_points_generator,
         "9f94d2d0edd59893f0750ddeae816051baf6c71c9d1536049ed3b2a4f3888467"
     ),
     (
         "count_maximal_layers",
-        count_maximal_layers_generator(fixed_seed),
+        count_maximal_layers_generator,
         "950e939df6b497881a6a3dea3c2a92ac5362ff2aee2841801da38eb45867902c"
     ),
     # Removed from problem set October 29, 2021
     # (
     # "square_follows",
-    # square_follows_generator(fixed_seed),
+    # square_follows_generator,
     # "e571beecc69a7ac9235ba8911deef92b367e1badb9cff87f58"
     # ),
     (
         "extract_increasing",
-        extract_increasing_generator(fixed_seed),
+        extract_increasing_generator,
         "0de18680245264367ed256c32f0563e620c700771ac5f2cf976eafe3afe4f828"
     ),
     (
         "is_cyclops",
-        is_cyclops_generator(fixed_seed),
+        is_cyclops_generator,
         "48f88b82c6a22f4c51d22652f989909ffef8b98d28eb40cf57bd4a25050c853a"
     ),
     (
         "pyramid_blocks",
-        pyramid_blocks_generator(fixed_seed),
+        pyramid_blocks_generator,
         "3bb8f8af87869b58ada39ca72e33b084524d70896619f89d91847533b89021c7"
     ),
     (
         "autocorrect_word",
-        autocorrect_word_generator(),
+        autocorrect_word_generator,
         "93742a7a15938b9184bf93cc493699b49ff8bfe07529e42d581985b23106ac47"
     ),
     (
         "remove_after_kth",
-        remove_after_kth_generator(fixed_seed),
+        remove_after_kth_generator,
         "3b89af0dce7e41c2fc6a851e4a35bb76f8845c5f6929ba6ade97c58d92fc3c07"
     ),
     (
         "seven_zero",
-        seven_zero_generator(fixed_seed),
+        seven_zero_generator,
         "907ec1aed8dde0ef69efc30a876af3adda28787e8c3cf67e8c0c47fa858ee9bc"
     ),
     # Removed from problem set December 10, 2020
@@ -4035,7 +4039,7 @@ testcases = [
     # ),
     (
         "sum_of_two_squares",
-        sum_of_two_squares_generator(fixed_seed),
+        sum_of_two_squares_generator,
         "93086670c2c63510741e58329a83fe42cc469762ca26c74130bbdf120f52e6f8"
     ),
     # Removed from problem set April 20, 2020
@@ -4046,32 +4050,32 @@ testcases = [
     # ),
     (
         "reverse_vowels",
-        schmalz_generator(),
+        schmalz_generator,
         "db4e408209986ba0ebb9b4ebbd1b4dc170d6cafd3cfc936e9fdc218b620ae57c"
     ),
     (
         "riffle",
-        riffle_generator(fixed_seed),
+        riffle_generator,
         "3f5df69d458a0f72fee992fda34c18139891dcc3a63d2fe3725c600767f1da48"
     ),
     (
         "ztalloc",
-        ztalloc_generator(fixed_seed),
+        ztalloc_generator,
         "b1c4615a2b3b086a26dd8c5211f065c8227d9c138dd9bd51422c177f4ca03b14"
     ),
     (
         "losing_trick_count",
-        losing_trick_count_generator(fixed_seed),
+        losing_trick_count_generator,
         "c6244de2ad61ce0665114dd006b9b7d2731465d0c28780fb54fb1673d31802cf"
     ),
     (
         "postfix_evaluate",
-        postfix_evaluate_generator(fixed_seed),
+        postfix_evaluate_generator,
         "47fb1c90b9198315bd27fb26ab2a7b3ca99d8e94e05f12c93d9594aa68089dd6"
     ),
     (
         "three_summers",
-        three_summers_generator(fixed_seed),
+        three_summers_generator,
         "94e6dc029d76368aae6979a3abbc18be5c1aff83ff8c753b65c47ec30e3cb89c"
     ),
     # Removed from problem set April 20, 2020
@@ -4089,53 +4093,53 @@ testcases = [
     # Removed from problem set April 20, 2020
     # (
     # "tribonacci",
-    # tribonacci_generator(),
+    # tribonacci_generator(seed),
     # "ac64825e938d5a3104ea4662b216285f05a071cde8fd82c6fd"
     # ),
     (
         "count_squares",
-        count_squares_generator(fixed_seed),
+        count_squares_generator,
         "cb1021c7a7e1cea05e4eb7b861df761e0d9fe94c03297f2b937726aa2f14f4d6"
     ),
     (
         "count_carries",
-        count_carries_generator(fixed_seed),
+        count_carries_generator,
         "13888e39b86ee15b225635228719e51f229d73aa08ff57e764b69364ebd862e5"
     ),
     (
         "lattice_paths",
-        lattice_paths_generator(fixed_seed),
+        lattice_paths_generator,
         "5aab78160181125a6944933dbe70acde133ae2a739798a0ce7abfb9596a28436"
     ),
     # Removed from problem set September 16, 2022
     # (
     #  "pancake_scramble",
-    #  pancake_scramble_generator(fixed_seed),
+    #  pancake_scramble_generator,
     #  "98fb3c9e30908ea6c2654d64d3c68ca2538927be529d75ddfe"
     # ),
     (
         "only_odd_digits",
-        only_odd_digits_generator(fixed_seed),
+        only_odd_digits_generator,
         "7775acef5b1e64bb996c997e4a0942d52cadde64987af514b2decda660f84792"
     ),
     (
         "squares_intersect",
-        squares_intersect_generator(fixed_seed),
+        squares_intersect_generator,
         "fb5f90845deddea1350fa81af5a228b18a2f4922f21ce36f725d54329b89c58f"
     ),
     (
         "rooks_with_friends",
-        rooks_with_friends_generator(fixed_seed),
+        rooks_with_friends_generator,
         "865f129cec84fdf07bad9e7fcdfa85541746c58402871ae89e2f3f62dfce4abe"
     ),
     (
         "safe_squares_rooks",
-        safe_squares_generator(fixed_seed),
+        safe_squares_generator,
         "c5c1536e0b1eebc92f5def4f1d7be4116a8a0cb48d754f2234463fc0d8a8bbf7"
     ),
     (
         "safe_squares_bishops",
-        safe_squares_generator(fixed_seed),
+        safe_squares_generator,
         "7dc0f6070c0d360dbbb8a9fa35f1c205c4dc7319f07dd1780b31280dcdce8da4"
     ),
     # Removed from problem set April 20, 2020
@@ -4152,7 +4156,7 @@ testcases = [
     # ),
     (
         "count_and_say",
-        count_and_say_generator(fixed_seed),
+        count_and_say_generator,
         "c5f25cecc498f5cba0f944bb7a8c47be7d78a5cac4797d9d282ebba489482b18"
     ),
     # Removed from problem set April 20, 2020
@@ -4163,12 +4167,12 @@ testcases = [
     # ),
     (
         "first_preceded_by_smaller",
-        first_preceded_by_smaller_generator(fixed_seed),
+        first_preceded_by_smaller_generator,
         "7d123860240c7b8614de16f232213a81568ffd167b7cb4e8de70d6fc943dc240"
     ),
     (
         "words_with_given_shape",
-        words_with_given_shape_generator(),
+        words_with_given_shape_generator,
         "9a0e08fcee10575eb6ef12de7bc5820b82b2383822beb69d2782bdace6b1894c"
     ),
     # Removed from problem set August 10, 2020
@@ -4179,23 +4183,23 @@ testcases = [
     # ),
     (
         "fibonacci_sum",
-        fibonacci_sum_generator(fixed_seed),
+        fibonacci_sum_generator,
         "e7058a191e5dbc3a8f69f302fa5f6180e8b4d4c688f6028792576010dcb3c16b"
     ),
     # Removed from the problem set August 10, 2021
     # (
     #  "factoring_factorial",
-    #  factoring_factorial_generator(fixed_seed),
+    #  factoring_factorial_generator,
     #  "be5d5249b396c259bde5338de73ae4d29831314d6c0fb9e369"
     #  ),
     (
         "bridge_hand_shorthand",
-        bridge_hand_generator(fixed_seed),
+        bridge_hand_generator,
         "c6beb2fd767be441a88b1869f7cdcbae9a6b232c07165e790483bf1fe57ac699"
     ),
     (
         "milton_work_point_count",
-        milton_work_point_count_generator(fixed_seed),
+        milton_work_point_count_generator,
         "3ff47252837a5ba8078c64e07791759067a37f940270915bf423e550635e615a"
     ),
     # Removed from problem set April 20, 2020
@@ -4206,17 +4210,17 @@ testcases = [
     # ),
     (
         "count_divisibles_in_range",
-        count_divisibles_in_range_generator(fixed_seed),
+        count_divisibles_in_range_generator,
         "2a260582841eb49f1ac4ae871e844a9551f2f6ad8702b1989eb765ad53ee48be"
     ),
     (
         "sort_by_digit_count",
-        sort_by_digit_count_generator(fixed_seed),
+        sort_by_digit_count_generator,
         "089d0fe98f13d333f85969a574dec245e433a9e30610a4d9255bb39960aa173f"
     ),
     (
         "is_perfect_power",
-        is_perfect_power_generator(fixed_seed),
+        is_perfect_power_generator,
         "36d9afbc5b7bb20be5f356ffb674f6bbe7be65a8e8dd697ef5cb79a8e9a7cc7d"
     ),
     # Removed from problem set April 20, 2020
@@ -4233,61 +4237,61 @@ testcases = [
     # ),
     (
         "frequency_sort",
-        frequency_sort_generator(fixed_seed),
+        frequency_sort_generator,
         "7cf98bb630901b746d4765edaaea5d5d2ea011e1271c7214111a52c9725fe8fd"
     ),
     # Removed from problem set September 14, 2022
     # (
     #  "count_consecutive_summers",
-    #  count_consecutive_summers_generator(),
+    #  count_consecutive_summers_generator(seed),
     #  "3ade63a194b40ff5aa1b53642eee754d30f2ab48ef77330540"
     # ),
     (
         "brangelina",
-        brangelina_generator(),
+        brangelina_generator,
         "f864cef7d1d71768b2efa0334e963d517290440401d98a8e85e71134a7e12c1f"
     ),
     (
         "balanced_ternary",
-        balanced_ternary_generator(fixed_seed),
+        balanced_ternary_generator,
         "0bfc0a405796217f5e5c11dec59016f14f031e3f2ca671597399b10c5d5120d8"
     ),
     (
         "josephus",
-        josephus_generator(fixed_seed),
+        josephus_generator,
         "6c39a1339f51ec7b8a29cf0a27636b6ba6be7527b75e89bac9e52ebc9ce9becf"
     ),
     # Removed from problem set December 17, 2020
     # (
     #  "aliquot_sequence",
-    #  aliquot_sequence_generator(),
+    #  aliquot_sequence_generator(seed),
     #  "17f910bff400bb0305e94c79e27fda857c5723385d73f2ccc4"
     # ),
     # Removed from problem set April 20, 2020
     # (
     # "all_cyclic_shifts",
-    # all_cyclic_shifts_generator(),
+    # all_cyclic_shifts_generator(seed),
     # "1d06f1ef0547d8441800f2dc19aa430396a0f2e8bc414e6775"
     # ),
     (
         "fibonacci_word",
-        fibonacci_word_generator(fixed_seed),
+        fibonacci_word_generator,
         "95864b4e4dad5eb33d6004cb0f8092428629d4b51608f78abb1b0229525ed1e1"
     ),
     # Removed from problem set September 1, 2021
     # (
     # "create_zigzag",
-    # create_zigzag_generator(fixed_seed),
+    # create_zigzag_generator,
     # "6495896d5e3f0ed9c7f924b9f8c5c99a78700b1a5a1a6f8f98"
     # ),
     (
         "calkin_wilf",
-        calkin_wilf_generator(fixed_seed),
+        calkin_wilf_generator,
         "fd39bebe2f409e102aa1ca8de00d520ad8d3ec9f1af9a1ad0ddcc0c4721c05d5"
     ),
     (
         "can_balance",
-        can_balance_generator(fixed_seed),
+        can_balance_generator,
         "14b7ed0b83e01874f5dd13aaad48289fe3fc9930862418b9e463c659f46f1f9a"
     ),
     # Removed from problem set April 20, 2020
@@ -4298,34 +4302,34 @@ testcases = [
     # ),
     (
         "bulls_and_cows",
-        bulls_and_cows_generator(fixed_seed),
+        bulls_and_cows_generator,
         "e00ca4cd1996a51ef5cd5588a7facd0a00f2e3f3946d5f4e96e70b65ba261ba0"
     ),
     # Removed from problem set October 21, 2021
     # (
     # "recaman",
-    # recaman_generator(),
+    # recaman_generator(seed),
     # "05f94fe36b66db7c2164895d2b1dc5668fa35696cd6add7bf3"
     # ),
     (
         "collapse_intervals",
-        collapse_intervals_generator(fixed_seed),
+        collapse_intervals_generator,
         "674bb82e2076379450296d830efa0337b4a3f9068a06ea0795d79662ea4f123f"
     ),
     (
         "expand_intervals",
-        expand_intervals_generator(fixed_seed),
+        expand_intervals_generator,
         "9a5a583c154073b7b308135aec7d8861bf527dff7e8b9a770e182ce166b6102d"
     ),
     (
         "reverse_ascending_sublists",
-        reverse_ascending_sublists_generator(fixed_seed),
+        reverse_ascending_sublists_generator,
         "099f999f059490e61c57e0845388f76f5dcbeda16be6aa422640750dcd4081a0"
     ),
     # Removed from problem set September 1, 2021
     # (
     # "reverse_reversed",
-    # reverse_reversed_generator(fixed_seed),
+    # reverse_reversed_generator,
     # "d111344cdd8503a913181ffc7e46551b62a3dc2558a4b0fcbe"
     # ),
     # Removed from problem set December 26, 2020
@@ -4342,28 +4346,28 @@ testcases = [
     # ),
     (
         "ryerson_letter_grade",
-        ryerson_letter_grade_generator(),
+        ryerson_letter_grade_generator,
         "b9b86a019c4502be825b0ed52c187f9a29106a08fbbb1ffcc67d483544a87e2f"
     ),
     (
         "is_ascending",
-        is_ascending_generator(fixed_seed),
+        is_ascending_generator,
         "a58079cfe1caa6768c9b9a2afb5f6ec3cf3e55526ab06578af3885213c3b8648"
     ),
     # Removed from problem set December 24, 2020
     # (
     #  "double_until_all_digits",
-    #  double_until_all_digits_generator(),
+    #  double_until_all_digits_generator(seed),
     #  "7c4ba46364765cb0679f609d428bbbae8ba0df440b001c4162"
     # ),
     (
         "give_change",
-        give_change_generator(fixed_seed),
+        give_change_generator,
         "5c38f097ab4b39598124d3983a58a10301e012ee156ac05f1a3ad8b84c53a59e"
     ),
     (
         "winning_card",
-        winning_card_generator(fixed_seed),
+        winning_card_generator,
         "fefd8984c1559dfde64a3ecb0d3176f26e0cb4acc6ccc6f7ea584dadb45280c0"
     ),
     # Removed from problem set April 20, 2020
@@ -4374,23 +4378,23 @@ testcases = [
     # ),
     (
         "bridge_hand_shape",
-        bridge_hand_generator(fixed_seed),
+        bridge_hand_generator,
         "29e963cc7715f89d9a7f133e2a620702502f8eb5583d119dda6d58be58266102"
     ),
     (
         "hand_shape_distribution",
-        hand_shape_distribution_generator(fixed_seed),
+        hand_shape_distribution_generator,
         "b9780dbc6fbe7a317c1e3b7a88acc599a85e5baaac692cb6ccc117a272ccd06b"
     ),
     # Removed from problem set April 20, 2020
     # (
     # "sort_by_typing_handedness",
-    # sort_by_typing_handedness_generator(),
+    # sort_by_typing_handedness_generator(seed),
     # "919973a60cc556525aa38082a607f9981e83e5a58944d084af"
     # ),
     (
         "possible_words",
-        possible_words_generator(fixed_seed),
+        possible_words_generator,
         "20d9ac2f97454ae01d482447057d4f2b2b5c001feefd781f7e02a532a694dbfb"
     ),
 
@@ -4398,29 +4402,29 @@ testcases = [
 
     (
         "cookie",
-        cookie_generator(fixed_seed),
+        cookie_generator,
         "e805e6415e06998231e26f5b5949ffae9f06782a5397573c8b6ff6c6358ccf61"
     ),
     (
         "eliminate_neighbours",
-        eliminate_neighbours_generator(fixed_seed),
+        eliminate_neighbours_generator,
         "24333594d079471cf6696e8b660c11fc586029a178a9879c2349d154635c6aff"
     ),
     (
         "counting_series",
-        counting_series_generator(fixed_seed),
+        counting_series_generator,
         "cc67f4cef01c34c136a902ffea23a9df4e21b1991c491964bf89dc940067f569"
     ),
     # Removed from problem set December 9, 2021
     # (
     # "is_zigzag",
-    # is_zigzag_generator(fixed_seed),
+    # is_zigzag_generator,
     # "fe5e03401a32bc5ca989759708d10a7f9d2cbd9e4821566b91"
     # ),
     # Removed from problem set October 3, 2021
     # (
     # "next_zigzag",
-    # next_zigzag_generator(fixed_seed),
+    # next_zigzag_generator,
     # "52d66db24fc831dd08657f36e2e7b49ab788e6c86e8a25d3c5"
     # ),
     # Removed from problem set December 17, 2020
@@ -4431,37 +4435,37 @@ testcases = [
     # ),
     (
         "wythoff_array",
-        wythoff_array_generator(fixed_seed),
+        wythoff_array_generator,
         "c334655a56811e0a0a3e47b2492215b13839c6fe60cfd8e9a65c784bcf3bb76d"
     ),
     (
         "hourglass_flips",
-        hourglass_flips_generator(fixed_seed),
+        hourglass_flips_generator,
         "d80394444051437c406c3ec73bd58d15c47d7a58c20dab5351af07607fb8ac3c"
     ),
     (
         "knight_jump",
-        knight_jump_generator(fixed_seed),
+        knight_jump_generator,
         "6a771380844685c2356a8a1eaf97376132aeb6f112bd6f68367a499579ae143a"
     ),
     (
         "frog_collision_time",
-        frog_collision_time_generator(fixed_seed),
+        frog_collision_time_generator,
         "2767a8f92c414656971210a1beeb83f20ad197d445897aff1076c7160574714f"
     ),
     (
         "spread_the_coins",
-        spread_the_coins_generator(fixed_seed),
+        spread_the_coins_generator,
         "5a1629f90f295d59d177cb99ea2b24e2c257f97b673ff77a67e286ae03b7279e"
     ),
     (
         "group_and_skip",
-        group_and_skip_generator(fixed_seed),
+        group_and_skip_generator,
         "d08b0f53bff20bc4904c534a41ca6a3c7e28519dcf9185553f3ad5e88d820bba"
     ),
     (
         "nearest_polygonal_number",
-        nearest_polygonal_number_generator(fixed_seed),
+        nearest_polygonal_number_generator,
         "3f4d94c36ae95bf184c292a197d42171344586d464c2e111028bda005f2286f6"
     ),
     # Removed from problem set July 8, 2020
@@ -4472,79 +4476,79 @@ testcases = [
     # ),
     (
         "subtract_square",
-        subtract_square_generator(fixed_seed),
+        subtract_square_generator,
         "4eedead71c2894be2e31e19bcf47a5a0786d70f6249a0274f2c2f14370b35990"
     ),
     # Removed from problem set December 9, 2021
     # (
     # "perimeter_limit_split",
-    # perimeter_limit_split_generator(fixed_seed),
+    # perimeter_limit_split_generator,
     # "151d96f12b67f953fae52a539f669a46b734c537ed19e3ad7b"
     # ),
     (
         "duplicate_digit_bonus",
-        duplicate_digit_bonus_generator(fixed_seed),
+        duplicate_digit_bonus_generator,
         "7ad86f9210f78edbc645b2f9373f8f3f2cad9d2eaaa08fc0887c9e686c0b1fd5"
     ),
     # Removed from problem set September 30, 2021
     # (
     #  "count_word_dominators",
-    #  count_word_dominators_generator(fixed_seed),
+    #  count_word_dominators_generator,
     #  "ade953572b3bf2540d892ae5d6c8912cd691305a494e3d009b"
     # ),
     (
         "hitting_integer_powers",
-        hitting_integer_powers_generator(fixed_seed),
+        hitting_integer_powers_generator,
         "0d432b33fafce7477ca095a96d427fdddbc49fbe8e771d4f3d7ae87d51453559"
     ),
     (
         "permutation_cycles",
-        permutation_cycles_generator(fixed_seed),
+        permutation_cycles_generator,
         "995c65239a22ee31d77c32a7269f8848b694461e5b18c8d5c1f6ea37d7d19a85"
     ),
     (
         "word_height",
-        word_height_generator(fixed_seed),
+        word_height_generator,
         "b5454c6d98c944459ad0509a5648643feab90152f189922f36cba4763ec04e9a"
     ),
     (
         "mcculloch",
-        mcculloch_generator(fixed_seed),
+        mcculloch_generator,
         "43549317567a9c4fdd7acaa31c7684daef2c4f3b934ed63a3fe2130a0d8325b5"
     ),
     (
         "trips_fill",
-        trips_fill_generator(fixed_seed),
+        trips_fill_generator,
         "de71d54a6b5ef0aafca5fb50a6db63afb7a8744f434cc2f2a32cc2c274e8a037"
     ),
     (
         "is_left_handed",
-        is_left_handed_generator(),
+        is_left_handed_generator,
         "5e8e432654b8352e1d293f1013c2832a029eadacb65ded537e78f0a3f48d2878"
     ),
     (
         "brussels_choice_step",
-        brussels_choice_step_generator(fixed_seed),
+        brussels_choice_step_generator,
         "30bf08918175513337d24274aa783820c4442617e8aa78969f0dcae32ae2206a"
     ),
     (
         "balanced_centrifuge",
-        balanced_centrifuge_generator(fixed_seed),
+        balanced_centrifuge_generator,
         "2c81e311e4547c8f797955107aa6d2ae9d862c15ca61eaaad0cf364776bba8b8"
     ),
     (
         "lunar_multiply",
-        lunar_multiply_generator(fixed_seed),
+        lunar_multiply_generator,
         "411dfa9dc8637871c4a257df54043301308ec7c3c09ab8ac3ca2b54561256e14"
     ),
     (
         "oware_move",
-        oware_move_generator(fixed_seed),
+        oware_move_generator,
         "7bb8b1b98cc604baf4e71970520efacca01698de168f20628dda2aa48dd8ea5e"
     ),
     (
         "conjugate_regular",
-        conjugate_regular_generator(),
+        conjugate_regular_generator,
         "132c4df527db578df034041f0cfd63eda6c98f452b9d8eb460b999558726c3ac"
     ),
 
@@ -4552,78 +4556,78 @@ testcases = [
 
     (
         "reach_corner",
-        reach_corner_generator(fixed_seed),
+        reach_corner_generator,
         "0255ef6a81a2989825f1070f5b44ab9c0ccadcb796e34bffd05b76deb5a5d07d"
     ),
     (
         "bulgarian_cycle",
-        bulgarian_cycle_generator(fixed_seed),
+        bulgarian_cycle_generator,
         "59be2b964195790855c6028c7296c9c894e90420677d3f065ac2fe5f92a477c7"
     ),
     (
         "prominences",
-        prominences_generator(fixed_seed),
+        prominences_generator,
         "3287e282781effcbb0bb54f99a69f79b3a06c420e2639539e5195e6b1465ea41"
     ),
     (
         "leibniz",
-        leibniz_generator(fixed_seed),
+        leibniz_generator,
         "ef3258160b68e07f3b5af2d6560d68221be321c040293d4c5493f1e6ee7e8a48"
     ),
     (
         "candy_share",
-        candy_share_generator(fixed_seed),
+        candy_share_generator,
         "5c83954002c783e3e283cf6d9a0b8500e179f15ba6a31eb4be4db1258daa4230"
     ),
     (
         "reverse_110",
-        reverse_110_generator(fixed_seed),
+        reverse_110_generator,
         "6ea230b01e444d4000336b51a2fffa43136fb8eba59e4124f2f73c137cb4502c"
     ),
     (
         "colour_trio",
-        colour_trio_generator(fixed_seed),
+        colour_trio_generator,
         "d06b021c2742fd6e29c0617c705c3a17845a9eae5b028ad5bf2fa58718fbdbd6"
     ),
     (
         "wordomino",
-        wordomino_generator(),
+        wordomino_generator,
         "5b081cc381ec8ddaa382d8450def04b53255ee62b67356f690a7eafa9efb98a5"
     ),
     # Removed from problem set April 18, 2022
     # (
     # "recaman_item",
-    # recaman_item_generator(),
+    # recaman_item_generator(seed),
     # "e36c779db6a77037f4e0c11363e4377a1dfe773cb0c7af8617"
     # ),
     (
         "count_troikas",
-        count_troikas_generator(fixed_seed),
+        count_troikas_generator,
         "9d593bfe53a18d6a6e8e355a27fa5c82efb999cf2198e60e794e3f51e16c85df"
     ),
     (
         "count_corners",
-        count_corners_generator(fixed_seed),
-        "d48250dd2102d522025cc1f7ae8db9ea645c274eb366ab0c646f3cf8c0655a27"
+        count_corners_generator,
+        "a0e7a909c954993466ab03738d160e01cd2293b8b98ceefbf8e2245ec0258454"
     ),
     (
         "cut_corners",
-        count_corners_generator(fixed_seed, 1500),
-        "19cf15c0b8970c57145f2fdc4c4cad646a30d56c74c53857145310e2dddf6010"
+        count_corners_generator,
+        "c467decbf7edc8c6f870ace2e158827ecc6677effd81fa4c6cd2eb34488c8f6c"
     ),
     (
         "domino_tile",
-        domino_tile_generator(fixed_seed),
+        domino_tile_generator,
         "d995b963593be92f0e3068ae9f2286159b24d03a49efb416a8c288c95c93c6c2"
     ),
     (
         "collect_numbers",
-        collect_numbers_generator(fixed_seed),
+        collect_numbers_generator,
         "99afb2b51423f6223f4b51c09914f81cf6a6d12ad536e8b08bf51309c80ca798"
     ),
     (
         "cut_into_squares",
-        cut_into_squares_generator(fixed_seed),
+        cut_into_squares_generator,
         "fb698d6bcd2422488b6ab1acb491740e4a56f0c20e61f6ccd4f69d65f0371529"
     ),
 
@@ -4631,380 +4635,380 @@ testcases = [
 
     (
         "laser_aliens",
-        laser_aliens_generator(fixed_seed),
+        laser_aliens_generator,
         "64186671716042ed9238ea75d0104cbb932a0e37e0275303f83d953a95534693"
     ),
     (
         "stepping_stones",
-        stepping_stones_generator(fixed_seed),
+        stepping_stones_generator,
         "c4ac30082fa34bc0f947fc1ddf3964c92dce0acac4e7a945dec84237124d28a4"
     ),
     (
         "verify_betweenness",
-        verify_betweenness_generator(fixed_seed),
+        verify_betweenness_generator,
         "16b9176a15ffd0a8da7cbd5a125627fa68b6eca4ad01523515b95b0c8092f342"
     ),
     (
         "illuminate_all",
-        illuminate_all_generator(fixed_seed),
+        illuminate_all_generator,
         "2b21126bfe7cc7abbfd45d6a9da7d2899a7db69bce0ffac0958d33fce3dcc7e1"
     ),
     (
         "best_clubs",
-        best_clubs_generator(fixed_seed),
+        best_clubs_generator,
         "cf82279e4ea8b4e1bd79d62c00243a210076bfb3d59dff4b0516520ff77e02f4"
     ),
     (
         "both_ways",
-        both_ways_generator(fixed_seed),
+        both_ways_generator,
         "9bfb5ef40a0c6347cd8594aa443a10462194792cd36089acae5a00071bbeb534"
     ),
     (
         "staircase",
-        staircase_generator(fixed_seed),
+        staircase_generator,
         "20ceca8a5fea22f23dfba0b567555aeb5a8dc4553f03bf34b7fbb121de9d5f9e"
     ),
     (
         "ordinal_transform",
-        ordinal_transform_generator(fixed_seed),
+        ordinal_transform_generator,
         "de7f04aa8f6ea61b43a89bf9cce0dc594f856d7fdc7963ba12273dc09eb47568"
     ),
     (
         "liang_hyphenation",
-        liang_hyphenation_generator(fixed_seed),
+        liang_hyphenation_generator,
         "4feb99e374834a18f50671da2b86ed65cd52143d60f59a7afe5ca2f849a01130"
     ),
     (
         "othello_moves",
-        othello_moves_generator(fixed_seed),
+        othello_moves_generator,
         "27e5957347ee99a7bd9d9925926bf6c96698c80229a2fdc7df76a42325edc47f"
     ),
     (
         "count_morse",
-        count_morse_generator(fixed_seed),
+        count_morse_generator,
         "f3db0082e241aa3c398d6da6597ec1e0f3a65a3bba71e31929194b5a694e4400"
     ),
     (
         "count_sevens",
-        count_sevens_generator(fixed_seed),
+        count_sevens_generator,
         "c056bb61e603b5e66c1772fa72178e54e42441176b13b7ef387567313a79e81a"
     ),
     (
         "count_deadwood",
-        count_deadwood_generator(fixed_seed),
+        count_deadwood_generator,
         "dd44068ef82650c1919652ddc808ad9798ece75f1196305a3a9e3a006bf47f6e"
     ),
     (
         "addition_chain",
-        addition_chain_generator(),
+        addition_chain_generator,
         "a2c9dfa8a7598ce1d2bd607ec8b2320b58257af7f185b6430d67e896014b30d2"
     ),
 
     # Additional Python problems, created starting in 2023.
     (
         "queen_captures_all",
-        queen_captures_all_generator(fixed_seed),
+        queen_captures_all_generator,
         "d3eecf7c5a9907d43e07bc74ad3bb8b5c754cd84298cd6c8a037d26570c1ce45"
     ),
     (
         "is_chess_960",
-        is_chess_960_generator(fixed_seed),
+        is_chess_960_generator,
         "4d9b0e6c631904cf993e4736fba5c0a5bd5fd87001468f36622fb316fd1d1827"
     ),
     # Removed from problem set June 10, 2023
     # (
     #  "soundex",
-    #  soundex_generator(fixed_seed),
+    #  soundex_generator,
     #  "8569238f186e3c9fb947bfcebaa57f3d48d9a9a8727e94a4176a04f49ebc53fe"
     # ),
     (
         "sum_of_consecutive_squares",
-        sum_of_consecutive_squares_generator(fixed_seed),
+        sum_of_consecutive_squares_generator,
         "be57860970677e4893ad158413f08c747210e0d893ebfaaf7ff2d0d22f487a6c"
     ),
     (
         "topswops",
-        topswops_generator(fixed_seed),
+        topswops_generator,
         "7829077541c4e84225ee30e742da1296d6c0225555736621eb5259769ebb2704"
     ),
     (
         "costas_array",
-        costas_array_generator(fixed_seed),
+        costas_array_generator,
         "6c9c0cfc7444d56bc21418d6776512e06da634998ed3012849e1b0bba048d221"
     ),
     (
         "mian_chowla",
-        mian_chowla_generator(),
+        mian_chowla_generator,
         "fd77ebaf2b8835e626ff9e25a1d757bca6b7186af3d6cf925113b1732e92e392"
     ),
     (
         "lindenmayer",
-        lindenmayer_generator(fixed_seed),
+        lindenmayer_generator,
         "7c9f332799d297bdbff7b3a3222285356f2435edc70ccacc17dd9856bc0df830"
     ),
     (
         "word_board",
-        word_board_generator(fixed_seed),
+        word_board_generator,
         "875a9c2a17d746676aea8c376ea7d82cf729abb8799d3200fd6afaa7f1c02a4a"
     ),
     (
         "bowling_score",
-        bowling_score_generator(fixed_seed),
+        bowling_score_generator,
         "336d1ceb26198d467fddcdc21fa36c0995d8d5fa10985b3281d3f0b90cd768bb"
     ),
     (
         "knight_survival",
-        knight_survival_generator(fixed_seed),
+        knight_survival_generator,
         "0c1a661f8c2414a0945139d9c25aef4502927c71434a84b344724d609e41c1a8"
     ),
     (
         "accumulate_dice",
-        accumulate_dice_generator(fixed_seed),
+        accumulate_dice_generator,
         "0807db5f5be2ccf6dfc4c2ce8cf0e9e9a123ea2fc658a085bea1d6a563d22faa"
     ),
     (
         "largest_ones_square",
-        largest_ones_square_generator(fixed_seed),
+        largest_ones_square_generator,
         "b1d5012a603e85405d5148203940811110a150066243afc742aad3eab6ab5a4c"
     ),
     (
         "count_odd_sum_sublists",
-        count_odd_sum_sublists_generator(fixed_seed),
+        count_odd_sum_sublists_generator,
         "d3bcb659e3925df3b243b0c26889a9dc8bdc45221b0650c3c109a8461f6e9340"
     ),
     (
         "multiplicative_persistence",
-        multiplicative_persistence_generator(fixed_seed),
+        multiplicative_persistence_generator,
         "9113edadf34a5c6f66c9dae8fa101e90a64754fff952922fbb0ee70538b34415"
     ),
     (
         "bus_travel",
-        bus_travel_generator(fixed_seed),
+        bus_travel_generator,
         "ec65407429c27a358eee332724a024cdae1a71dda4706a83dc7f77df4ea6fbab"
     ),
     (
         "has_majority",
-        has_majority_generator(fixed_seed),
+        has_majority_generator,
         "e8578d6ff24dc3a2532e247e5d95f1730871c71e26c7a0e15837a6ba5d69e8de"
     ),
     (
         "card_row_game",
-        card_row_game_generator(fixed_seed),
+        card_row_game_generator,
         "698fc8231b8cd745cb3223c986eec39f32a03426059971d6466ee9a72fe01a0c"
     ),
     (
         "smetana_interpreter",
-        smetana_interpreter_generator(fixed_seed),
+        smetana_interpreter_generator,
         "46a70fa3ccff41c5cd08cf247513228a54113e4ca54ab18c5b4ec57a60c159cc"
     ),
     (
         "stalin_sort",
-        stalin_sort_generator(fixed_seed),
+        stalin_sort_generator,
         "ee869e50c9b9def412fadb0d142a8e601d9d550921d04a1736e3a99b98a8deba"
     ),
     (
         "insertion_sort_swaps",
-        stalin_sort_generator(fixed_seed),
+        stalin_sort_generator,
         "1c863b25d97baaaee165ee9a07e26b09ee6575634d5180a413836a14e6132d3b"
     ),
     (
         "optimal_blackjack",
-        optimal_blackjack_generator(fixed_seed),
+        optimal_blackjack_generator,
         "205d163c94fb506e862b6b38b458cafb2659cb0ba2fcf9c53a507c1f1ad930e1"
     ),
     (
         "blocking_pawns",
-        blocking_pawns_generator(fixed_seed),
+        blocking_pawns_generator,
         "3d08794bf4533c633371fe69998e177660c6f5707241b3006d05bef2a2a524c7"
     ),
     (
         "forbidden_digit",
-        forbidden_digit_generator(fixed_seed),
+        forbidden_digit_generator,
         "6b39e16384361b0f4f2a6b026ac1b71c24d8ffc87317d9afd375b25a15c3af23"
     ),
     (
         "break_bad",
-        break_bad_generator(fixed_seed),
+        break_bad_generator,
         "124006d47514ba14d9ef488020db56cefdc97fc79515b3c45e2b298ddd8eb2d1"
     ),
     (
         "keypad_words",
-        keypad_words_generator(fixed_seed),
+        keypad_words_generator,
         "3298e017820c3af9d0e3252b0b849bd7e5d96e45519ce9b748f9a324e25b5132"
     ),
     (
         "abacaba",
-        abacaba_generator(fixed_seed),
+        abacaba_generator,
         "ea34964bd4c72b543da28e9d7044acd24423c297fdd6465314d6b5d04ea80e67"
     ),
     (
         "stern_brocot",
-        stern_brocot_generator(fixed_seed),
+        stern_brocot_generator,
         "9fa761f803fdf9a7c0359611cd0a62e91445e23e3f9754d5f746e5f787576a06"
     ),
     (
         "discrete_rounding",
-        discrete_rounding_generator(),
+        discrete_rounding_generator,
         "e8683699e3667c869320bc9e772206866c64fff5a4d34374fa9686b2b4ede827"
     ),
     (
         "mu_torere_moves",
-        mu_torere_moves_generator(fixed_seed),
+        mu_torere_moves_generator,
         "a3a4ce73fcaad2dcc182c8c94181e817d0bebb47dabe566a39383e1f5ae45b16"
     ),
     (
         "count_palindromes",
-        count_palindromes_generator(fixed_seed),
+        count_palindromes_generator,
         "d169a14f48d28e5ec4ae28a03a2925d811abee9c1ef6f4472e156ff84f7e8980"
     ),
     (
         "shotgun",
-        shotgun_generator(fixed_seed),
+        shotgun_generator,
         "0f203942549b6168cdc63cad802601252655a39e098fab2d396f52c07358cd80"
     ),
     (
         "langford_violations",
-        langford_violations_generator(fixed_seed),
+        langford_violations_generator,
         "0bfac84d1229eee67f2b0056efa5121fc7b65618b33aa28504013e4465c6d6b3"
     ),
     (
         "hofstadter_figure_figure",
-        hofstadter_figure_figure_generator(),
+        hofstadter_figure_figure_generator,
         "c2250ce763119b3bade3a84b3afb98915b7be968e4f6c25c40d7df88a21122c9"
     ),
     (
         "kimberling_expulsion",
-        kimberling_expulsion_generator(fixed_seed),
+        kimberling_expulsion_generator,
         "48771e32d9ca5633aa8185357a15ab815706e0fcb91d5ba0b4302a38530a1ba0"
     ),
     (
         "repetition_resistant",
-        repetition_resistant_generator(),
+        repetition_resistant_generator,
         "d7f292d22b9b223aabc3b3e8f9a7c512d082474f379408f69b755f380308622e"
     ),
     (
         "tog_comparison",
-        tog_comparison_generator(fixed_seed),
+        tog_comparison_generator,
         "f55e23dcfc75636d3aa85e525e7b3132a1f7ae2e4c412adc01bc8be93adcada3"
     ),
     (
         "trip_plan",
-        trip_plan_generator(fixed_seed),
+        trip_plan_generator,
         "e014b488d173342b34ec6527275855dadff78b45adb6b3900f188e549d96c4ba"
     ),
     (
         "bridge_score",
-        bridge_score_generator(fixed_seed),
+        bridge_score_generator,
         "b4ba8ca19871247542d172a16c065e7f41598ada7551b54088acb928278d5476"
     ),
     (
         "squares_total_area",
-        squares_total_area_generator(fixed_seed),
+        squares_total_area_generator,
         "6cf12847fd4a49b76e773364d435a433079433b18be903cc0163a13b123a7052"
     ),
     (
         "fewest_boxes",
-        fewest_boxes_generator(fixed_seed),
+        fewest_boxes_generator,
         "db346b93869969e0c9f496115b5ce894911c23e6f9d9a20ac3e4cc20c7875100"
     ),
     (
         "des_chiffres",
-        des_chiffres_generator(fixed_seed),
+        des_chiffres_generator,
         "1f3dfbcdfbc56462ea786672124615ee2e480fb47c8a4c141c3c9b25436cab00"
     ),
     (
         "cube_tower",
-        cube_tower_generator(fixed_seed),
+        cube_tower_generator,
         "a729ad1e589e0870ae4c708b86c2c24ea496d11819e6c551ca7a35645b23e265"
     ),
     (
         "tr",
-        tr_generator(fixed_seed),
+        tr_generator,
         "92039e11e76854a376b7c548520fa50277bfc023c3a5f8c9fc00b6d1886231f1"
     ),
     (
         "digit_partition",
-        digit_partition_generator(fixed_seed),
+        digit_partition_generator,
         "6b1bdd849118a4405ebc7fc3f66f7082c56be26c9fb3e39ca26278c8967dcf15"
     ),
     (
         "measure_balsam",
-        measure_balsam_generator(fixed_seed),
+        measure_balsam_generator,
         "a15cdb98d1c1c6ccebc5ef47610f29d6b0cdf97ddd93baf642b148ce5718707e"
     ),
     (
         "count_distinct_substrings",
-        count_distinct_substrings_generator(fixed_seed),
+        count_distinct_substrings_generator,
         "0ea1c4446e997cf3395947bf66a01525147ab06083891da579f370d706c4b225"
     ),
     (
         "mmu_lru",
-        mmu_generator(fixed_seed),
+        mmu_generator,
         "1cf6e3ac363dcd3b59df1ff53cf9abdd84487747f51d32f8af4cd34f1d40e35a"
     ),
     (
         "mmu_optimal",
-        mmu_generator(fixed_seed),
+        mmu_generator,
         "fb6b9c3578fcd78de3953e650ea321eba4466950985b5ce56649c6a43e1eb3e1"
     ),
     (
         "vector_add_reach",
-        vector_add_reach_generator(fixed_seed),
+        vector_add_reach_generator,
         "a4da54deb5b13790eb6d081e4126cfa43005e2c004fdc5184d4e182e8c919a3b"
     ),
     (
         "tower_of_babel",
-        tower_of_babel_generator(fixed_seed),
+        tower_of_babel_generator,
         "60ed0f633b21e9ed353972241cff02fa09ff29e9425888374395959ad182281e"
     ),
     (
         "parking_lot_permutation",
-        parking_lot_permutation_generator(fixed_seed),
+        parking_lot_permutation_generator,
         "2033e14ea8323502638b89793d35bf53720a091c5eb0680eafac7e900b81b4f8"
     ),
     (
         "gijswijt",
-        gijswijt_generator(fixed_seed),
+        gijswijt_generator,
         "61727e9c59198b85f3ef3e61074a5c9b33782cd9d2ca184d70aef543f4c10877"
     ),
     (
         "markov_distance",
-        markov_distance_generator(fixed_seed),
+        markov_distance_generator,
         "68ada2f65a1bd602fbe361a9327cb59c88cc28ee0dc7671af9b0db2bb3d17ece"
     ),
     (
         "count_unicolour_rectangles",
-        count_unicolour_rectangles_generator(fixed_seed),
+        count_unicolour_rectangles_generator,
         "14b4467fc57c884e0a583c7659985bdd8a0c84e095ef1b581586d00f7609e126"
     ),
     (
         "max_product",
-        max_product_generator(fixed_seed),
+        max_product_generator,
         "639791d496fd80720d4986925a37937dfb5a8cd3025c651677796c917abca2c9"
     ),
     (
         "goodstein",
-        goodstein_generator(fixed_seed),
+        goodstein_generator,
         "cf10c309927110702b1ad430a88e59d78b8e389f51f66b616d88770e35ba5f48"
     ),
     (
         "prize_strings",
-        prize_strings_generator(fixed_seed),
+        prize_strings_generator,
         "bf65f0be4387fca6f16e89e30257d62e5924d5173a11d44d4b62296e9e04a168"
     ),
     (
         "nice_sequence",
-        nice_sequence_generator(fixed_seed),
+        nice_sequence_generator,
         "4b8d06baba51031db34501b056beded81f15c8ab83f47985c79c715fb2958aca"
     ),
     (
         "game_with_multiset",
-        game_with_multiset_generator(fixed_seed),
+        game_with_multiset_generator,
         "bea9a0fed502f5967a175bf0f2f0dc83269043c419f17da309c9179c435593fb"
     ),
     (
         "carryless_multiplication",
-        carryless_multiplication_generator(fixed_seed),
+        carryless_multiplication_generator,
         "4a8271e20c0925d77b221278c0dbb23408887a52c70e2a80a5722366551db923"
     ),
 
@@ -5012,193 +5016,198 @@ testcases = [
 
     (
         "reversenacci",
-        reversenacci_generator(fixed_seed),
+        reversenacci_generator,
         "2142cca26a02e73bcf5ddd13766f394930d679081f6c9c003901003285cfd577"
     ),
     (
         "kayles",
-        kayles_generator(fixed_seed),
+        kayles_generator,
         "1f346bcd31387e134394072470e5c460ab8f1b342ed5ddf1a93be28e99f618b3"
     ),
     (
         "greedy_egyptian",
-        greedy_egyptian_generator(fixed_seed),
+        greedy_egyptian_generator,
         "be7ba3e90b7c410b4eecfbcd88ecbdfc133cf22ac80dd77212927b6a0a773738"
     ),
     (
         "minimal_egyptian",
-        minimal_egyptian_generator(fixed_seed),
+        minimal_egyptian_generator,
         "752f2bbdabaa37bb900a7642026cc257d22571ee8c09fd72949df0b9ef92c7a4"
     ),
     (
         "carving_egyptian",
-        islice(greedy_egyptian_generator(fixed_seed), 3000),
-        "b21cc8f569c9dba1598df800132a0663ec753de87fbde79c5077e9b843447b4a"
+        greedy_egyptian_generator,
+        "a04371ff999a47545d0785566d8e3c1c813039a9029eb64c741ab9648f80006f"
     ),
     (
         "super_tiny_rng",
-        super_tiny_rng_generator(fixed_seed),
+        super_tiny_rng_generator,
         "79462fa344225685a68470f3b8f08f017b629d46af69f1292187076b339b4d70"
     ),
     (
         "van_der_corput",
-        van_der_corput_generator(fixed_seed),
+        van_der_corput_generator,
         "309c5f9f5ba1e72b5b4673f3e5e44af9376c8c5eb79d6338d8dac13e38b08ae7"
     ),
     (
         "count_cigarettes",
-        count_cigarettes_generator(fixed_seed),
+        count_cigarettes_generator,
         "df769dd9a0edb86107562b18451edb0bc056c6c2687170f0d2cdd139bab297a9"
     ),
     (
         "is_string_shuffle",
-        is_string_shuffle_generator(fixed_seed),
+        is_string_shuffle_generator,
         "40bfe12ca770ab65453e07048ff1c434088fe72c80b121f1c96dbffb15cf8e3b"
     ),
     (
         "str_rts",
-        str_rts_generator(fixed_seed),
+        str_rts_generator,
         "8c726ce515c552eaca2e31bc5dbe4ffbc5b39bc2b0a0fdafbba807e2430ac399"
     ),
     (
         "lowest_common_dominator",
-        lowest_common_dominator_generator(fixed_seed),
+        lowest_common_dominator_generator,
         "91ab36011499d313b00ccf4914c5cd9882edb4005651444ce18db035a1e39ed6"
     ),
     (
         "itky_leda",
-        itky_leda_generator(fixed_seed),
+        itky_leda_generator,
         "f7d61d769bc947f9245312a3afde7f504a2305c07d6ebd2ecd46d4d083f29fd2"
     ),
     (
         "arrow_walk",
-        arrow_walk_generator(fixed_seed),
+        arrow_walk_generator,
         "0c07aa91e80a5f207853c6134686bb354c6ad3b5d86ba594a0e3926f77beb746"
     ),
     (
         "self_describe",
-        self_describe_generator(fixed_seed),
+        self_describe_generator,
         "958fc9e2ea82deb3df48d1ab3b5002aac5e380ec85a2a09adc2f02c033202eed"
     ),
     (
         "domino_pop",
-        domino_pop_generator(fixed_seed),
+        domino_pop_generator,
         "215a96c7117b4cb58d0f08fbda0925a7d9be9b98115481dc3308c0dd9ec6420c"
     ),
     (
         "median_filter",
-        median_filter_generator(fixed_seed),
+        median_filter_generator,
         "212a511acbcaf77584e38428867e279e6527ac0d0d89f94664456a4897a4fd32"
     ),
     (
         "longest_zigzag",
-        longest_zigzag_generator(fixed_seed),
+        longest_zigzag_generator,
         "cd4a2b565263afc05117d1f5eb0364de5030653a592b4177524539ed8df59bfa"
     ),
     (
         "place_disks",
-        place_disks_generator(fixed_seed),
+        place_disks_generator,
         "a70244b21edec2d56007356b453a0ce4da992257bf9f439202ff01180c39a677"
     ),
     (
         "count_triangles",
-        count_triangles_generator(fixed_seed),
+        count_triangles_generator,
         "53d4de8947aa9973485f85bc955921be6e55df0d001facf79deb402cbe8038a3"
     ),
     (
         "pair_sums",
-        pair_sums_generator(fixed_seed),
+        pair_sums_generator,
         "6304c144f259b9f4d54cac13413a52b14e05ddd38c52056da668d33cd5836550"
     ),
     (
         "pair_swaps",
-        pair_swaps_generator(fixed_seed),
+        pair_swaps_generator,
         "a500f72b1baabdcbc57e721bf7f155f1da007adeaef4ba662619b7481d0772f7"
     ),
     (
         "shapley_shubik",
-        shapley_shubik_generator(fixed_seed),
+        shapley_shubik_generator,
         "63fccfb0bb0a4f597c6a7ddc64964c636ef5d101568cb9c54538b96d93afabdf"
     ),
     (
         "repeating_decimal",
-        repeating_decimal_generator(fixed_seed),
+        repeating_decimal_generator,
         "31b2f0a173417aa2c3a290cb8711b6d5010e69d3ce22b611b59bb334df47d1c5"
     ),
     (
         "dfa",
-        dfa_generator(fixed_seed),
+        dfa_generator,
         "b1f19542fe54a7ef7992c5ce4834bd3293cc74635e147f381afd15c4814a6154"
     ),
     (
         "nfa",
-        nfa_generator(fixed_seed),
+        nfa_generator,
         "cd6773bc72eb8399618a937604d264e732e32b64399598fb7d11bb80ffb87a12"
     ),
     (
         "condorcet_election",
-        condorcet_election_generator(fixed_seed),
+        condorcet_election_generator,
         "fd57f0fef51bf6082dba7e43e70781f46a063663664e1b64ff95f378ea120718"
     ),
     (
         "lychrel",
-        lychrel_generator(),
+        lychrel_generator,
         "51834023cf1028fc8dbf344d6f3d9d855df27f823f0b4e7f784ca1bce6a9f2c6"
     ),
     (
         "square_lamps",
-        square_lamps_generator(fixed_seed),
+        square_lamps_generator,
         "db49769d88b3326d3d0c3ee93f8f1c894a0c8f56ec55036bab36ad70f20fab55"
     ),
     (
         "trip_flip",
-        trip_flip_generator(fixed_seed),
+        trip_flip_generator,
         "4ca25906d4c84ec6df20467e45019f5e544b6c5bbc68c6b0725b36f2b3a82d67"
     ),
     (
         "arithmetic_skip",
-        arithmetic_skip_generator(fixed_seed),
+        arithmetic_skip_generator,
         "57ee0ab04df9acaf8dcc7930a534b8fa54333a4be71c18ea089dae3edbaf08dd"
     ),
     (
         "knight_jam",
-        knight_jam_generator(fixed_seed),
+        knight_jam_generator,
         "a2373eb6a800bb78e2f92a3087be34afd1928929d01d2905b72a94dd050691e5"
     ),
     (
         "infected_cells",
-        infected_cells_generator(fixed_seed),
+        infected_cells_generator,
         "e573d964f51ce3e60426b26785c87a5b909bb4a301410707235c7f57f951f8a8"
     ),
     (
         "twos_and_threes",
-        twos_and_threes_generator(fixed_seed),
+        twos_and_threes_generator,
         "c5ba8b88236187abce068fab06424c08c78eff91f535c0541780e3c534c1d10b"
     ),
     (
         "count_friday_13s",
-        count_friday_13s_generator(fixed_seed),
+        count_friday_13s_generator,
         "3f446c580c97403da422f017c3a2d97985e0e53bcf6cd83e74cddca18ce36d74"
     ),
     (
         "lamp_pairs",
-        lamp_pairs_generator(fixed_seed),
+        lamp_pairs_generator,
         "d43f2304d11ccc50301aadbcfca56fa0844a9020b7f55524c3b2d1c6b42919ef"
     ),
     (
         "lowest_fraction_between",
-        lowest_fraction_between_generator(fixed_seed),
+        lowest_fraction_between_generator,
         "2c4d4408b05463320e31e0b12c1ab7f3e3a1850a14e77810cae229a3c598e896"
     ),
     (
         "tic_tac",
-        tic_tac_generator(fixed_seed),
+        tic_tac_generator,
         "f180ff8f423758cf6539bcee68d8ed442f832b0a312946b876d13f067bd7e2ed"
     ),
     (
         "jai_alai",
-        jai_alai_generator(fixed_seed),
+        jai_alai_generator,
         "00960c8cc9d2c39525d7e99d28c49ee78ed67871afa2b0dd452cde3a19a4371f"
+    ),
+    (
+        "unity_partition",
+        unity_partition_generator,
+        "352de342c6642b596e5ceeecc2eb678cfdab3121b5d2da2a00d77bd707c60d43"
     )
 ]
 
@@ -5211,7 +5220,7 @@ def run_all():
         if version_info < (3, 7, 0):
             print("THIS SCRIPT REQUIRES PYTHON 3.7.0 OR LATER. EXITING.")
             exit(1)
-        implemented = sort_by_source(testcases)
+        implemented = sort_by_source()
         print(f"Student file labs109.py contains {len(implemented)} recognized functions to test.")
         if use_expected_answers:
             # If record file exists, read the expected answers from it.
@@ -5237,37 +5246,37 @@ def run_all():
                                 verified = True
                         elif storing:
                             known[curr].append(line)
-                if not verified:
+                if not verified:  # To recognize super old versions of expected answers.
                     print(f"YOU ARE USING A VERY OBSOLETE VERSION OF {expected_answers_file}. EXITING.")
                     exit(3)
                 else:
                     print(f"Finished reading expected answers.")
-                    test_all_functions(labs109, testcases, known=known)
+                    test_all_functions(labs109, known=known)
             else:
                 # If the record file doesn't exist, record the model answers.
                 if can_record:
                     with gzip.open(expected_answers_file, 'wt') as rf:
-                        test_all_functions(labs109, testcases, recorder=rf)
+                        test_all_functions(labs109, recorder=rf)
                 else:
                     print("You are missing the expected_answers file. Please download this file")
                     print("from the same place where you got this tester script from, to allow")
                     print("this tester to emit proper bug reports for test cases.")
-                    test_all_functions(labs109, testcases)
+                    test_all_functions(labs109)
         else:
             print("Testing functions without using recorded expected answers.")
-            test_all_functions(labs109, testcases, known=None)
+            test_all_functions(labs109, known=None)
     except Exception as e:
         print(f"TESTER CRASHED WITH ERROR: {e}")
         exit(4)
 
 
-# Given teacher and student implementations of the same function, run
-# the test cases for both of them and output the first or the shortest
-# test case for which these two implementations disagree.
+# Given teacher and student implementations of the same function, run the
+# same test cases for both of them, and output either the first or the
+# shortest test case at which these two implementations disagree.
 
-def discrepancy(teacher, student, test_cases, stop_at_first=False, print_all=False):
+def discrepancy(teacher, student, test_generator, stop_at_first=False, print_all=False):
     shortest_args, disc_teacher, disc_student, disc, cases = None, None, None, 0, 0
-    for n, args in enumerate(test_cases):
+    for n, args in enumerate(test_generator(fixed_seed)):
         # Turn the args into a tuple, if they aren't one already.
         if type(args) != tuple:
             args = (args,)
@@ -5310,4 +5319,4 @@ run_all()
 
 
 # teacher student generator
-#discrepancy(labs109.des_chiffres, des_chiffres, des_chiffres_generator(fixed_seed), stop_at_first=True)
+#discrepancy(labs109.des_chiffres, des_chiffres, des_chiffres_generator, stop_at_first=True)

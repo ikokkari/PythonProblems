@@ -1,4 +1,4 @@
-# THIS FILE IS NOT IN PUBLIC DOMAIN, NOR RELEASED UNDER ANY
+# THESE SOLUTIONS ARE NOT IN PUBLIC DOMAIN, NOR RELEASED UNDER ANY
 # FREE SOFTWARE LICENSE SUCH AS GPL, MIT OR CREATIVE COMMONS.
 
 # This file may not be distributed without the express written
@@ -13,7 +13,7 @@ from collections import deque
 from bisect import bisect_left
 from functools import lru_cache
 from itertools import combinations, chain, islice, count, product
-from datetime import date, timedelta
+from datetime import timedelta
 from queue import Queue
 
 
@@ -85,17 +85,37 @@ __factorials = [1]
 # Fill in the factorials list as needed.
 
 def __fact(n):
-    ██████████████████████████████
+    ████████████████████████████████
         █████████████████████████████████████████████████████████
     ██████████████████████
 
 
 # The actual solution functions. These are not in any particular order.
 
-def jai_alai(n, results):
+def unity_partition(n):
+
     ██████████████████████████████
-    ████████
-    ███████████████
+        #print(f"{nn} {k} {total} {so_far}")
+        ███████████
+            ██████████████████████████████████████████
+        ███████████████████
+            ███████████
+        ████████████████████████████████████████████████
+        ██████████████
+            ████████████████
+            ██████████████████████████████████████████████████████
+                █████████████
+            ████████████
+            ███████████████████████████████████████████
+        ███████████
+
+    █████████████████████████████
+    ███████████████████████████████████████████████████
+    █████████████
+
+
+def jai_alai(n, results):
+    ███████████████████████████████████████████████████████
     █████████████████████
         ████████████
     ██████████████████████
@@ -103,7 +123,7 @@ def jai_alai(n, results):
         █████████████████
             ███████████████████████████████████
         █████████████████
-        █████████████████████
+        ███████████████████████# Back to the end of the line you go
     █████████████
 
 
@@ -129,7 +149,6 @@ def tic_tac(board, player, probs):
     ████████████████████
         ████████████████████
             ██████████████████████████
-                ███████████████
                 ████████████████████████
                 ██████████████████████████████████████████████████████████
                 ██████████████████████
