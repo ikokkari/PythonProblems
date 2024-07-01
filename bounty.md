@@ -170,6 +170,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Word positions
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Deterministic finite automata
    </td>
    <td>
@@ -177,6 +183,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>The parking lot is full
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>First fit bin packing
    </td>
    <td>
    </td>
@@ -325,6 +337,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Recamán sequence
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Mian–Chowla sequence
    </td>
    <td>Karel Tutsu, June 12, 2023
@@ -445,6 +463,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>A very graphy caterpillar
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>St. Bitus‘ Dance
    </td>
    <td>
@@ -464,6 +488,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>[Be]t[Te]r [C][Al]l [Sm][Al]l
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Spiral matrix
    </td>
    <td>
    </td>
@@ -506,6 +536,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Forbidden digit 
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Independent dominating set 
    </td>
    <td>
    </td>
@@ -649,6 +685,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Word bin packing
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Probabilistic tic-tac-toe
    </td>
    <td>
@@ -680,6 +722,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
   <tr>
    <td>Scatter her enemies
+   </td>
+   <td>Karel Tutsu, March 8, 2023
+   </td>
+  </tr>
+   <tr>
+   <td>Sneaking
    </td>
    <td>Karel Tutsu, March 8, 2023
    </td>
