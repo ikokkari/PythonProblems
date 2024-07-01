@@ -5376,7 +5376,7 @@ testcases = [
     (
         "is_caterpillar",
         is_caterpillar_generator,
-        None
+        "2c4304fa79be635d9ba08f511d343009d7e7cb6260174e5dbfdd9f5f318df06a"
     ),
     (
         "recaman",
