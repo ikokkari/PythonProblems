@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "June 21, 2024"
+version = "July 1, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -270,6 +270,7 @@ __names = [
     "llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch"
 ]
 
+__knight_moves = [(1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1), (-2, 1), (-1, 2)]
 
 # Some utility functions to help writing test generators.
 
@@ -323,6 +324,151 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def recaman_generator(seed):
+    for n in range(1, 1000001):
+        yield n,
+
+
+def is_caterpillar_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(5, 1, 1), 2000):
+        edges = [[] for _ in range(n)]
+        m = rng.randint(2, n - 2)
+        for u in range(1, m):
+            edges[u].append(u - 1)
+            edges[u - 1].append(u)
+        for u in range(m, n):
+            if rng.randint(0, 99) < 80:
+                v = rng.randint(0, m - 1)
+            else:
+                v = rng.randint(0, u - 1)
+            edges[u].append(v)
+            edges[v].append(u)
+        perm = list(range(n))
+        rng.shuffle(perm)
+        inv = [0 for _ in range(n)]
+        for (i, e) in enumerate(perm):
+            inv[e] = i
+        edges = [[perm[v] for v in edges[inv[u]]] for u in range(n)]
+        while rng.randint(0, 99) < 20:
+            if rng.randint(0, 99) < 80:
+                u = rng.randint(0, n - 1)
+                v = rng.randint(0, n - 1)
+                if u != v and v not in edges[u]:
+                    edges[u].append(v)
+                    edges[v].append(u)
+            else:
+                u = rng.randint(0, n - 1)
+                if len(edges[u]) > 0:
+                    v = rng.choice(edges[u])
+                    edges[u].remove(v)
+                    edges[v].remove(u)
+        for e in edges:
+            e.sort()
+        yield edges,
+
+
+def sneaking_generator(seed):
+    def choose():
+        x = rng.randint(0, n - 1)
+        y = rng.randint(0, n - 1)
+        while (x, y) in knights:
+            x = rng.randint(0, n - 1)
+            y = rng.randint(0, n - 1)
+        return (x, y)
+
+    rng = Random(seed)
+    for n in islice(pyramid(4, 6, 7), 100):
+        knights = set()
+        m = rng.randint(n // 2, n + 1)
+        while len(knights) < m:
+            x = rng.randint(0, n - 1)
+            y = rng.randint(0, n - 1)
+            knights.add((x, y))
+        (gx, gy) = choose()
+        while True:
+            (kx, ky) = choose()
+            is_ok = True
+            for (xx, yy) in knights:
+                for (dx, dy) in __knight_moves:
+                    if (kx, ky) == (xx + dx, yy + dy):
+                        is_ok = False
+                        break
+                if not is_ok:
+                    break
+            if is_ok:
+                yield n, (kx, ky), (gx, gy), list(knights)
+                break
+
+
+def first_fit_bin_packing_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(2, 1, 1), 3000):
+        items = [rng.randint(1, 2*n) for _ in range(n)]
+        m = max(items)
+        capacity = rng.randint(m, 3 * m)
+        yield items, capacity
+
+
+def word_bin_packing_generator(seed):
+    rng = Random(seed)
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [w.strip() for w in f if len(w) == 5]
+    for n in islice(pyramid(3, 1, 1), 250):
+        yield rng.sample(words, n),
+
+
+def word_positions_generator(seed):
+    yield 'Buffalo buffalo Buffalo buffalo buffalo buffalo Buffalo buffalo', 'buffalo'
+    yield 'James while John had had had had had had had had had had had a better effect on the teacher', 'had'
+    yield 'That that is is that that is not is not is that it it is', 'that'
+    yield 'That that is is that that is not is not is that it it is', 'is'
+    rng = Random(seed)
+    words = [random_string(ups + lows, rng.randint(1, 10), rng) for _ in range(100)]
+    for n, p in islice(zip(pyramid(2, 1, 1), cycle([20, 50, 80])), 2000):
+        sentence = []
+        for i in range(n):
+            if i > 0 and rng.randint(0, 99) < p:
+                sentence.append(rng.choice(sentence))
+            else:
+                sentence.append(rng.choice(words))
+        yield " ".join(sentence), rng.choice(sentence)
+
+
+def independent_dominating_set_generator(seed):
+    rng = Random(seed)
+    for n, w in islice(zip(pyramid(5, 2, 1), cycle(range(3, 8))), 200):
+        edge_set = set()
+        m = 2 * rng.randint(n, 2*n)
+        while len(edge_set) < m:
+            u = rng.randint(0, n - 1)
+            s = rng.randint(1, w)
+            s = s * rng.choice([-1, +1])
+            v = (u + s) % n
+            if u != v:
+                edge_set.add((u, v))
+                edge_set.add((v, u))
+        edges = [[] for _ in range(n)]
+        for (u, v) in edge_set:
+            edges[u].append(v)
+        yield edges,
+
+
+def spiral_matrix_generator(seed):
+    rng = Random(seed)
+    # Try all positions of all matrices up to size 6 systematically
+    for n in range(1, 6):
+        for row in range(n):
+            for col in range(n):
+                yield n, row, col
+    # Rest with random fuzzing
+    for n in range(6, 500):
+        for _ in range(n//2):
+            row = rng.randint(0, n - 1)
+            col = rng.randint(0, n - 1)
+            yield n, row, col
+
 
 def unity_partition_generator(seed):
     for n in range(78, 200):
@@ -4305,12 +4451,6 @@ testcases = [
         bulls_and_cows_generator,
         "e00ca4cd1996a51ef5cd5588a7facd0a00f2e3f3946d5f4e96e70b65ba261ba0"
     ),
-    # Removed from problem set October 21, 2021
-    # (
-    # "recaman",
-    # recaman_generator(seed),
-    # "05f94fe36b66db7c2164895d2b1dc5668fa35696cd6add7bf3"
-    # ),
     (
         "collapse_intervals",
         collapse_intervals_generator,
@@ -4594,12 +4734,6 @@ testcases = [
         wordomino_generator,
         "5b081cc381ec8ddaa382d8450def04b53255ee62b67356f690a7eafa9efb98a5"
     ),
-    # Removed from problem set April 18, 2022
-    # (
-    # "recaman_item",
-    # recaman_item_generator(seed),
-    # "e36c779db6a77037f4e0c11363e4377a1dfe773cb0c7af8617"
-    # ),
     (
         "count_troikas",
         count_troikas_generator,
@@ -5208,6 +5342,46 @@ testcases = [
         "unity_partition",
         unity_partition_generator,
         "352de342c6642b596e5ceeecc2eb678cfdab3121b5d2da2a00d77bd707c60d43"
+    ),
+    (
+        "spiral_matrix",
+        spiral_matrix_generator,
+        "46f2fb9f90177dc1fdc4a585c4ba7976126e726ad4e5aad302413aa71bdacb7f"
+    ),
+    (
+        "independent_dominating_set",
+        independent_dominating_set_generator,
+        "83bb5cb2e6fffaaecbc2fa5e0f3d5755e78849a3e1bbc668ff0e6ceae850047b"
+    ),
+    (
+        "word_positions",
+        word_positions_generator,
+        "ed4ac2429d2e082f9d3091d2c5cbb0f815b730888f96f650fd35c0aab841d6d1"
+    ),
+    (
+        "word_bin_packing",
+        word_bin_packing_generator,
+        "603732356a9647d992ee7171789581a7f65b3142f3c53fd974ee55b3db02d4fd"
+    ),
+    (
+        "first_fit_bin_packing",
+        first_fit_bin_packing_generator,
+        "0e2f55bdbb982962c5fba2db72fd91bc29382dc9e9e0804f180f08ee9df22507"
+    ),
+    (
+        "sneaking",
+        sneaking_generator,
+        "8c431e273b5b2b5ad3da921226384348038cb854228927ee992ee574227ec69a"
+    ),
+    (
+        "is_caterpillar",
+        is_caterpillar_generator,
+        None
+    ),
+    (
+        "recaman",
+        recaman_generator,
+        "ff9c423fa18896d442d5ac8c149ba82ca973703c380c164015d3eacd85a5e1fa"
     )
 ]
 
@@ -5319,4 +5493,4 @@ run_all()
 
 
 # teacher student generator
-#discrepancy(labs109.des_chiffres, des_chiffres, des_chiffres_generator, stop_at_first=True)
+#discrepancy(labs109.independent_dominating_set, labs109.independent_dominating_set2, independent_dominating_set_generator, print_all=True)
