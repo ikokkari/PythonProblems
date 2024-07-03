@@ -729,7 +729,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Sneaking
    </td>
-   <td>Karel Tutsu, March 8, 2023
+   <td>
    </td>
   </tr>
     <tr>
