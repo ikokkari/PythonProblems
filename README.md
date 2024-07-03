@@ -10,7 +10,7 @@ These problems are suitable for students who have already completed some introdu
 
 A bounty for each bonus problem is available to the first person to solve that problem. The file [bounty.md](https://github.com/ikokkari/PythonProblems/blob/main/bounty.md) contains more information.
 
-Obfuscated model solutions are available in the file `obfuscated.txt`, to give students the idea of the length and general complexity of the instructor's private solutions.
+Obfuscated model solutions are available in the file [obfuscated.txt(https://github.com/ikokkari/PythonProblems/blob/main/obfuscated.txt), to give students the idea of the length and general complexity of the instructor's private solutions.
 
 The lab specification document and the automated tester software `tester109.py` are released under the [GNU General Public License v3](https://www.gnu.org/licenses/gpl-3.0.txt), with no warranties implied by the author.
 
