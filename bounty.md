@@ -535,12 +535,6 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
-   <td>Stern–Brocot path
-   </td>
-   <td>
-   </td>
-  </tr>
-   <tr>
    <td>Forbidden digit 
    </td>
    <td>
