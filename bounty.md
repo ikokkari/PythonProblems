@@ -194,6 +194,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Lychrel numbers
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>First fit bin packing
    </td>
    <td>
@@ -505,6 +511,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Baker–Norine dollar game
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Total covered area
    </td>
    <td>Karel Tutsu, September 1, 2023
@@ -542,6 +554,12 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Independent dominating set 
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Vertex cover 
    </td>
    <td>
    </td>
