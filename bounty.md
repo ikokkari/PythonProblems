@@ -283,7 +283,7 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
-   <td>Count Langford violations
+   <td>List the Langford violations
    </td>
    <td>Anonymous, July 8, 2023
    </td>
