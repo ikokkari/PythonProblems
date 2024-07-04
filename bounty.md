@@ -164,6 +164,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Translate
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Ifs and butts
    </td>
    <td>
