@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "July 1, 2024"
+version = "July 4, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -325,6 +325,34 @@ def pyramid(n=1, goal=5, inc=1):
 
 # XXX Test case generators for the individual functions.
 
+def baker_norine_dollar_game_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(4, 2, 3), 150):
+        edge_set = set()
+        for u in range(1, n):
+            v = rng.randint(0, u - 1)
+            edge_set.add((u, v))
+            edge_set.add((v, u))
+        m = rng.randint(n, (n*(n-1))//3)
+        while len(edge_set) < 2 * m:
+            u = rng.randint(0, n - 1)
+            v = rng.randint(0, n - 1)
+            if u != v:
+                edge_set.add((u, v))
+                edge_set.add((v, u))
+        edges = [[] for _ in range(n)]
+        for (u, v) in edge_set:
+            edges[u].append(v)
+        balance = [0 for _ in range(n)]
+        debt = rng.randint(1, n - 1)
+        for _ in range(debt):
+            balance[rng.randint(0, n - 1)] -= 1
+        no_debt = [u for u in range(n) if balance[u] >= 0]
+        for _ in range(debt + rng.randint(m, 2*m - n)):
+            balance[rng.choice(no_debt)] += 1
+        yield edges, balance
+
+
 def recaman_generator(seed):
     for n in range(1, 1000001):
         yield n,
@@ -436,9 +464,8 @@ def word_positions_generator(seed):
         yield " ".join(sentence), rng.choice(sentence)
 
 
-def independent_dominating_set_generator(seed):
-    rng = Random(seed)
-    for n, w in islice(zip(pyramid(5, 2, 1), cycle(range(3, 8))), 200):
+def __graph_generator(rng):
+    for n, w in zip(pyramid(5, 2, 1), cycle(range(3, 8))):
         edge_set = set()
         m = 2 * rng.randint(n, 2*n)
         while len(edge_set) < m:
@@ -455,9 +482,17 @@ def independent_dominating_set_generator(seed):
         yield edges,
 
 
+def independent_dominating_set_generator(seed):
+    yield from islice(__graph_generator(Random(seed)), 200)
+
+
+def vertex_cover_generator(seed):
+    yield from islice(__graph_generator(Random(seed)), 800)
+
+
 def spiral_matrix_generator(seed):
     rng = Random(seed)
-    # Try all positions of all matrices up to size 6 systematically
+    # Try all positions of all spiral matrices up to size 5 systematically
     for n in range(1, 6):
         for row in range(n):
             for col in range(n):
@@ -5382,6 +5417,16 @@ testcases = [
         "recaman",
         recaman_generator,
         "ff9c423fa18896d442d5ac8c149ba82ca973703c380c164015d3eacd85a5e1fa"
+    ),
+    (
+        "vertex_cover",
+        vertex_cover_generator,
+        "a610e498fc06f48349a441b6eb50797c89f435229f3e6b844f359f417d43b3ed"
+    ),
+    (
+        "baker_norine_dollar_game",
+        baker_norine_dollar_game_generator,
+        "abea57f620a61db3755e5ed755b60aefc47ccf8d5c3ed479208d3cdfa521dc81"
     )
 ]
 
