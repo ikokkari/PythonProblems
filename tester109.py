@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "July 6, 2024"
+version = "July 8, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -324,6 +324,52 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def accumulating_merge_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(4, 3, 3), 3000):
+        items1 = [rng.randint(1, 3*n) for _ in range(rng.randint(1, n))]
+        items2 = [rng.randint(1, 3*n) for _ in range(rng.randint(1, n))]
+        yield items1, items2
+
+
+def string_stretching_generator(seed):
+    rng = Random(seed)
+    for n, p in islice(zip(pyramid(3, 4, 5), cycle([20, 40, 60])), 500):
+        m = rng.randint(2, n)
+        pattern = rng.choice(lows[:n+1])
+        repeats = 0
+        for _ in range(m - 1):
+            if repeats < 3  and rng.randint(0, 99) < p:
+                repeats += 1
+                pattern += rng.choice(pattern)
+            else:
+                pattern += rng.choice(lows[:n+1])
+        text = pattern
+        for _ in range(rng.randint(1, (n//2) + 1)):
+            i = rng.randint(0, len(text))
+            text = text[:i] + pattern + text[i:]
+        yield text,
+
+
+def conway_coin_race_generator(seed):
+    rng = Random(seed)
+    # Try out explicitly all patterns up to length 4
+    for n in range(1, 5):
+        for a in product([0, 1], repeat=n):
+            a = "".join(str(bit) for bit in a)
+            for b in product([0, 1], repeat=n):
+                b = "".join(str(bit) for bit in b)
+                if a < b:
+                    yield a, b
+    # Rest with fuzzing
+    for n in islice(pyramid(5, 3, 3), 2000):
+        a = "".join([rng.choice(["0", "1"]) for _ in range(n)])
+        m = rng.randint(3, n)
+        b = "".join([rng.choice(["0", "1"]) for _ in range(m)])
+        if b not in a:
+            yield a, b
+
 
 def baker_norine_dollar_game_generator(seed):
     rng = Random(seed)
@@ -5427,6 +5473,21 @@ testcases = [
         "baker_norine_dollar_game",
         baker_norine_dollar_game_generator,
         "abea57f620a61db3755e5ed755b60aefc47ccf8d5c3ed479208d3cdfa521dc81"
+    ),
+    (
+        "conway_coin_race",
+        conway_coin_race_generator,
+        "1380928afc4b166aed51bb08d836bdb5d7dd4c6923a9e36bb8e609886d069601"
+    ),
+    (
+        "string_stretching",
+        string_stretching_generator,
+        "68f48dab25dccc15bbb00292d516db543e807f803ab8bf1b2b8545779be51c06"
+    ),
+    (
+        "accumulating_merge",
+        accumulating_merge_generator,
+        "961d05e3ffaf939e1e7c65a7d1ab9db80b978077a5de5d1168f8766de7a838ae"
     )
 ]
 
