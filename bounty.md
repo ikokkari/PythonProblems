@@ -124,7 +124,7 @@ To keep this fair and interesting, each individual person can get at most one bo
    </td>
   </tr>
    <tr>
-   <td>A110: String Stretching
+   <td>A110: String stretching
    </td>
    <td>
    </td>
