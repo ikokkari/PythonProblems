@@ -26,6 +26,7 @@ from datetime import date
 # position in the labs109.py file. Use the limit of -1 to say "all test cases".
 
 verbose_execution = {
+    "bandwidth": -1
     #   "function_one": 42,   # Print the first 42 test cases of function_one
     #   "function_two": -1,   # Print all test cases of function_two, however many there are
     #   "function_three": 0   # Be silent with function_three (but run it early)
@@ -35,7 +36,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "July 14, 2024"
+version = "July 15, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -5519,7 +5520,7 @@ testcases = [
     (
         "bandwidth",
         bandwidth_generator,
-        "fcb04af326e9818c9209553ad6da41426aa32c016fb56a414416a0efb58b0d65"
+        "c7c8a2a383205ca058296b9638a1e5fde11cd3e9bcdbbbc95edb836863d0f863"
     )
 ]
 
