@@ -141,6 +141,18 @@ To keep this fair and interesting, each individual person can get at most one bo
    <td>
    </td>
   </tr>
+   <tr>
+   <td>A113: Probabilistic tic-tac-toe
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>A114: Bandwidth minimization
+   </td>
+   <td>
+   </td>
+  </tr>
 </table>
      
 Starting March 2023, the author started creating another set of Python problems, separate from the main corpus of the *109 Python Problems*. (One can only quit for so long without the inevitable relapse.) The following problems don't have paid bounties, but the first person to submit a working solution for each of the following problems will still get their name etched in the table below for perpetuity. Unlike the above list of bonus problems, each student is allowed to get several bounties from this list of additional problems. There are no monetary bounties for the following problems, though, just the bragging rights and the good feeling for the work well done.
@@ -393,6 +405,11 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <tr>
    <td>Carryless multiplication
+   </td>
+   <td>
+   </td>
+  </tr>
+   <td>Manimix
    </td>
    <td>
    </td>
@@ -731,12 +748,6 @@ Starting March 2023, the author started creating another set of Python problems,
    <td>SMETANA interpreter
    </td>
    <td>Abdul Rahman Al Nabulsi, April 15, 2024
-   </td>
-  </tr>
-   <tr>
-   <td>Probabilistic tic-tac-toe
-   </td>
-   <td>
    </td>
   </tr>
    <tr>
