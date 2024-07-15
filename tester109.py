@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "July 8, 2024"
+version = "July 14, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -54,7 +54,8 @@ timeout_cutoff = 20
 # How many test cases to record in the file for each function.
 testcase_cutoff = 300
 
-# Are the students allowed to create expected_answers file?
+# Is the script allowed to create a new expected_answers file? Do not
+# change this unless you know what you are doing.
 can_record = False
 
 # For instructors who want to add their own problems to this set:
@@ -324,6 +325,27 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def bandwidth_generator(seed):
+    yield from islice(__graph_generator(Random(seed)), 70)
+
+
+def manimix_generator(seed):
+    for expr in ["[1]", "(2)", "[45]", "[54]", "(19)", "(123456)", "(90)", "[(13)2]", "([13]2)", "[(45)(27)]"]:
+        yield expr,
+
+    rng = Random(seed)
+
+    def expr(d, m):
+        if d == 0:
+            return rng.choice("0123456789")
+        else:
+            inner = "".join([expr(rng.randint(0, d - 1), m) for _ in range(rng.randint(2, m))])
+            return f"[{inner}]" if rng.randint(0, 99) < 50 else f"({inner})"
+
+    for d, m in islice(zip(pyramid(3, 7, 9), pyramid(3, 6, 8)), 200):
+        yield expr(d, m),
+
 
 def accumulating_merge_generator(seed):
     rng = Random(seed)
@@ -5488,6 +5510,16 @@ testcases = [
         "accumulating_merge",
         accumulating_merge_generator,
         "961d05e3ffaf939e1e7c65a7d1ab9db80b978077a5de5d1168f8766de7a838ae"
+    ),
+    (
+        "manimix",
+        manimix_generator,
+        "ff4b5fe52d94d3857936edc7ba77431fd12cbfed4b67e83ec054e2f8ac220948"
+    ),
+    (
+        "bandwidth",
+        bandwidth_generator,
+        "fcb04af326e9818c9209553ad6da41426aa32c016fb56a414416a0efb58b0d65"
     )
 ]
 
@@ -5599,4 +5631,4 @@ run_all()
 
 
 # teacher student generator
-#discrepancy(labs109.independent_dominating_set, labs109.independent_dominating_set2, independent_dominating_set_generator, print_all=True)
+#discrepancy(labs109.bandwidth, labs109.bandwidth2, bandwidth_generator, print_all=True)
