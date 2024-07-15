@@ -26,7 +26,6 @@ from datetime import date
 # position in the labs109.py file. Use the limit of -1 to say "all test cases".
 
 verbose_execution = {
-    "bandwidth": -1
     #   "function_one": 42,   # Print the first 42 test cases of function_one
     #   "function_two": -1,   # Print all test cases of function_two, however many there are
     #   "function_three": 0   # Be silent with function_three (but run it early)
