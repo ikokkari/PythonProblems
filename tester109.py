@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "July 15, 2024"
+version = "July 17, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -325,6 +325,19 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def set_splitting_generator(seed):
+    rng = Random(seed)
+    for n, w in islice(zip(pyramid(6, 10, 12), pyramid(3, 11, 12)), 2000):
+        subsets = []
+        m = rng.randint(n, 2 * n)
+        while len(subsets) < m:
+            k = rng.randint(2, w) if rng.randint(0, 99) < 60 else 2
+            subset = sorted(rng.sample(range(n), k))
+            if subset not in subsets:
+                subsets.append(subset)
+        yield n, subsets
+
 
 def bandwidth_generator(seed):
     yield from islice(__graph_generator(Random(seed)), 70)
@@ -5520,6 +5533,11 @@ testcases = [
         "bandwidth",
         bandwidth_generator,
         "c7c8a2a383205ca058296b9638a1e5fde11cd3e9bcdbbbc95edb836863d0f863"
+    ),
+    (
+        "set_splitting",
+        set_splitting_generator,
+        "1e93552d6e63b557dc9a24d6c94719201f04c022ed05fd296c223e45a7a48726"
     )
 ]
 
@@ -5631,4 +5649,4 @@ run_all()
 
 
 # teacher student generator
-#discrepancy(labs109.bandwidth, labs109.bandwidth2, bandwidth_generator, print_all=True)
+#discrepancy(labs109.set_splitting3, labs109.set_splitting, set_splitting_generator, stop_at_first=True)
