@@ -56,7 +56,7 @@ testcase_cutoff = 300
 
 # Is the script allowed to create a new expected_answers file? Do not
 # change this unless you know what you are doing.
-can_record = True
+can_record = False
 
 # For instructors who want to add their own problems to this set:
 #
