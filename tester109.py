@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "July 17, 2024"
+version = "July 26, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -56,7 +56,7 @@ testcase_cutoff = 300
 
 # Is the script allowed to create a new expected_answers file? Do not
 # change this unless you know what you are doing.
-can_record = False
+can_record = True
 
 # For instructors who want to add their own problems to this set:
 #
@@ -325,6 +325,27 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def powertrain_generator(seed):
+    rng = Random(seed)
+    for m in islice(pyramid(2, 4, 5), 5000):
+        n = int(random_string("123456789", m, rng))
+        if n != 2592:
+            yield n,
+
+
+def complex_base_decode_generator(seed):
+    # All bit strings up to length 8
+    yield "0",
+    yield "1",
+    for n in range(1, 8):
+        for bits in product([0, 1], repeat=n):
+            yield "1" + "".join(str(b) for b in bits),
+    # The rest with fuzzing
+    rng = Random(seed)
+    for n in range(8, 2000):
+        yield "1" + "".join(str(rng.randint(0, 1)) for _ in range(n)),
+
 
 def set_splitting_generator(seed):
     rng = Random(seed)
@@ -5538,6 +5559,16 @@ testcases = [
         "set_splitting",
         set_splitting_generator,
         "1e93552d6e63b557dc9a24d6c94719201f04c022ed05fd296c223e45a7a48726"
+    ),
+    (
+        "complex_base_decode",
+        complex_base_decode_generator,
+        "8794386e3201ff38ce84c29445cbd788526873b777ca186bb9dabf5cdc25c51d"
+    ),
+    (
+        "powertrain",
+        powertrain_generator,
+        "27e0ae0230ba1a31b0a1d87b086fd7de7265acd7f5930721d477bdebea9fc377"
     )
 ]
 
