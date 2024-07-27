@@ -625,7 +625,7 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
-   <td>Decoding the base –1 + *i*
+   <td>Decoding the base –1 + i
    </td>
    <td>
    </td>
