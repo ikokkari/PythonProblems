@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "July 26, 2024"
+version = "July 29, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -325,6 +325,26 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def cubes_on_trailer_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(2, 15, 8), 60):
+        xs = n
+        ys = rng.randint(n, n + 2)
+        zs = rng.randint(2, n + 1)
+        xy = [[False for _ in range(ys)] for _ in range(xs)]
+        xz = [[False for _ in range(zs)] for _ in range(xs)]
+        yz = [[False for _ in range(zs)] for _ in range(ys)]
+        for x in range(xs):
+            for y in range(ys):
+                z = rng.randint(1, zs) if rng.randint(0, 99) < 50 else 0
+                if z > 0:
+                    xy[x][y] = True
+                    for zz in range(z):
+                        xz[x][zz] = True
+                        yz[y][zz] = True
+        yield xy, xz, yz,
+
 
 def powertrain_generator(seed):
     rng = Random(seed)
@@ -5569,6 +5589,11 @@ testcases = [
         "powertrain",
         powertrain_generator,
         "27e0ae0230ba1a31b0a1d87b086fd7de7265acd7f5930721d477bdebea9fc377"
+    ),
+    (
+        "cubes_on_trailer",
+        cubes_on_trailer_generator,
+        "59c38b61301115bf64ef27207b1cd7bcf88bb38844e5f250471a54942f49342b"
     )
 ]
 
@@ -5680,4 +5705,4 @@ run_all()
 
 
 # teacher student generator
-#discrepancy(labs109.set_splitting3, labs109.set_splitting, set_splitting_generator, stop_at_first=True)
+# discrepancy(labs109.cubes_on_trailer2, labs109.cubes_on_trailer, cubes_on_trailer_generator, stop_at_first=True)
