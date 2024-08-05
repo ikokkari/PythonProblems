@@ -221,7 +221,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Translate
    </td>
-   <td>
+   <td>Zoe Lebel-Pantazopoulos, August 4, 2024
    </td>
   </tr>
    <tr>
