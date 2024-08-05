@@ -471,7 +471,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Replacement with perfect hindsight
    </td>
-   <td>
+   <td>Aryan Khurram, August 5, 2024
    </td>
    </tr>
    <tr>
@@ -537,7 +537,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>String shuffle
    </td>
-   <td>
+   <td>Aryan Khurram, August 5, 2024
    </td>
   </tr>
    <tr>
