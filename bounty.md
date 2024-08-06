@@ -239,7 +239,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Deterministic finite automata
    </td>
-   <td>
+   <td>Kiran Soogrim-Maharaj, August 6, 2024
    </td>
   </tr>
    <tr>
@@ -280,13 +280,13 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
    <td>Count Friday the Thirteenths
    </td>
-   <td>
+   <td>Kiran Soogrim-Maharaj, August 6, 2024
    </td>
   </tr>
    <tr>
    <td>Median filter
    </td>
-   <td>
+   <td>Kiran Soogrim-Maharaj, August 6, 2024
    </td>
   </tr>
    <tr>
