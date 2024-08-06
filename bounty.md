@@ -245,7 +245,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>The parking lot is full
    </td>
-   <td>
+   <td>Aryan Khurram, August 6, 2024
    </td>
   </tr>
    <tr>
@@ -275,7 +275,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Arrow walk with me
    </td>
-   <td>
+   <td>Aryan Khurram, August 6, 2024
    </td>
   </tr>
    <td>Count Friday the Thirteenths
@@ -334,7 +334,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Accumulating merge
    </td>
-   <td>
+   <td>Aryan Khurram, August 6, 2024
    </td>
   </tr>
    <tr>
