@@ -269,7 +269,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Count possible triangles
    </td>
-   <td>
+   <td>Kiran Soogrim-Maharaj, August 6, 2024
    </td>
   </tr>
    <tr>
@@ -298,7 +298,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Nondeterministic finite automata
    </td>
-   <td>
+   <td>Kiran Soogrim-Maharaj, August 6, 2024
    </td>
   </tr>
    <tr>
@@ -316,7 +316,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>Longest mirrored substring
    </td>
-   <td>
+   <td>Kiran Soogrim-Maharaj, August 6, 2024
    </td>
   </tr>
    <tr>
