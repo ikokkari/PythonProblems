@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "July 29, 2024"
+version = "August 7, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -325,6 +325,78 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def magic_knight_generator(seed):
+    rng = Random(seed)
+    for n in range(5, 300):
+        if n % 2 != 0 and n % 3 != 0:
+            items = sorted(rng.sample(range(1, n * n), 5))
+            items.append(n * n)
+            yield n, items
+
+
+def power_prefix_generator(seed):
+    rng = Random(seed)
+    p = 1024
+    for n in islice(pyramid(6, 2, 3), 300):
+        power = str(p)
+        prefix = power[:rng.randint(4, min(len(power), n))]
+        prefix = "".join(d if rng.randint(0, 100) < 70 else '*' for d in prefix)
+        yield prefix,
+        p = p * (2 ** rng.randint(2, n))
+
+
+def pinch_moves_generator(seed):
+    yield ".BWW.WB", 'B'
+    yield "RBW.BW", 'W'
+    rng = Random(seed)
+    for n in islice(pyramid(8, 10, 10), 500):
+        board = ""
+        captured = False
+        player = rng.choice('BW')
+        other = 'W' if player == 'B' else 'B'
+        prev = rng.choice("BW")
+        while len(board) < n:
+            move = rng.randint(0, 100)
+            if move < 20 and not captured:
+                o1 = rng.randint(1, 3)
+                o2 = rng.randint(1, 3)
+                if rng.randint(0, 100) < 70:
+                    board += f"{other * o1}{'R' * rng.randint(1, 2)}{other * o2}"
+                else:
+                    board += f"{other * o1}{'R' * rng.randint(1, 2)}{other}{'R' * rng.randint(1, 2)}{other * o2}"
+                captured = True
+            elif move < 50:
+                board += '.'
+            elif move < 80:
+                board += f".{prev * rng.randint(1, 2)}"
+                prev = 'B' if prev == 'W' else 'W'
+            else:
+                p = rng.randint(0, 2)
+                o = rng.randint(0, 2)
+                board += f".{player * p}{other * o}" if rng.randint(0, 100) < 50 else f".{other * o}{player * p}"
+        yield board, player
+
+
+def tom_and_jerry_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(6, 5, 8), 1500):
+        edge_set = set()
+        for u in range(1, n + 1):
+            for _ in range(rng.randint(1, 3)):
+                v = rng.randint(max(0, u - n//4), u - 1)
+                edge_set.add((u, v))
+        edges = [[] for _ in range(n + 1)]
+        for (u, v) in edge_set:
+            edges[u].append(v)
+            edges[v].append(u)
+        for u in range(1, n):
+            if all(v < u for v in edges[u]):
+                v = rng.randint(u + 1, n)
+                edges[u].append(v)
+                edges[v].append(u)
+        yield n, edges
+
 
 def cubes_on_trailer_generator(seed):
     rng = Random(seed)
@@ -5594,6 +5666,26 @@ testcases = [
         "cubes_on_trailer",
         cubes_on_trailer_generator,
         "59c38b61301115bf64ef27207b1cd7bcf88bb38844e5f250471a54942f49342b"
+    ),
+    (
+        "tom_and_jerry",
+        tom_and_jerry_generator,
+        "40248c1b4f5694ef7e271507036e1f77519a5277ace9ab0dafd9dc242e70d211"
+    ),
+    (
+        "pinch_moves",
+        pinch_moves_generator,
+        "1969aaba44754251ec69acde533a0a483d7078d30ea108c458557502fcbf5b07"
+    ),
+    (
+        "power_prefix",
+        power_prefix_generator,
+        "161230a8ee881be370b9f7988714e68c31bdef13ceff99df0b7c088e4486b6fd"
+    ),
+    (
+        "magic_knight",
+        magic_knight_generator,
+        "ab6c0a822b4f9d1b7033689a1a8db130325bd71bdbf6ce22c874a24a80bea01b"
     )
 ]
 
