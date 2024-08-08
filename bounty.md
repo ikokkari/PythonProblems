@@ -177,6 +177,30 @@ To keep this fair and interesting, each individual person can get at most one bo
    <td>
    </td>
   </tr>
+   <tr>
+   <td>A119: Tom and Jerry
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>A120: Pinch to a pound
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>A121: Minimal Egyptian fractions
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>A122: Unity partition
+   </td>
+   <td>
+   </td>
+  </tr>
 </table>
      
 Starting March 2023, the author started creating another set of Python problems, separate from the main corpus of the *109 Python Problems*. (One can only quit for so long without the inevitable relapse.) The following problems don't have paid bounties, but the first person to submit a working solution for each of the following problems will still get their name etched in the table below for perpetuity. Unlike the above list of bonus problems, each student is allowed to get several bounties from this list of additional problems. There are no monetary bounties for the following problems, though, just the bragging rights and the good feeling for the work well done.
@@ -237,6 +261,12 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
+   <td>Power prefix
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Deterministic finite automata
    </td>
    <td>Kiran Soogrim-Maharaj, August 6, 2024
@@ -287,6 +317,12 @@ Starting March 2023, the author started creating another set of Python problems,
    <td>Median filter
    </td>
    <td>Kiran Soogrim-Maharaj, August 6, 2024
+   </td>
+  </tr>
+   <tr>
+   <td>The magic knight of Muhammad ibn Muhammad
+   </td>
+   <td>
    </td>
   </tr>
    <tr>
@@ -696,19 +732,6 @@ Starting March 2023, the author started creating another set of Python problems,
    <td>
    </td>
   </tr>
-   <tr>
-   <td>Minimal Egyptian fractions
-   </td>
-   <td>
-   </td>
-  </tr>
-   <tr>
-   <td>Unity partition
-   </td>
-   <td>
-   </td>
-  </tr>
-  <tr>
    <td>Sum of consecutive squares
    </td>
    <td>Karel Tutsu, August 30, 2023
