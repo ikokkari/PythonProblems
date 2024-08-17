@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "August 7, 2024"
+version = "August 17, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -325,6 +325,29 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def ants_on_the_rod_generator(seed):
+    yield [[1, 1], [2, 1], [3, 1], [4, -1]], 5
+    rng = Random(seed)
+    for n in islice(pyramid(2, 2, 3), 3000):
+        w = rng.randint(2 * n, 3 * n)
+        ants = [[pos, rng.choice([-1, +1])] for pos in sorted(rng.sample(range(1, w), n))]
+        yield ants, w
+
+
+def split_at_none_generator(seed):
+    rng = Random(seed)
+    for n, p in islice(zip(pyramid(3, 2, 2), cycle([10, 30, 50])), 4000):
+        items = [None if rng.randint(0, 99) < p else rng.randint(-3*n, 3*n) for _ in range(n)]
+        yield items,
+
+
+def multiply_and_sort_generator(seed):
+    rng = Random(seed)
+    for n in range(2, 4000):
+        for mul in rng.sample(range(2, 13), 3):
+            yield n, mul
+
 
 def magic_knight_generator(seed):
     rng = Random(seed)
@@ -5686,6 +5709,21 @@ testcases = [
         "magic_knight",
         magic_knight_generator,
         "ab6c0a822b4f9d1b7033689a1a8db130325bd71bdbf6ce22c874a24a80bea01b"
+    ),
+    (
+        "multiply_and_sort",
+        multiply_and_sort_generator,
+        "a0c2e2ff9df8551f7dc7e2fd25eeabb3ca16fae14fd7fdc4e69efd23c90d35e0"
+    ),
+    (
+       "split_at_none",
+       split_at_none_generator,
+       "9ec01a9207657d477c99d6ce9f0cbb99869ebec7aea412997e2a4799baec9b2c"
+    ),
+    (
+        "ants_on_the_rod",
+        ants_on_the_rod_generator,
+        "d199601b862de42ef06e267e90be194934eab6bc87822dd77a33baff895cc185"
     )
 ]
 
