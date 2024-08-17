@@ -871,7 +871,7 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
 </table>
 
-Starting August 2024, a third problem collection was started.
+Starting August 2024, a third problem collection was started. Same rules as with the second collection.
 
 <table>
 <tr>
