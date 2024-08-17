@@ -201,6 +201,12 @@ To keep this fair and interesting, each individual person can get at most one bo
    <td>
    </td>
   </tr>
+   <tr>
+   <td>A123: Ants on the rod
+   </td>
+   <td>
+   </td>
+  </tr>
 </table>
      
 Starting March 2023, the author started creating another set of Python problems, separate from the main corpus of the *109 Python Problems*. (One can only quit for so long without the inevitable relapse.) The following problems don't have paid bounties, but the first person to submit a working solution for each of the following problems will still get their name etched in the table below for perpetuity. Unlike the above list of bonus problems, each student is allowed to get several bounties from this list of additional problems. There are no monetary bounties for the following problems, though, just the bragging rights and the good feeling for the work well done.
@@ -865,3 +871,26 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
 </table>
 
+Starting August 2024, a third problem collection was started.
+
+<table>
+<tr>
+   <td><b>Problem</b>
+   </td>
+   <td><b>Bounty claimed</b>
+   </td>
+  </tr>
+   <tr>
+   <td>Multiply and sort
+   </td>
+   <td>
+   </td>
+  </tr>
+   </tr>
+   <tr>
+   <td>Split at None
+   </td>
+   <td>
+   </td>
+  </tr>
+</table>
