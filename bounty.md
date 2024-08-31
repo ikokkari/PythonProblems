@@ -890,7 +890,7 @@ Starting August 2024, a third problem collection was started. Same rules as with
    <tr>
    <td>Split at None
    </td>
-   <td>
+   <td>Karel Tutsu, August 30, 2024
    </td>
   </tr>
 </table>
