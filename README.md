@@ -1,7 +1,5 @@
 # 109 Python Problems for CCPS 109
 
-Most of the coding problem collections that you can find online tend to feature nine garbage problems for every decent problem. **This is not one of those collections.** This problem collection features only educational and interesting problems that have actual value and are not made-up make-work nonsense. I am ready to stand fully behind every problem with this claim, ready to be judged by any of these problems by my worst enemy. Every problem here comes with my personal guarantee of being worthwhile, educational, fun and interesting for learners of all levels.
-
 **Beginner Python coders can watch the video [Solving 109 Python Problems for CCPS 109](https://youtu.be/a9EsZl9ryWg) on YouTube for a demonstration of how to solve these problems and use the automated tester.**
 
 This collection features Python problems suitable for university level computer science majors from the first freshman introductory course all the way to senior level courses on algorithms, as taught by [Ilkka Kokkarinen](http://www.scs.ryerson.ca/~ikokkari/) for the Chang School of Continuing Education, Toronto Metropolitan University, Toronto, Canada. The lecture material and example Python programs of that introductory Python course are also freely available in the GitHub repository [ikokkari/PythonExamples](https://github.com/ikokkari/PythonExamples).
