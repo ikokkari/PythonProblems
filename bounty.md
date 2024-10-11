@@ -881,8 +881,16 @@ Starting August 2024, a third problem collection was started. Same rules as with
    </td>
   </tr>
    <tr>
-   <td>Multiply and sort
+   <td>Multiply and sort</td>
+   <td>
    </td>
+  </tr>
+   <tr>
+   <td>Friendship paradox</td>
+   <td>
+   </td>
+   <tr>
+   <td>Sum of square roots</td>
    <td>
    </td>
   </tr>
@@ -890,7 +898,26 @@ Starting August 2024, a third problem collection was started. Same rules as with
    <tr>
    <td>Split at None
    </td>
-   <td>Karel Tutsu, August 30, 2024
+   <td>Karel Tutsu, August 30, 2024</td>
+  </tr>
+   <tr>
+   <td>Factoradical dudes</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Gauss circle</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Maximal palindromic integer</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Tchuka Ruma</td>
+   <td>
    </td>
   </tr>
 </table>
