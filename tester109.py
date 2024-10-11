@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "August 17, 2024"
+version = "October 10, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -325,6 +325,81 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def square_root_sum_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(3, 2, 2), 2000):
+        n1, n2, d = [], [], rng.randint(0, 1)
+        for _ in range(n):
+            p = rng.randint(2, 3 * n) if n1 == [] else max(n1[-1], n2[-1])
+            p1 = rng.randint(p + 1, p + 4)
+            p2 = p1 + 1
+            if d == 0:
+                n1.append(p1)
+                n2.append(p2)
+            else:
+                n1.append(p2)
+                n2.append(p1)
+            d = 1 - d
+        yield n1, n2
+
+
+def friendship_paradox_generator(seed):
+    rng = Random(seed)
+    for n, p in islice(zip(pyramid(3, 2, 2), cycle([30, 50, 80])), 2000):
+        friend_set = set()
+        for i in range(0, n):
+            friends = set()
+            while len(friends) < 1 or rng.randint(0, 99) < p:
+                j = rng.randint(0, n - 1)
+                if i != j:
+                    friends.add((i, j))
+            for (i, j) in friends:
+                friend_set.add((i, j))
+                friend_set.add((j, i))
+        friends = [[] for _ in range(n)]
+        for (i, j) in friend_set:
+            friends[i].append(j)
+        yield friends,
+
+
+def factoradic_base_generator(seed):
+    for n in range(1, 100):
+        yield n,
+    for n in islice(scale_random(seed, 3, 4), 1500):
+        yield n,
+
+
+def tchuka_ruma_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(3, 5, 6), 150):
+        board = [0 for _ in range(n)]
+        for i in range(1, n):
+            board[i] = rng.randint(0, n)
+        yield board,
+
+
+def gauss_circle_generator(seed):
+    for r in range(1, 2001):
+        yield r,
+
+
+def maximal_palindrome_generator(seed):
+    for digits in ['0', '00', '123', '98', '123123123', '225588770099']:
+        yield digits,
+    rng = Random(seed)
+    for n, p in islice(zip(pyramid(2, 2, 2), cycle([10, 50, 90])), 3000):
+        digits = []
+        for d in range(10):
+            if rng.randint(0, 100) < 40:
+                m = rng.randint(2, n//2 + 3)
+                if rng.randint(0, 99) < p and m % 2 == 1:
+                    m += 1
+                digits.extend(str(d) for _ in range(m))
+        if digits:
+            rng.shuffle(digits)
+            yield "".join(digits),
+
 
 def ants_on_the_rod_generator(seed):
     yield [[1, 1], [2, 1], [3, 1], [4, -1]], 5
@@ -5724,6 +5799,36 @@ testcases = [
         "ants_on_the_rod",
         ants_on_the_rod_generator,
         "d199601b862de42ef06e267e90be194934eab6bc87822dd77a33baff895cc185"
+    ),
+    (
+        "maximal_palindrome",
+        maximal_palindrome_generator,
+        "aa8ccbaa4abd872b45329771887c1ce359adfde6b5647b340209fcf6795445ac"
+    ),
+    (
+        "gauss_circle",
+        gauss_circle_generator,
+        "8a35212161bea3c9ff78b70ac96169f0e0d75bcaecfb3466f7658efa08724bde"
+    ),
+    (
+        "tchuka_ruma",
+        tchuka_ruma_generator,
+        "5b82c7b2cba915081985eadccfda4986c163cf7f7d72cdbc65f38d77cf7aad8c"
+    ),
+    (
+        "factoradic_base",
+        factoradic_base_generator,
+        "8e4750ee12d888b3e66bd4c9410690771ca8000d3f418ec09d9cf6104ec5bf36"
+    ),
+    (
+        "friendship_paradox",
+        friendship_paradox_generator,
+        "7f9ea5f8dfeddc64aebdb692aab586372ea6471e5505c84bfa44917c17de42e0"
+    ),
+    (
+        "square_root_sum",
+        square_root_sum_generator,
+        "f1e732e1c1e8e4d901b30c928851acdcbe3a007f3128f76344f74e3b8ac4edb3"
     )
 ]
 
