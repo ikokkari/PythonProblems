@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "October 10, 2024"
+version = "November 2, 2024"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -325,6 +325,38 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def lehmer_decode_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(2, 3, 3), 3000):
+        inv = [rng.randint(0, n - i) for i in range(n)]
+        yield inv,
+
+
+def lehmer_encode_generator(seed):
+    rng = Random(seed)
+    for n in range(1, 6):
+        for p in permutations(range(n)):
+            yield list(p),
+    p = list(range(7))
+    for n in islice(pyramid(7, 2, 2), 2000):
+        if len(p) < n:
+            p.append(n - 1)
+        rng.shuffle(p)
+        yield p[:],
+
+
+def loopless_walk_generator(seed):
+    rng = Random(seed)
+    for n, p in islice(zip(pyramid(2, 1, 1), cycle([20, 50, 70])), 4000):
+        steps = []
+        for _ in range(n):
+            if len(steps) > 0 and rng.randint(0, 99) < p:
+                steps.append(rng.choice(steps))
+            else:
+                steps.append(rng.choice(lows))
+        yield "".join(steps)
+
 
 def square_root_sum_generator(seed):
     rng = Random(seed)
@@ -5829,6 +5861,21 @@ testcases = [
         "square_root_sum",
         square_root_sum_generator,
         "f1e732e1c1e8e4d901b30c928851acdcbe3a007f3128f76344f74e3b8ac4edb3"
+    ),
+    (
+        "loopless_walk",
+        loopless_walk_generator,
+        "0fd99c7f0ab5cb5e4697293486c2f6ffe383911697a47394517e625aaa4a76e9"
+    ),
+    (
+        "lehmer_encode",
+        lehmer_encode_generator,
+        "0ef0464a45f433b84b78676f92c4610e031cc66983a4be1478cf746cb7e1335f"
+    ),
+    (
+        "lehmer_decode",
+        lehmer_decode_generator,
+        "b9eee47331d8cf5d85220e8e8ee947b16f820957f2e5f04ac098547e61d30605"
     )
 ]
 
