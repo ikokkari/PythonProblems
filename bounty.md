@@ -889,16 +889,30 @@ Starting August 2024, a third problem collection was started. Same rules as with
    <td>Friendship paradox</td>
    <td>
    </td>
+   </tr>
+   <tr>
+   <td>Lehmer code: encoding</td>
+   <td>
+   </td>
+  </tr>
    <tr>
    <td>Sum of square roots</td>
    <td>
    </td>
-  </tr>
+   <tr>
+   <td>Loopless walk</td>
+   <td>
+   </td>
    </tr>
    <tr>
    <td>Split at None
    </td>
    <td>Karel Tutsu, August 30, 2024</td>
+  </tr>
+   <tr>
+   <td>Lehmer code: decoding</td>
+   <td>
+   </td>
   </tr>
    <tr>
    <td>Factoradical dudes</td>
