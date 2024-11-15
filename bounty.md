@@ -219,652 +219,653 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
   <tr>
-   <td>The Fischer King
+   <td>1. The Fischer King
    </td>
    <td>Karel Tutsu, June 7, 2023
    </td>
   </tr>
    <tr>
-   <td>Multiplicative persistence
+   <td>2. Multiplicative persistence
    </td>
    <td>Karel Tutsu, June 7, 2023
    </td>
   </tr>
    <tr>
-   <td>Top of the swops
+   <td>3. Top of the swops
    </td>
    <td>Karel Tutsu, June 7, 2023
    </td>
   </tr>
    <tr>
-   <td>Lowest common dominator
+   <td>4. Lowest common dominator
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Discrete rounding
+   <td>5. Discrete rounding
    </td>
    <td>Karel Tutsu, June 7, 2023
    </td>
   </tr>
    <tr>
-   <td>Translate
+   <td>6. Translate
    </td>
    <td>Zoe Lebel-Pantazopoulos, August 4, 2024
    </td>
   </tr>
    <tr>
-   <td>Ifs and butts
+   <td>7. Ifs and butts
    </td>
    <td>Zoe Lebel-Pantazopoulos, August 4, 2024
    </td>
   </tr>
    <tr>
-   <td>Word positions
+   <td>8. Word positions
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Power prefix
+   <td>9. Power prefix
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Deterministic finite automata
+   <td>10. Deterministic finite automata
    </td>
    <td>Kiran Soogrim-Maharaj, August 6, 2024
    </td>
   </tr>
    <tr>
-   <td>The parking lot is full
+   <td>11. The parking lot is full
    </td>
    <td>Aryan Khurram, August 6, 2024
    </td>
   </tr>
    <tr>
-   <td>Lychrel numbers
+   <td>12. Lychrel numbers
    </td>
    <td>Zoe Lebel-Pantazopoulos, August 4, 2024
    </td>
   </tr>
    <tr>
-   <td>Powertrain
+   <td>13. Powertrain
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>First fit bin packing
+   <td>14. First fit bin packing
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Count possible triangles
+   <td>15. Count possible triangles
    </td>
    <td>Kiran Soogrim-Maharaj, August 6, 2024
    </td>
   </tr>
    <tr>
-   <td>Arrow walk with me
+   <td>16. Arrow walk with me
    </td>
    <td>Aryan Khurram, August 6, 2024
    </td>
   </tr>
-   <td>Count Friday the Thirteenths
+   <td>17. Count Friday the Thirteenths
    </td>
    <td>Kiran Soogrim-Maharaj, August 6, 2024
    </td>
   </tr>
    <tr>
-   <td>Median filter
+   <td>18. Median filter
    </td>
    <td>Kiran Soogrim-Maharaj, August 6, 2024
    </td>
   </tr>
    <tr>
-   <td>The magic knight of Muhammad ibn Muhammad
+   <td>19. The magic knight of Muhammad ibn Muhammad
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Man of La Cancha
+   <td>20. Man of La Cancha
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Nondeterministic finite automata
+   <td>21. Nondeterministic finite automata
    </td>
    <td>Kiran Soogrim-Maharaj, August 6, 2024
    </td>
   </tr>
    <tr>
-   <td>Count unicolour rectangles
+   <td>22. Count unicolour rectangles
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Count palindromic substrings
+   <td>23. Count palindromic substrings
    </td>
    <td>Karel Tutsu, June 13, 2023
    </td>
   </tr>
    <tr>
-   <td>Longest mirrored substring
+   <td>24. Longest mirrored substring
    </td>
    <td>Kiran Soogrim-Maharaj, August 6, 2024
    </td>
   </tr>
    <tr>
-   <td>Square lamplighter
+   <td>25. Square lamplighter
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Pairwise lamps
+   <td>26. Pairwise lamps
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Accumulating merge
+   <td>27. Accumulating merge
    </td>
    <td>Aryan Khurram, August 6, 2024
    </td>
   </tr>
    <tr>
-   <td>And they walk in twos or threes or more
+   <td>28. And they walk in twos or threes or more
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Ladies and gentlemen, Conway Bitty
+   <td>29. Ladies and gentlemen, Conway Bitty
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Lowest fraction between two fractions
+   <td>30. Lowest fraction between two fractions
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Reasonable filename comparison
+   <td>31. Reasonable filename comparison
    </td>
    <td>Anonymous, July 8, 2023
    </td>
   </tr>
    <tr>
-   <td>List the Langford violations
+   <td>32. List the Langford violations
    </td>
    <td>Anonymous, July 8, 2023
    </td>
   </tr>
    <tr>
-   <td>Ten pins, not six, Dolores
+   <td>33. Ten pins, not six, Dolores
    </td>
    <td>Karel Tutsu, June 7, 2023
    </td>
   </tr>
    <tr>
-   <td>Strict majority element
+   <td>34. Strict majority element
    </td>
    <td>Maxim Olatoye, May 20, 2023
    </td>
   </tr>
    <tr>
-   <td>Add like an Egyptian
+   <td>35. Add like an Egyptian
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Sorting by pairwise swaps
+   <td>36. Sorting by pairwise swaps
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Van der Corput sequence
+   <td>37. Van der Corput sequence
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Condorcet election
+   <td>38. Condorcet election
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>It's a game, a reflection
+   <td>39. It's a game, a reflection
    </td>
    <td>Karel Tutsu, June 11, 2023
    </td>
   </tr>
    <tr>
-   <td>Reverse a Fibonacci-like sequence
+   <td>40. Reverse a Fibonacci-like sequence
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Recamán sequence
+   <td>41. Recamán sequence
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Mian–Chowla sequence
+   <td>42. Mian–Chowla sequence
    </td>
    <td>Karel Tutsu, June 12, 2023
    </td>
   </tr>
    <tr>
-   <td>Stern–Brocot path
+   <td>43. Stern–Brocot path
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Carryless multiplication
+   <td>44. Carryless multiplication
    </td>
    <td>
    </td>
   </tr>
-   <td>Manimix
+   <tr>
+   <td>45. Mū tōrere boom-de-ay
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>46. A place for everything and everything in its place
+   </td>
+   <td>
+   </td>
+   </tr>
+   <tr>
+   <td>47. Scoring a tournament bridge hand
+   </td>
+   <td>
+   </td>
+   </tr>
+   <tr>
+   <td>48. Manimix
    </td>
    <td>Aryan Khurram, August 4, 2024
    </td>
   </tr>
    <tr>
-   <td>Mū tōrere boom-de-ay
-   </td>
-   <td>
-   </td>
-  </tr>
-   <tr>
-   <td>A place for everything and everything in its place
+   <td>49. Count distinct substrings
    </td>
    <td>
    </td>
    </tr>
    <tr>
-   <td>Scoring a tournament bridge hand
-   </td>
-   <td>
-   </td>
-   </tr>
-   <tr>
-   <td>Count distinct substrings
-   </td>
-   <td>
-   </td>
-   </tr>
-   <tr>
-   <td>Replacement with perfect hindsight
+   <td>50. Replacement with perfect hindsight
    </td>
    <td>Aryan Khurram, August 5, 2024
    </td>
    </tr>
    <tr>
-   <td>Replacement with perfect foresight
+   <td>51. Replacement with perfect foresight
    </td>
    <td>
    </td>
    </tr>
    <tr>
-   <td>When there's no item, there's no problem
+   <td>52. When there's no item, there's no problem
    </td>
    <td>Karel Tutsu, August 30, 2023
    </td>
    </tr>
    <tr>
-   <td>Boxed away
+   <td>53. Boxed away
    </td>
    <td>
    </td>
    </tr>
    <tr>
-   <td>'Tis but a scratch
+   <td>54. ’Tis but a scratch
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Do or die
+   <td>55. Do or die
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Arithmetic skip
+   <td>56. Arithmetic skip
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Carving Egyptian fractions
+   <td>57. Carving Egyptian fractions
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Largest square of ones
+   <td>58. Largest square of ones
    </td>
    <td>Maxim Olatoye, June 15, 2023
    </td>
   </tr>
    <tr>
-   <td>Infection affection
+   <td>59. Infection affection
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Prize strings
+   <td>60. Prize strings
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>String shuffle
+   <td>61. String shuffle
    </td>
    <td>Aryan Khurram, August 5, 2024
    </td>
   </tr>
    <tr>
-   <td>Weak Goodstein sequence
+   <td>62. Weak Goodstein sequence
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Markov distance
+   <td>63. Markov distance
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>A very graphy caterpillar
+   <td>64. A very graphy caterpillar
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>St. Bitus‘ Dance
+   <td>65. St. Bitus‘ Dance
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Digit string partition
+   <td>66. Digit string partition
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Hofstadter's figure-figure sequences
+   <td>67. Hofstadter's figure-figure sequences
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>[Be]t[Te]r [C][Al]l [Sm][Al]l
+   <td>68. [Be]t[Te]r [C][Al]l [Sm][Al]l
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Spiral matrix
+   <td>69. Spiral matrix
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Baker–Norine dollar game
+   <td>70. Baker–Norine dollar game
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Total covered area
+   <td>71. Total covered area
    </td>
    <td>Karel Tutsu, September 1, 2023
    </td>
    </tr>
    <tr>
-   <td>Balsam for the code 
+   <td>72. Balsam for the code 
    </td>
    <td>Nam Nguyen, March 6, 2024
    </td>
   </tr>
    <tr>
-   <td>Flip those trips
+   <td>73. Flip those trips
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Maximal disk placement 
+   <td>74. Maximal disk placement 
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Nice sequence 
+   <td>75. Nice sequence 
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Forbidden digit 
+   <td>76. Forbidden digit 
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Decoding the base –1 + i
+   <td>77. Decoding the base –1 + <i>i</i>
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Independent dominating set 
+   <td>78. Independent dominating set 
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Vertex cover 
+   <td>79. Vertex cover 
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Shotgun sequence
+   <td>80. Shotgun sequence
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Card row game
+   <td>81. Card row game
    </td>
    <td>Maxim Olatoye, June 18, 2023
    </td>
   </tr>
    <tr>
-   <td>The remains
+   <td>82. The remains
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Count sublists with odd sums
+   <td>83. Count sublists with odd sums
    </td>
    <td>Karel Tutsu, August 30, 2023
    </td>
   </tr>
    <tr>
-   <td>Tailfins and hamburgers
+   <td>84. Tailfins and hamburgers
    </td>
    <td>Nam Nguyen, March 30, 2024
    </td>
    </tr>
    <tr>
-   <td>Split the digits, maximize the product
+   <td>85. Split the digits, maximize the product
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Tower of cubes
+   <td>86. Tower of cubes
    </td>
    <td>Nam Nguyen, March 6, 2024
    </td>
   </tr>
    <tr>
-   <td>Gijswijt sequence
+   <td>87. Gijswijt sequence
    </td>
    <td>
    </td>
   </tr>
-   <td>Sum of consecutive squares
+   <td>88. Sum of consecutive squares
    </td>
    <td>Karel Tutsu, August 30, 2023
    </td>
   </tr>
    <tr>
-   <td>Balance of power
+   <td>89. Balance of power
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Longest zigzag subsequence
+   <td>90. Longest zigzag subsequence
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Kimberling's expulsion sequence
+   <td>91. Kimberling's expulsion sequence
    </td>
    <td>Nam Nguyen, April 26, 2024
    </td>
   </tr>
    <tr>
-   <td>Kimberling's repetition-resistant sequence
+   <td>92. Kimberling's repetition-resistant sequence
    </td>
    <td>Nam Nguyen, May 1, 2024
    </td>
   </tr>
    <tr>
-   <td>Game with multiset
+   <td>93. Game with multiset
    </td>
    <td>Nam Nguyen, April 26, 2024
    </td>
   </tr>
    <tr>
-   <td>Tower of Babel
+   <td>94. Tower of Babel
    </td>
    <td>Nam Nguyen, March 6, 2024
    </td>
   </tr>
    <tr>
-   <td>Make a list self-describing
+   <td>95. Make a list self-describing
    </td>
    <td>Nam Nguyen, May 1, 2024
    </td>
   </tr>
    <tr>
-   <td>Two pins, not three, Dolores
+   <td>96. Two pins, not three, Dolores
    </td>
    <td>Matt Campeau, April 2, 2024
    </td>
   </tr>
    <tr>
-   <td>Out where the buses don't run
+   <td>97. Out where the buses don't run
    </td>
    <td>“Shwnzp”, May 26, 2023
    </td>
   </tr>
    <tr>
-   <td>SMETANA interpreter
+   <td>98. SMETANA interpreter
    </td>
    <td>Abdul Rahman Al Nabulsi, April 15, 2024
    </td>
   </tr>
    <tr>
-   <td>The sharpest axes
+   <td>99. The sharpest axes
    </td>
    <td>Nam Nguyen, April 24, 2024
    </td>
   </tr>
    <tr>
-   <td>Vidrach Itky Leda
+   <td>100. Vidrach Itky Leda
    </td>
    <td>Nam Nguyen, May 1, 2024
    </td>
   </tr>
    <tr>
-   <td>How's my coding? Call 1-800-3284778
+   <td>101. How's my coding? Call 1-800-3284778
    </td>
    <td>Karel Tutsu, August 25, 2023
    </td>
   </tr>
   <tr>
-   <td>Scatter her enemies
+   <td>102. Scatter her enemies
    </td>
    <td>Karel Tutsu, March 8, 2023
    </td>
   </tr>
    <tr>
-   <td>Sneaking
+   <td>103. Sneaking
    </td>
    <td>
    </td>
   </tr>
     <tr>
-   <td>Inverse pair sums
+   <td>104. Inverse pair sums
    </td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Blocking pawns
+   <td>105. Blocking pawns
    </td>
    <td>Nam Nguyen, March 6, 2024
    </td>
   </tr>
    <tr>
-   <td>Boggles the mind
+   <td>106. Boggles the mind
    </td>
    <td>Mortreza Eivazi, June 30, 2023
    </td>
   </tr>
    <tr>
-   <td>The round number round
+   <td>107. The round number round
    </td>
    <td>Shane Liu, March 31, 2024
    </td>
    </tr>
    <tr>
-   <td>Complete a Costas array
+   <td>108. Complete a Costas array
    </td>
    <td>Karel Tutsu, August 22, 2023
    </td>
   </tr>
    <tr>
-   <td>Oppenhoppenheimereimer
+   <td>109. Oppenhoppenheimereimer
    </td>
    <td>John Hodgins, April 20, 2023
    </td>
