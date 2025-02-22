@@ -664,7 +664,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>75. Nice sequence 
    </td>
-   <td>
+   <td>Ethan Harriman, February 22, 2025
    </td>
   </tr>
    <tr>
