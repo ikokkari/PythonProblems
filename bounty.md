@@ -634,7 +634,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>70. Baker–Norine dollar game
    </td>
-   <td>
+   <td>Samuel Hua, March 10, 2025
    </td>
   </tr>
    <tr>
@@ -747,7 +747,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>89. Balance of power
    </td>
-   <td>
+   <td>Samuel Hua, March 10, 2025
    </td>
   </tr>
    <tr>
