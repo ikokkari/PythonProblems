@@ -156,7 +156,7 @@ To keep this fair and interesting, each individual person can get at most one bo
    <tr>
    <td>A115: Set splitting
    </td>
-   <td>
+   <td>Ethan Harriman, March 19, 2025
    </td>
   </tr>
    <tr>
