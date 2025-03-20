@@ -658,7 +658,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>74. Maximal disk placement 
    </td>
-   <td>
+   <td>Sarvesh Badhwar, March 13, 2025
    </td>
   </tr>
    <tr>
