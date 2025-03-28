@@ -682,7 +682,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>78. Independent dominating set 
    </td>
-   <td>
+   <td>Mohamed Shrief, March 28, 2025
    </td>
   </tr>
    <tr>
