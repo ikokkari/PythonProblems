@@ -207,7 +207,7 @@ I will therefore offer a bounty of 100 CAD for each bonus problem to the first p
   </tr>
 </table>
      
-Starting March 2023, the author started creating another set of Python problems, separate from the main corpus of the *109 Python Problems*. (One can only quit for so long without the inevitable relapse.) **The following problems don't have paid bounties**, but the first person to submit a working solution for each of the following problems will still get their name etched in the table below for perpetuity. There are no monetary bounties for the following problems, though, just the bragging rights and the good feeling for the work well done.
+Starting March 2023, the author started creating another set of Python problems, separate from the main corpus of the *109 Python Problems*. (One can only quit for so long without the inevitable relapse.) **The following problems don't have paid bounties**, but the first person to submit a working solution for each of the following problems will still get their name etched in the table below for perpetuity, plus the bragging rights and the good feeling for the work well done.
      
 <table>
   <tr>
