@@ -326,6 +326,96 @@ def pyramid(n=1, goal=5, inc=1):
 
 # XXX Test case generators for the individual functions.
 
+def optimal_ab_filling_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(3, 2, 3), 1000):
+        text = "".join(rng.choice("aabb...") for _ in range(n))
+        ab = rng.randint(1, 5)
+        ba = rng.randint(1, 5)
+        yield text, ab, ba
+
+
+def haircut_generator(seed):
+    rng = Random(seed)
+    for p, m in islice(zip(count(10), pyramid(3, 5, 6)), 500):
+        speed = [rng.randint(10, 60) for _ in range(m)]
+        n = rng.randint(5, p)
+        yield speed, n
+
+
+def bayes_dice_update_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(2, 4, 5), pyramid(10, 4, 6)), 200):
+        dice = rng.sample(range(2, m + 1), n)
+        dice.sort()
+        d = rng.choice(dice)
+        rolls = [rng.randint(1, d) for _ in range(1, n)]
+        yield dice, rolls
+
+
+def limited_swaps_generator(seed):
+    rng = Random(seed)
+    prev_n = 0
+    for n in islice(pyramid(3, 5, 6), 200):
+        if n != prev_n:
+            pairs = list(combinations(range(n), 2))
+        perm = list(range(n))
+        rng.shuffle(perm)
+        m = min(rng.randint(n//2, max(n + 2, (n * n - n - 3)//2)), len(pairs) - 1)
+        swaps = rng.sample(pairs, m)
+        swaps.sort()
+        yield perm, swaps
+
+
+def s_eval_generator(seed):
+    rng = Random(seed)
+
+    def create_expr(d, n):
+        if d < 1:
+            return rng.randint(0, 10**n)
+        op = rng.choice("+-*")
+        e1 = create_expr(rng.randint(0, d - 1), n)
+        e2 = create_expr(rng.randint(0, d - 1), n)
+        return f"({op} {e1} {e2})"
+
+    yield "42"
+    for d, n in islice(zip(pyramid(1, 3, 4), pyramid(1, 20, 30)), 1000):
+        yield create_expr(d, n),
+
+
+def odds_and_evens_generator(seed):
+    yield from [('11', '1111'), ('10', '01'), ('0', '0000'), ('1111', '1'), ('000111', '111000') ]
+    rng = Random(seed)
+    for n in islice(pyramid(3, 3, 3), 2000):
+        first = random_string('01', n, rng)
+        second = random_string('01', rng.randint(1, n), rng)
+        yield (first, second) if rng.randint(0, 99) < 50 else (second, first)
+
+
+def cousin_explainer_generator(seed):
+    rng = Random(seed)
+    for m, p in islice(zip(pyramid(6, 3, 0), pyramid(4, 20, 15)), 5000):
+        a = rng.randint(1, m)
+        b, steps1 = a, rng.randint(0, p)
+        steps = steps1
+        while b > 1 and steps1 > 0:
+            b = b // 2
+            steps1 -= 1
+        steps2 = rng.randint(1, p + 2)
+        while b < 2**11 and steps2 > 0:
+            b = 2 * b + rng.randint(0, 1)
+            steps2 -= 1
+        if a != b:
+            yield a, b
+            if steps < 2:
+                yield b, a
+
+
+def splitting_numbers_generator(seed):
+    for n in islice(scale_random(seed, 2, 3), 2000):
+        yield n,
+
+
 def lehmer_decode_generator(seed):
     rng = Random(seed)
     for n in islice(pyramid(2, 3, 3), 3000):
@@ -3279,6 +3369,7 @@ def sort_by_digit_count_generator(seed):
 
 
 def count_divisibles_in_range_generator(seed):
+    yield from [(-4, 5, 2), (4, 5, 2), (-6, 6, 3), (-1, 100, 10), (-9, 3, 3), (-10, 5, 3) ]
     rng = Random(seed)
     vals = scale_random(seed, 2, 6)
     divs = scale_random(seed, 2, 20)
@@ -3287,8 +3378,8 @@ def count_divisibles_in_range_generator(seed):
         yield -vv, v, d
         yield vv, v, d
         yield -v, -vv, d
-        yield -v, vv, d
-        yield -v, v, d
+        yield -v, vv // d, d
+        yield -(v // d), v, d
         yield -v, 0, d
         yield 0, v, d
 
@@ -4716,7 +4807,7 @@ testcases = [
     (
         "count_divisibles_in_range",
         count_divisibles_in_range_generator,
-        "2a260582841eb49f1ac4ae871e844a9551f2f6ad8702b1989eb765ad53ee48be"
+        "874a0000fd2c0617f73d211080c5f0a3918666aa5245d76b37d58cefd62b27d9"
     ),
     (
         "sort_by_digit_count",
@@ -5876,6 +5967,46 @@ testcases = [
         "lehmer_decode",
         lehmer_decode_generator,
         "b9eee47331d8cf5d85220e8e8ee947b16f820957f2e5f04ac098547e61d30605"
+    ),
+    (
+        "splitting_numbers",
+        splitting_numbers_generator,
+        "593d2a375594e272f1bd3ebd9a88318e3e2868616d50226f1502133688b99787"
+    ),
+    (
+        "cousin_explainer",
+        cousin_explainer_generator,
+        "0566d180608174707ffa9b420f6c650975db37c14037750c2e6c24e069ef32f9"
+    ),
+    (
+        "odds_and_evens",
+        odds_and_evens_generator,
+        "878b85e676cf48b845f744e4cccf7576c95749884f401ad1daffd25943caff22"
+    ),
+    (
+        "s_eval",
+        s_eval_generator,
+        "7bec0a24887c90dc11104cad0630718909a2bea88bb64646e67bf5eb03eddd16"
+    ),
+    (
+        "limited_swaps",
+        limited_swaps_generator,
+        "d6c8b213871e4bb7e9127f696982cc464b4ec9bcc8f8763df8dd4b2b9968b5db"
+    ),
+    (
+        "bayes_dice_update",
+        bayes_dice_update_generator,
+        "f59c447735f6ed20a16d0cf0691df050cf6ff3b26941b1e1f4e019b99b3c28c8"
+    ),
+    (
+        "haircut",
+        haircut_generator,
+        "6b9c2be415afe750a1143d5654ff2d132342b0dd43b20d39a88ba2960880a100"
+    ),
+    (
+        "optimal_ab_filling",
+        optimal_ab_filling_generator,
+        "634e9fd2c1e9d3f309baead12c00fae23b1307191eb17980eff2ab9286670bc6"
     )
 ]
 
@@ -5987,4 +6118,4 @@ run_all()
 
 
 # teacher student generator
-# discrepancy(labs109.cubes_on_trailer2, labs109.cubes_on_trailer, cubes_on_trailer_generator, stop_at_first=True)
+# discrepancy(labs109.count_divisibles_in_range, count_divisibles_in_range, count_divisibles_in_range_generator, stop_at_first=True)
