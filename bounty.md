@@ -898,6 +898,7 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    <td>Sum of square roots</td>
    <td>
    </td>
+   </tr>
    <tr>
    <td>Loopless walk</td>
    <td>
@@ -914,12 +915,47 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Bayesian updating of dice</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Haircut</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Factoradical dudes</td>
    <td>
    </td>
   </tr>
    <tr>
+   <td>Cousin explainer</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Gauss circle</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Odds and evens</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Limited swap sorting</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Optimal text filling</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>S-expression evaluator</td>
    <td>
    </td>
   </tr>
