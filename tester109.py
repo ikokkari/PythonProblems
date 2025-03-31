@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "November 2, 2024"
+version = "March 29, 2025"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
