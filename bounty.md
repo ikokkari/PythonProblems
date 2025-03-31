@@ -148,7 +148,7 @@ I will therefore offer a bounty of 100 CAD for each bonus problem to the first p
    <tr>
    <td>A114: Bandwidth minimization
    </td>
-   <td>
+   <td>Mojtaba Khalesi, March 31, 2025
    </td>
   </tr>
    <tr>
