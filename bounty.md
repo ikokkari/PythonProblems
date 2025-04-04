@@ -668,7 +668,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>76. Forbidden digit 
    </td>
-   <td>
+   <td>Zhiyu Jin, April 4, 2025
    </td>
   </tr>
    <tr>
