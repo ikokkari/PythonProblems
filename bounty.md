@@ -136,7 +136,7 @@ I will therefore offer a bounty of 100 CAD for each bonus problem to the first p
    <tr>
    <td>A112: Word bin packing
    </td>
-   <td>
+   <td>Dan Ruiyot, April 13, 2025
    </td>
   </tr>
    <tr>
@@ -160,13 +160,13 @@ I will therefore offer a bounty of 100 CAD for each bonus problem to the first p
    <tr>
    <td>A116: Domino poppers
    </td>
-   <td>
+   <td>Dan Ruiyot, April 13, 2025
    </td>
   </tr>
    <tr>
    <td>A117: Knight jam
    </td>
-   <td>
+   <td>Dan Ruiyot, April 13, 2025
    </td>
   </tr>
    <tr>
