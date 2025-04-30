@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "March 29, 2025"
+version = "April 29, 2025"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -5896,7 +5896,7 @@ testcases = [
     (
         "pinch_moves",
         pinch_moves_generator,
-        "1969aaba44754251ec69acde533a0a483d7078d30ea108c458557502fcbf5b07"
+        "cb5932ed866518ab208c571cb411e7d467dc5806995e9dfa6578b92c3b340f5f"
     ),
     (
         "power_prefix",
