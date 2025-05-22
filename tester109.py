@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "April 29, 2025"
+version = "May 22, 2025"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -325,6 +325,31 @@ def pyramid(n=1, goal=5, inc=1):
 
 
 # XXX Test case generators for the individual functions.
+
+def front_back_sort_generator(seed):
+    for n in range(1, 8):
+        for perm in permutations(range(n)):
+            yield list(perm),
+
+
+def pick_it_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(3, 2, 3), pyramid(5, 3, 4)), 100):
+        items = [rng.randint(1, m) for _ in range(n)]
+        yield items,
+
+
+def find_all_words_generator(seed):
+    rng = Random(seed)
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [w.strip() for w in f if len(w) >= 8]
+    for n in islice(pyramid(8, 6, 7), 200):
+        letters = rng.choice(words)
+        while len(letters) < n:
+            letters += rng.choice(lows)
+        letters = "".join(sorted([c for c in letters]))
+        yield letters, words
+
 
 def optimal_ab_filling_generator(seed):
     rng = Random(seed)
@@ -2958,24 +2983,10 @@ def leibniz_generator(seed):
 
 
 def prominences_generator(seed):
-    yield from [[42], [0], [1, 3, 1], [3, 1, 4], [1, 10, 5, 20, 6, 10, 4]]
-    yield [3, 10, 9, 8, 7, 6, 5, 4, 3, 11, 1]
-
+    for heights in [[1], [1, 2], [2, 1], [2, 1, 2], [1, 2, 1]]:
+        yield heights
     rng = Random(seed)
-    h = 3
-    # Permutations up to length 6 ought to root out most logic errors.
-    for k in range(1, 7):
-        for p in permutations(range(k)):
-            heights = [rng.randint(1, h)]
-            for _ in range(k - 1):
-                heights.append(heights[-1] + rng.randint(1, h))
-            yield [heights[i] for i in p],
-        h += 2
-
-    # Okay, basic logic seems right, so on to pseudorandom fuzz testing.
-
-    scale, n, count_until_increase, goal = 3, 7, 0, 10
-    for _ in range(5000):
+    for n, scale in islice(zip(pyramid(3, 3, 3), pyramid(3, 6, 10)), 5000):
         heights, change = [rng.randint(1, scale)], +1
         while len(heights) < n:
             if rng.randint(0, 99) < 40:
@@ -2985,10 +2996,7 @@ def prominences_generator(seed):
             heights.append(ee)
         while heights[-1] > scale:
             heights.append(heights[-1] - rng.randint(1, scale))
-        yield heights
-        count_until_increase += 1
-        if count_until_increase == goal:
-            count_until_increase, goal, scale, n = 0, goal + 4, scale + 2, n + 1
+        yield heights,
 
 
 def brussels_choice_step_generator(seed):
@@ -5157,7 +5165,7 @@ testcases = [
     (
         "prominences",
         prominences_generator,
-        "3287e282781effcbb0bb54f99a69f79b3a06c420e2639539e5195e6b1465ea41"
+        "26b0dc947bb597270524828e885286c7e6b1ef7dba4b795ced407f9609786f62"
     ),
     (
         "leibniz",
@@ -6007,6 +6015,21 @@ testcases = [
         "optimal_ab_filling",
         optimal_ab_filling_generator,
         "634e9fd2c1e9d3f309baead12c00fae23b1307191eb17980eff2ab9286670bc6"
+    ),
+    (
+        "find_all_words",
+        find_all_words_generator,
+        "08f8760535f584c3d238dcb2c9c465a41f7be7db6e8e524a3ca1e041d4fe4916"
+    ),
+    (
+        "pick_it",
+        pick_it_generator,
+        "79f1ba044e4b254fb1382040fedde1dfff8ddbf0dafbd7e4ad99c38af35f7edd"
+    ),
+    (
+        "front_back_sort",
+        front_back_sort_generator,
+        "5bf66a7a2e73a15528975eac43e699525c6b9df046d5e50b191e5d06a3acb92c"
     )
 ]
 
