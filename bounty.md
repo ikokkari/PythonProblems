@@ -969,4 +969,19 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    <td>
    </td>
   </tr>
+   <tr>
+   <td>The prodigal sequence</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>The Borgesian dictionary</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>The art of strategic sacrifice</td>
+   <td>
+   </td>
+  </tr>
 </table>
