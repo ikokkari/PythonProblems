@@ -6019,7 +6019,7 @@ testcases = [
     (
         "front_back_sort",
         front_back_sort_generator,
-        "5bf66a7a2e73a15528975eac43e699525c6b9df046d5e50b191e5d06a3acb92c"
+        "8b292439e2ade7a1b27adcf8e8effcca2d58ba722178537002030e6f111f101b"
     )
 ]
 
