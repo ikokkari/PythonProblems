@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "May 22, 2025"
+version = "May 23, 2025"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -434,11 +434,6 @@ def cousin_explainer_generator(seed):
             yield a, b
             if steps < 2:
                 yield b, a
-
-
-def splitting_numbers_generator(seed):
-    for n in islice(scale_random(seed, 2, 3), 2000):
-        yield n,
 
 
 def lehmer_decode_generator(seed):
@@ -5975,11 +5970,6 @@ testcases = [
         "lehmer_decode",
         lehmer_decode_generator,
         "b9eee47331d8cf5d85220e8e8ee947b16f820957f2e5f04ac098547e61d30605"
-    ),
-    (
-        "splitting_numbers",
-        splitting_numbers_generator,
-        "593d2a375594e272f1bd3ebd9a88318e3e2868616d50226f1502133688b99787"
     ),
     (
         "cousin_explainer",
