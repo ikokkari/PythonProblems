@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "May 23, 2025"
+version = "June 9, 2025"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -197,7 +197,7 @@ def test_one_function(f, test_generator, expected_checksum=None, recorder=None, 
             print("RUNS OUT ONCE THE NUMBERS INVOLVED BECOME LARGE ENOUGH.")
             return -1
     else:
-        print(f"({output_len}) ", end='')
+        print(f"({output_len}) ")
         return 0
 
 
@@ -326,8 +326,98 @@ def pyramid(n=1, goal=5, inc=1):
 
 # XXX Test case generators for the individual functions.
 
+def pebblery_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(4, 2, 2), 120):
+        pred = [[] for _ in range(n)]
+        for i in range(1, n):
+            pred[rng.randint(0, i -1)].append(i)
+            for _ in range(rng.randint(0, 3)):
+                j = rng.randint(0, i - 1)
+                if i not in pred[j]:
+                    pred[j].append(i)
+        yield pred,
+
+
+def poker_test_generator(seed):
+    yield [1, 2, 3, 4 ,5],
+    rng = Random(seed)
+    for n, m, p in islice(zip(pyramid(10, 1, 1), pyramid(5, 6, 7), cycle([0, 40, 70])), 3000):
+        seq = [rng.randint(0, m)]
+        for _ in range(n):
+            if rng.randint(0, 99) < p and len(seq) > 2:
+                seq.append(seq[rng.randint(-3, -1)])
+            else:
+                seq.append(rng.randint(0, m))
+        yield seq,
+
+
+def is_semiconnected_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(4, 2, 2), 800):
+        edge_set = set()
+        m = rng.randint(n, (n*n)//3)
+        while len(edge_set) < m:
+            u = rng.randint(0, n-1)
+            v = rng.randint(0, n-1)
+            if u != v:
+                edge_set.add((u, v))
+        edges = [[] for _ in range(n)]
+        for (u, v) in edge_set:
+            edges[u].append(v)
+        yield edges,
+
+
+def post_correspondence_problem_generator(seed):
+    yield ["a", 'ab', 'bba'], ['baa', 'aa', 'bb'], 5, 20
+    yield ["aa", "b"], ["a", "ab"], 2, 4
+    rng = Random(seed)
+    pieces = []
+    for n in range(1, 5):
+        for piece in product('ab', repeat=n):
+            pieces.append("".join(piece))
+    for n, m in islice(zip(pyramid(3, 5, 6), pyramid(4, 3, 4)), 500):
+        sample = rng.sample(pieces, 2*n)
+        prefix, postfix, top_longer, bottom_longer = False, False, False, False
+        first, second = sample[:n], sample[n:]
+        for (a, b) in zip(first, second):
+            prefix = prefix or a.startswith(b) or b.startswith(a)
+            postfix = postfix or a.endswith(b) or b.endswith(a)
+            top_longer = top_longer or len(a) > len(b)
+            bottom_longer = bottom_longer or len(a) < len(b)
+        if prefix and postfix and top_longer and bottom_longer:
+            yield first, second, m, rng.randint(m, 3*m),
+
+
+def zeckendorf_decode_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(3, 5, 8), pyramid(5, 2, 2)), 5000):
+        fits = ""
+        for _ in range(rng.randint(1, n)):
+            prev = 0
+            for _ in range(rng.randint(1, m)):
+                curr = 0 if prev == 1 else rng.randint(0, 1)
+                fits += str(curr)
+                prev = curr
+            fits += "11" if prev == 0 else "1"
+        yield fits,
+
+
+def average_run_length_generator(seed):
+    for items in [[2, 2], [4, 4, 4, 1], [3, 3, 3, 3, 2, 5], [1, 2, 1, 0], [4, 3, 1], [1, 2, 1, 2, 1, 2]]:
+        yield items,
+    rng = Random(seed)
+    for n, m, p in islice(zip(pyramid(2, 2, 2), pyramid(3, 8, 10), cycle([20, 30, 50])), 5000):
+        items, d = [rng.randint(0, m)], rng.choice([-1, 1])
+        while len(items) < n:
+            items.append(abs(items[-1] + d * rng.randint(0, m)))
+            if rng.randint(0, 99) < p:
+                d = -d
+        yield items,
+
+
 def front_back_sort_generator(seed):
-    for n in range(1, 8):
+    for n in range(1, 10):
         for perm in permutations(range(n)):
             yield list(perm),
 
@@ -526,7 +616,7 @@ def gauss_circle_generator(seed):
         yield r,
 
 
-def maximal_palindrome_generator(seed):
+def maximum_palindrome_generator(seed):
     for digits in ['0', '00', '123', '98', '123123123', '225588770099']:
         yield digits,
     rng = Random(seed)
@@ -5927,8 +6017,8 @@ testcases = [
         "d199601b862de42ef06e267e90be194934eab6bc87822dd77a33baff895cc185"
     ),
     (
-        "maximal_palindrome",
-        maximal_palindrome_generator,
+        "maximum_palindrome",
+        maximum_palindrome_generator,
         "aa8ccbaa4abd872b45329771887c1ce359adfde6b5647b340209fcf6795445ac"
     ),
     (
@@ -6019,7 +6109,42 @@ testcases = [
     (
         "front_back_sort",
         front_back_sort_generator,
-        "8b292439e2ade7a1b27adcf8e8effcca2d58ba722178537002030e6f111f101b"
+        "171886df33fbc4f12bf02f0b28c75cec03422d096a3315a81c10e346ed0fa458"
+    ),
+    (
+        "fourth_seat_opening",
+        bridge_hand_generator,
+        "b1ffb46b778d907a1741fc921aa411ec8acb4f0af64b392127f543032b6c5c2e"
+    ),
+    (
+        "average_run_length",
+        average_run_length_generator,
+        "195e165ffa14c82d3e7db21e32fbb33f8d270b0e1c46b38f05303c52a63ad696"
+    ),
+    (
+        "zeckendorf_decode",
+        zeckendorf_decode_generator,
+        "252f65ba09483657d9d28c1ff13f1714e6e97dea0a8b8d02f971185712f42861"
+    ),
+    (
+        "post_correspondence_problem",
+        post_correspondence_problem_generator,
+        "1865ae70a1ecaa696d66db87afa1d4495c0f0796a6190baa3dedc22676312af5"
+    ),
+    (
+        "is_semiconnected",
+        is_semiconnected_generator,
+        "45133ffcbe3f48cdbe9c49123790b4d04983b24958a652ecb7cdf1ac469ddfb8"
+    ),
+    (
+        "poker_test",
+        poker_test_generator,
+        "06cb768a3d39522c91ee20fd05ab897f04d2a6933c3ecf58414ad8d628c96866"
+    ),
+    (
+        "pebblery",
+        pebblery_generator,
+        "5ed98c6552cde4b0a7210fd426a6517f3687a8b37b7cf636d30983bfd2f9121a"
     )
 ]
 
