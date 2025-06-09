@@ -905,6 +905,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
    </tr>
    <tr>
+   <td>Fourth seat opening</td>
+   <td>
+   </td>
+   </tr>
+   <tr>
    <td>Split at None
    </td>
    <td>Karel Tutsu, August 30, 2024</td>
@@ -935,6 +940,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Poker test of randomness</td>
+   <td>
+   </td>
+   </tr>
+   <tr>
    <td>Gauss circle</td>
    <td>
    </td>
@@ -944,6 +954,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    <td>
    </td>
   </tr>
+   <tr>
+   <td>Zeckendorf decode</td>
+   <td>
+   </td>
+   </tr>
    <tr>
    <td>Limited swap sorting</td>
    <td>
@@ -955,6 +970,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Average run length test of randomness</td>
+   <td>
+   </td>
+   </tr>
+   <tr>
    <td>S-expression evaluator</td>
    <td>
    </td>
@@ -964,6 +984,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    <td>
    </td>
   </tr>
+   <tr>
+   <td>Semiconnected guys</td>
+   <td>
+   </td>
+   </tr>
    <tr>
    <td>Tchuka Ruma</td>
    <td>
@@ -984,4 +1009,14 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    <td>
    </td>
   </tr>
+   <tr>
+   <td>Post correspondence problem</td>
+   <td>
+   </td>
+   </tr>
+   <tr>
+   <td>The way of a man with array</td>
+   <td>
+   </td>
+   </tr>
 </table>
