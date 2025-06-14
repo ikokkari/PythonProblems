@@ -895,7 +895,7 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
-   <td>Maximal repeated suffic</td>
+   <td>Maximal repeated suffix</td>
    <td>
    </td>
   </tr>
