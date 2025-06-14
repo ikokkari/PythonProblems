@@ -19,11 +19,15 @@ import labs109
 from fractions import Fraction as F
 from datetime import date
 
+from labs109 import slater_velez, maximal_repeated_suffix
+
 # During development, this dictionary contains the functions whose calls and
 # results you want to see first during the test run. Make each entry "name":N,
 # where N is how many test cases you want to see printed out. This also makes
 # the tester to run the tests for these functions first, regardless of their
 # position in the labs109.py file. Use the limit of -1 to say "all test cases".
+
+# AAA
 
 verbose_execution = {
     #   "function_one": 42,   # Print the first 42 test cases of function_one
@@ -35,7 +39,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "June 9, 2025"
+version = "June 14, 2025"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -324,7 +328,98 @@ def pyramid(n=1, goal=5, inc=1):
             goal, count_until_increase, n = goal + inc, 0, n + 1
 
 
+# Rearrange the numbering of graph given in adjacency list form.
+
+def rearrange_graph(edges, rng):
+    n = len(edges)
+    perm = list(range(n))
+    rng.shuffle(perm)
+    new_edges = [[] for _ in range(n)]
+    for u in range(n):
+        for v in edges[u]:
+            new_edges[perm[u]].append(perm[v])
+    return new_edges
+
+
 # XXX Test case generators for the individual functions.
+
+def bays_durham_shuffle_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(10, 2, 2), pyramid(10, 1, 1)), 5000):
+        k = rng.randint(3, n // 2)
+        yield (rng.randint(0, m) for _ in range(n)), k
+
+
+def maximal_repeated_suffix_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(2, 1, 1), pyramid(3, 10, 12)), 10000):
+        items = []
+        while len(items) < n:
+            if len(items) < 3 or rng.randint(0, 99) < 50:
+                items.append(rng.randint(0, m))
+            else:
+                i = rng.randint(0, len(items) - 2)
+                j = rng.randint(i, len(items))
+                items += items[i:j]
+        i = rng.randint(0, len(items) - 2)
+        items += items[i:]
+        yield items,
+
+
+def count_slices_with_sum_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(3, 1, 1), pyramid(2, 7, 12)), 5000):
+        items = [rng.randint(1, m)]
+        while len(items) < n:
+            if len(items) < 4 or rng.randint(0, 99) < 50:
+                items.append(rng.randint(1, m))
+            else:
+                i = rng.randint(0, len(items) - 2)
+                j = rng.randint(i + 1, len(items))
+                items.extend(items[i::j])
+        i = rng.randint(0, n - 2)
+        j = rng.randint(i + 1, n)
+        yield items, sum(items[i:j])
+
+
+def count_increasing_paths_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(2, 2, 2), 500):
+        v = list(range(n*n))
+        rng.shuffle(v)
+        matrix = [v[i:i+n] for i in range(0, n*n, n)]
+        yield matrix
+
+
+def slater_velez_generator(seed):
+    for n in range(2, 5000):
+        yield n,
+
+
+def diamond_sequence_generator(seed):
+    for n in range(2, 100000):
+        yield n,
+
+
+def multiple_winner_election_generator(seed):
+    yield [128, 115, 26, 23], 21, "dhondt"
+    yield [128, 115, 26, 23], 21, "webster"
+    yield [128, 115, 26, 23], 21, "imperiali"
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(2, 3, 5), pyramid(4, 2, 1)), 500):
+        v = rng.randint(n*m, 2*n*m)
+        votes = [rng.randint(2, 3 + v // 10) for _ in range(n)]
+        while v > 0:
+            i = rng.randint(0, n - 1)
+            vv = rng.randint(min(3, v), max(4, v//10))
+            votes[i] += vv
+            v -= vv
+        votes.sort(reverse=True)
+        seats = rng.randint(m, 3*m)
+        yield votes, seats, "dhondt"
+        yield votes, seats, "webster"
+        yield votes, seats, "imperiali"
+
 
 def pebblery_generator(seed):
     rng = Random(seed)
@@ -6144,7 +6239,42 @@ testcases = [
     (
         "pebblery",
         pebblery_generator,
-        "5ed98c6552cde4b0a7210fd426a6517f3687a8b37b7cf636d30983bfd2f9121a"
+        "d10a947e011474f764213f5c8d037ab88798e07875747a331463b7d1b7249905"
+    ),
+    (
+        "multiple_winner_election",
+        multiple_winner_election_generator,
+        "5022bb941dd85ec1a5614ee29d9ff5e3f26bf1135cabbeaa05ff0592c2ecd2d8"
+    ),
+    (
+        "diamond_sequence",
+        diamond_sequence_generator,
+        "6a32ad8799cdbbca9216e786ae51dcbf248981ae5c0b09363119ae58fd176193"
+    ),
+    (
+        "slater_velez",
+        slater_velez_generator,
+        "8fea69528644e8bf37155d36c5a020212923ec3f50c1699b32dc5f5a408c8f1f"
+    ),
+    (
+        "count_increasing_paths",
+        count_increasing_paths_generator,
+        "acda6ba0d7ec043ee899565d82c5b48155297cfbb0450b7bbef19068d86482c5"
+    ),
+    (
+        "count_slices_with_sum",
+        count_slices_with_sum_generator,
+        "45626a82c31325959799e3d09fd0397fa792947f2cb5b117c04c00b38956dc77"
+    ),
+    (
+        "maximal_repeated_suffix",
+        maximal_repeated_suffix_generator,
+        "aefd8494e6f4839afd7ff1acdfe19017d4efd1c6423acb1940e9b8542c79da9e"
+    ),
+    (
+        "bays_durham_shuffle",
+        bays_durham_shuffle_generator,
+        "b9bc3bef28f9bc768cbac97e244ac59a44cb3334f3abbff426b46aa0a938bdb1"
     )
 ]
 
