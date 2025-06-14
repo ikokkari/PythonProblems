@@ -890,6 +890,21 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
    </tr>
    <tr>
+   <td>Bays–Durham shuffle</td></td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Maximal repeated suffic</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Count slices with given sum</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Lehmer code: encoding</td>
    <td>
    </td>
@@ -909,6 +924,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    <td>
    </td>
    </tr>
+   <tr>
+   <td>Multiple winner election</td>
+   <td>
+   </td>
+  </tr>
    <tr>
    <td>Split at None
    </td>
@@ -965,12 +985,22 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
-   <td>Optimal text filling</td>
+   <td>Average run length test of randomness</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Average run length test of randomness</td>
+   <td>Count increasing paths</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Diamond sequence</td>
+   <td>
+   </td>
+   </tr>
+   <tr>
+   <td>Optimal text filling</td>
    <td>
    </td>
    </tr>
@@ -991,6 +1021,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </tr>
    <tr>
    <td>Tchuka Ruma</td>
+   <td>
+   </td>
+   </tr>
+   <tr>
+   <td>Slater–Vélez sequence</td>
    <td>
    </td>
   </tr>
