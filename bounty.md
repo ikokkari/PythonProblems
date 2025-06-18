@@ -971,7 +971,7 @@ Starting August 2024, a third problem collection is being collected. Same rules 
   </tr>
    <tr>
    <td>Odds and evens</td>
-   <td>
+   <td>Thomas Brooks, June 17, 2025
    </td>
   </tr>
    <tr>
