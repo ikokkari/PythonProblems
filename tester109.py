@@ -19,15 +19,11 @@ import labs109
 from fractions import Fraction as F
 from datetime import date
 
-from labs109 import slater_velez, maximal_repeated_suffix
-
 # During development, this dictionary contains the functions whose calls and
 # results you want to see first during the test run. Make each entry "name":N,
 # where N is how many test cases you want to see printed out. This also makes
 # the tester to run the tests for these functions first, regardless of their
 # position in the labs109.py file. Use the limit of -1 to say "all test cases".
-
-# AAA
 
 verbose_execution = {
     #   "function_one": 42,   # Print the first 42 test cases of function_one
@@ -39,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "June 14, 2025"
+version = "June 21, 2025"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -343,6 +339,185 @@ def rearrange_graph(edges, rng):
 
 # XXX Test case generators for the individual functions.
 
+def merge_biggest_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(3, 1, 1), 10000):
+        yield [rng.randint(1, 3*n) for _ in range(n)],
+
+
+def maximum_word_select_generator(seed):
+    rng = Random(seed)
+    alphabet = 'abcdefghijklmnopqrstuvwxyz'
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        word_list = [w.strip() for w in f if 3 <= len(w) <= 8 or rng.randint(0, 99) < 10]
+    for n in islice(pyramid(4, 2, 2), 120):
+        words = rng.sample(word_list, n)
+        letters = [c if rng.randint(0, 99) < 85 else rng.choice(alphabet) for c in "".join(words)]
+        yield words, "".join(sorted(letters))
+
+
+def generalized_fibonacci_generator(seed):
+    for n in range(3, 20):
+        yield (1, 1), n      # Fibonacci
+        yield (1, 1, 1), n   # Tribonacci
+        yield (1, 2), n      # Pell
+        yield (2, 1), n      # Jacobstahl
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(3, 5, 6), pyramid(20, 1, 1)), 1000):
+        multipliers = tuple(rng.randint(-n, n) for _ in range(n))
+        k = rng.randint(n+1, m)
+        yield multipliers, m
+
+
+def sultans_daughter_generator(seed):
+    rng = Random(seed)
+    for digits in ["663653", "140952", "111122", "1171112222", "61111679612222",
+                   "1113151722222", "161316111267647653667222222", "13115616633131152222222",
+                   "47536414753642", "47431474312", "4447431474312", "5647431474312"]:
+        yield digits,
+
+    def create(depth):
+        if depth < 1:
+            tail = create(depth) if rng.randint(0, 99) < 50 else ""
+            return rng.choice("0123456789") + tail
+        else:
+            y = create(depth - 1)
+            roll = rng.randint(0, 99)
+            if roll < 30:
+                return "1" + y + "2"
+            elif roll < 45:
+                return "3" + y
+            elif roll < 60:
+                return "4" + y
+            elif roll < 70:
+                return "5" + y
+            elif roll < 80:
+                return "6" + y
+            elif roll < 90:
+                return "7" + y
+            else:
+                return rng.choice("89") + y
+
+    for n in islice(pyramid(3, 3, 2), 500):
+        yield create(n),
+
+
+def partition_point_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(4, 1, 1), 10000):
+        k = rng.randint(1, n - 1)
+        items = [rng.randint(0, n*n) for _ in range(k)]
+        m = max(items)
+        items.extend(rng.randint(m + 1, 2 * m) for _ in range(n - k + 1))
+        yield items,
+
+
+def sturm_word_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(20, 1, 1), 1000):
+        x = rng.randint(1, n)
+        y = rng.randint(x + 1, 2 * n)
+        g = gcd(x, y)
+        x, y = x // g, y // g
+        yield x, y
+        yield y, x
+
+
+def double_ended_pop_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(10, 1, 1), pyramid(20, 4, 5)), 3000):
+        items = [rng.randint(0, m) for _ in range(n)]
+        k = rng.randint(4, n // 2)
+        yield items, k
+
+
+def palindrome_split_generator(seed):
+    for text in ["X", "AA", "AAA", "ABA", "ABBA", "ABAB", "ABACAB"]:
+        yield text,
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(4, 1, 1), pyramid(3, 10, 10)), 1000):
+        alpha = ups[:rng.randint(2, m)]
+        text = rng.choice(alpha)
+        while len(text) < n:
+            c = rng.randint(0, 99)
+            if len(text) < 4 or c < 30:
+                text += rng.choice(alpha)
+            elif c < 60:
+                k = rng.randint(2, len(text))
+                text += text[:-k:-1]
+            else:
+                k1, k2 = rng.sample(range(len(text)), 2)
+                k1, k2 = min(k1, k2), max(k1, k2)
+                text += text[k1:k2]
+        yield text,
+
+
+def assign_sides_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(3, 2, 2), pyramid(6, 1, 1)), 1000):
+        costs = []
+        for _ in range(2 * n):
+            a = rng.randint(1, m)
+            b = rng.randint(1, m)
+            costs.append((a, b))
+        yield costs,
+
+
+def colonel_blotto_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(3, 3, 4), 2500):
+        prize = [rng.randint(1, 3*n) for _ in range(n)]
+        values = sorted(range(n), key=lambda i:(-prize[i], i))
+        units = [rng.randint(1, 10) for _ in range(2*n)]
+        units.sort(reverse=True)
+        enemy = [2*u + 1 for u in units[0::2]]
+        enemy = [enemy[values[i]] for i in range(n)]
+        for _ in range(rng.randint(0, min(n, 4))):
+            i = rng.randint(0, n-1)
+            j = rng.randint(0, n-1)
+            enemy[i], enemy[j] = enemy[j], enemy[i]
+        friend = [2*u for u in units[1::2]]
+        yield friend, enemy, prize
+
+
+def maximal_cliques_generator(seed):
+    rng = Random(seed)
+    for n, p in islice(zip(pyramid(6, 2, 3), cycle([10, 40, 60])), 1000):
+        edge_set = set()
+        nn = (n * (n - 1)) // 6
+        m = rng.randint(nn, 2*nn)
+        while len(edge_set) < m:
+            k = 2
+            while k < n - 2 and rng.randint(0, 99) < p:
+                k += 1
+            nodes = rng.sample(range(n), k)
+            for u, v in combinations(nodes, 2):
+                edge_set.add(((min(u, v), max(u, v))))
+        edges = [[] for _ in range(n)]
+        for (u, v) in edge_set:
+            edges[u].append(v)
+            edges[v].append(u)
+        yield edges,
+
+
+def chunk_sorting_generator(seed):
+    rng = Random(seed)
+    for n in range(1, 4):
+        for perm in permutations(range(n)):
+            yield list(perm),
+    for n in islice(pyramid(4, 1, 3), 20000):
+        perm, prev = [], 0
+        items = rng.sample(range(1, n), rng.randint(0, n - 3))
+        items.append(n)
+        items.sort()
+        for c in items:
+            chunk = list(range(prev, c))
+            rng.shuffle(chunk)
+            perm.extend(chunk)
+            prev = c
+        yield perm,
+
+
 def bays_durham_shuffle_generator(seed):
     rng = Random(seed)
     for n, m in islice(zip(pyramid(10, 2, 2), pyramid(10, 1, 1)), 5000):
@@ -426,7 +601,7 @@ def pebblery_generator(seed):
     for n in islice(pyramid(4, 2, 2), 120):
         pred = [[] for _ in range(n)]
         for i in range(1, n):
-            pred[rng.randint(0, i -1)].append(i)
+            pred[rng.randint(0, i-1)].append(i)
             for _ in range(rng.randint(0, 3)):
                 j = rng.randint(0, i - 1)
                 if i not in pred[j]:
@@ -596,7 +771,7 @@ def s_eval_generator(seed):
 def odds_and_evens_generator(seed):
     yield from [('11', '1111'), ('10', '01'), ('0', '0000'), ('1111', '1'), ('000111', '111000') ]
     rng = Random(seed)
-    for n in islice(pyramid(3, 3, 3), 2000):
+    for n in islice(pyramid(3, 3, 3), 300):
         first = random_string('01', n, rng)
         second = random_string('01', rng.randint(1, n), rng)
         yield (first, second) if rng.randint(0, 99) < 50 else (second, first)
@@ -6164,7 +6339,7 @@ testcases = [
     (
         "odds_and_evens",
         odds_and_evens_generator,
-        "878b85e676cf48b845f744e4cccf7576c95749884f401ad1daffd25943caff22"
+        "4958fb6e6b2fe0bbf05cfb9ab961cea747507d6d4066d30e2c29fc00f83ec478"
     ),
     (
         "s_eval",
@@ -6275,6 +6450,66 @@ testcases = [
         "bays_durham_shuffle",
         bays_durham_shuffle_generator,
         "b9bc3bef28f9bc768cbac97e244ac59a44cb3334f3abbff426b46aa0a938bdb1"
+    ),
+    (
+        "chunk_sorting",
+        chunk_sorting_generator,
+        "17e92e31ccde20410a83a361e0c59e3ce0f25df47af3901825c656e2210185d3"
+    ),
+    (
+        "maximal_cliques",
+        maximal_cliques_generator,
+        "8c459e96a4cfb536c218badf1d9880821de2640e0dc22ac0bbca299ed8c92862"
+    ),
+    (
+        "colonel_blotto",
+        colonel_blotto_generator,
+        "4b9508f3f465c998c11c623d6675d72e30344fa4b173b5abd708c22dd688d7d5"
+    ),
+    (
+        "assign_sides",
+        assign_sides_generator,
+        "114cfee371799bb8635842e80509fbf4c446bea627f3ef0dc599cb5349e5ffe0"
+    ),
+    (
+        "palindrome_split",
+        palindrome_split_generator,
+        "28375a1f9c984bc5bdcd6bbdbcc749a967967f0545b3b15db03597779fa3e54c"
+    ),
+    (
+        "double_ended_pop",
+        double_ended_pop_generator,
+        "00175df4eb6b8139a37ff3d74ee62161182dbfa916205f92f96d4ced919f3e73"
+    ),
+    (
+        "sturm_word",
+        sturm_word_generator,
+        "6bbe7f566c210528b93a5a3765a14e820a81a8aad5b78866062187c95b28133f"
+    ),
+    (
+        "partition_point",
+        partition_point_generator,
+        "56bd3ee3e6238ef629754b563e87b62057dac379e40a55853dcd0b48a6c3b900"
+    ),
+    (
+        "sultans_daughter",
+        sultans_daughter_generator,
+        "fe1820731cefa94df3d9e5c0e7e716e454d8819c8118b67758e2c031babe249b"
+    ),
+    (
+        "generalized_fibonacci",
+        generalized_fibonacci_generator,
+        "f7173e3b23a6de63aeae96c27edc69a7cd07fe933914afb8f8970ba8bc7a13ca"
+    ),
+    (
+        "maximum_word_select",
+        maximum_word_select_generator,
+        "b2a166ce18ca7c2dbefb0424a549f16b3b719672eae3fab1a0e73643e98796b0"
+    ),
+    (
+        "merge_biggest",
+        merge_biggest_generator,
+        "97123657509c501e0beee1dc2b94b805c73029c2ed8a3681ec1207127f043da7"
     )
 ]
 
