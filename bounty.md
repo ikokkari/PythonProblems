@@ -895,6 +895,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Double-ended pop</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Maximal repeated suffix</td>
    <td>
    </td>
@@ -925,6 +930,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
    </tr>
    <tr>
+   <td>Sturm und drangle</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Multiple winner election</td>
    <td>
    </td>
@@ -933,6 +943,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    <td>Split at None
    </td>
    <td>Karel Tutsu, August 30, 2024</td>
+  </tr>
+   <tr>
+   <td>Chunk sorting</td>
+   <td>
+   </td>
   </tr>
    <tr>
    <td>Lehmer code: decoding</td>
@@ -950,12 +965,27 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Six of this, half a dozen of the other</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Factoradical dudes</td>
    <td>
    </td>
   </tr>
    <tr>
    <td>Cousin explainer</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Bron–Kerbosch maximal clique enumeration</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Smallie Bigs</td>
    <td>
    </td>
   </tr>
@@ -970,15 +1000,15 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
-   <td>Odds and evens</td>
-   <td>Thomas Brooks, June 17, 2025
-   </td>
-  </tr>
-   <tr>
    <td>Zeckendorf decode</td>
    <td>
    </td>
    </tr>
+   <tr>
+   <td>Sultan's daughter</td>
+   <td>
+   </td>
+  </tr>
    <tr>
    <td>Limited swap sorting</td>
    <td>
@@ -1010,7 +1040,12 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
-   <td>Maximal palindromic integer</td>
+   <td>Maximum palindromic integer</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Optimal palindromic split</td>
    <td>
    </td>
   </tr>
@@ -1030,6 +1065,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Odds and evens</td>
+   <td>Thomas Brooks, June 18, 2025
+   </td>
+  </tr>
+   <tr>
    <td>The prodigal sequence</td>
    <td>
    </td>
@@ -1040,7 +1080,17 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>The Dictorian borgesitory</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>The art of strategic sacrifice</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Colonel Blotto and the spymaster</td>
    <td>
    </td>
   </tr>
