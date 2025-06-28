@@ -34,8 +34,8 @@ verbose_execution = {
 # Whether to use the expected answers from the expected answers file when they exist.
 use_expected_answers = True
 
-# The release date of this version of the tester.
-version = "June 21, 2025"
+# The release date of this version of the tester.False
+version = "June 27, 2025"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -338,6 +338,71 @@ def rearrange_graph(edges, rng):
 
 
 # XXX Test case generators for the individual functions.
+
+def shell_sort_generator(seed):
+    mersenne = [1, 3, 7, 15, 31, 63, 127, 255, 511, 1023, 2047, 4095, 8191, 16383]
+    pow2_plus1 = [1, 3, 5, 9, 17, 33, 65, 129, 257, 513, 1025, 2049, 4097, 8193, 16385]
+    hamming = [1, 2, 3, 4, 6, 8, 9, 12, 16, 18, 24, 27, 32, 36, 48, 54, 64, 72, 81, 96,
+               108, 128, 144, 162, 192, 216, 243, 256, 288, 324, 384, 432, 486, 512, 576,
+               648, 729, 768, 864, 972, 1024, 1152, 1296, 1458, 1536, 1728, 1944, 2048,
+               2187, 2304, 2592, 2916, 3072, 3456, 3888]
+    ciura = [1, 8, 23, 77, 281, 1073, 4193]
+    lee_tokuda = [1, 4, 9, 20, 45, 102, 230, 516, 1158, 2599]
+    gapss = [mersenne, pow2_plus1, hamming, ciura, lee_tokuda]
+    for n in range(1, 6):
+        for p in permutations(range(n)):
+            yield list(p), [g for g in ciura if g < n]
+    rng = Random(seed)
+    for n, gaps in zip(range(6, 2000), cycle(gapss)):
+        perm = list(range(n))
+        rng.shuffle(perm)
+        yield perm, [g for g in gaps if g < n]
+
+
+def from_simple_continued_fraction_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(2, 2, 3), pyramid(7, 3, 4)), 2000):
+        yield [rng.randint(1, m) for _ in range(n)],
+
+
+def to_simple_continued_fraction_generator(seed):
+    for (a, b) in combinations(__primes, 2):
+        yield a, b
+    for (a, b, c) in combinations(__primes, 3):
+        yield a, b * c
+        yield (c, a * b) if a * b > c else (a * b, c)
+    rng = Random(seed)
+    for n in islice(scale_random(seed, 2, 5), 500):
+        yield rng.randint(1, n -1), n
+
+
+def instant_runoff_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(3, 6, 7), pyramid(5, 4, 4)), 2000):
+        ballots = []
+        ballot = list(range(n))
+        for _ in range(m):
+            if rng.randint(0, 99) < 30:
+                rng.shuffle(ballot)
+            else:
+                i = rng.randint(1, n - 1)
+                ballot[0], ballot[i] = ballot[i], ballot[0]
+            ballots.append(ballot[:])
+        yield ballots,
+
+
+def fox_and_hounds_generator(seed):
+    rng = Random(seed)
+    for _ in range(100):
+        pos = set()
+        while len(pos) < 5:
+            row = rng.randint(0, 7)
+            col = rng.randint(0, 7)
+            if row % 2 != col % 2:
+                pos.add((row, col))
+        pos = sorted(pos)
+        yield pos[4], pos[:4],
+
 
 def merge_biggest_generator(seed):
     rng = Random(seed)
@@ -6510,6 +6575,36 @@ testcases = [
         "merge_biggest",
         merge_biggest_generator,
         "97123657509c501e0beee1dc2b94b805c73029c2ed8a3681ec1207127f043da7"
+    ),
+    (
+        "fox_and_hounds",
+        fox_and_hounds_generator,
+        "b86ab1b355d10c3d9e2f5c5875fc71ea9ebfe26f7ea8316d94daf6c2e0d1160e"
+    ),
+    (
+        "instant_runoff",
+        instant_runoff_generator,
+        "66383b4cbe850823a241d033ec6e85d359de89a0689a9676b9dc70397db742d2"
+    ),
+    (
+        "to_simple_continued_fraction",
+        to_simple_continued_fraction_generator,
+        "c7057312966ee06ce8188f2b4f6cf9bad70ed63e0ee4fe7b851fb9631826443d"
+    ),
+    (
+        "from_simple_continued_fraction",
+        from_simple_continued_fraction_generator,
+        "4a1a996e20aafa363c052afc10481266a00efa890474e963c8c6a4e60817d9e0"
+    ),
+    (
+        "copeland_method",
+        instant_runoff_generator,
+        "5c33d87934bc629371033f1912b4703bf9b23c84a471c4389f1c02f88cb2851f"
+    ),
+    (
+        "shell_sort",
+        shell_sort_generator,
+        "946145609c66699d5a3c30be7aff89514462232b226735e707e69bea3eefee94"
     )
 ]
 
@@ -6619,6 +6714,5 @@ def discrepancy(teacher, student, test_generator, stop_at_first=False, print_all
 
 run_all()
 
-
 # teacher student generator
-# discrepancy(labs109.count_divisibles_in_range, count_divisibles_in_range, count_divisibles_in_range_generator, stop_at_first=True)
+#discrepancy(labs109.bulgarian_cycle, bulgarian_cycle, bulgarian_cycle_generator, print_all=True, stop_at_first=False)
