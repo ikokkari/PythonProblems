@@ -8,7 +8,7 @@ The specifications for all these lab problems are collected in the file [109 Pyt
 
 These problems are suitable for students who have already completed some introductory collection of finger practice exercises on Python language basics, such as [CodingBat Python](https://codingbat.com/python). The author also has a [similar collection of Java problems](https://github.com/ikokkari/CCPS209Labs) suitable for a second course on object oriented programming in Java and the first course on data structures and algorithms. Everyone teaching or learning Python is welcome to use, adapt and distribute these problems and the associated acceptance tester for their own purposes as they see fit.
 
-A bounty for each bonus problem is available to the first person to solve that problem. The file [bounty.md](https://github.com/ikokkari/PythonProblems/blob/main/bounty.md) contains more information.
+A bounty for each unclaimed problem is available to the first person to solve that problem. The file [bounty.md](https://github.com/ikokkari/PythonProblems/blob/main/bounty.md) contains more information.
 
 Obfuscated model solutions are available in the file [obfuscated.txt](https://github.com/ikokkari/PythonProblems/blob/main/obfuscated.txt), to give students the idea of the length and general complexity of the instructor's private solutions.
 
