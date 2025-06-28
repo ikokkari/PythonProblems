@@ -890,12 +890,22 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
    </tr>
    <tr>
-   <td>Bays–Durham shuffle</td></td>
+   <td>Generalized Fibonacci sequence</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Bays–Durham shuffle</td>
    <td>
    </td>
   </tr>
    <tr>
    <td>Double-ended pop</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Shell sort</td>
    <td>
    </td>
   </tr>
@@ -930,6 +940,16 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
    </tr>
    <tr>
+   <td>Convert fraction to simple continued fraction</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Convert simple continued fraction to fraction</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Sturm und drangle</td>
    <td>
    </td>
@@ -946,6 +966,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
   </tr>
    <tr>
    <td>Chunk sorting</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Merge the two biggest</td>
    <td>
    </td>
   </tr>
@@ -971,6 +996,16 @@ Starting August 2024, a third problem collection is being collected. Same rules 
   </tr>
    <tr>
    <td>Factoradical dudes</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Copeland harder</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Instant runoff voting</td>
    <td>
    </td>
   </tr>
@@ -1091,6 +1126,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
   </tr>
    <tr>
    <td>Colonel Blotto and the spymaster</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Fox and hounds</td>
    <td>
    </td>
   </tr>
