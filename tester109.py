@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.False
-version = "June 27, 2025"
+version = "July 2, 2025"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -338,6 +338,45 @@ def rearrange_graph(edges, rng):
 
 
 # XXX Test case generators for the individual functions.
+
+def burrows_wheeler_encode_generator(seed):
+    rng = Random(seed)
+    for text in ["a$", "aa$", "abc$", "abab$", "baba$", "baab$"]:
+        yield text, range(len(text))
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        word_list = [w.strip() for w in f if 6 < len(w)]
+    for n in range(3, 500):
+        words = rng.sample(word_list, n)
+        words.append("$")
+        words = "".join(words)
+        positions = sorted(rng.sample(range(len(words)), rng.randint(3, 7)))
+        yield words, positions
+
+
+def maximal_repeats_generator(seed):
+    rng = Random(seed)
+    for n, m, k in islice(zip(pyramid(10, 2, 2), cycle(range(2, 9)), cycle(range(2, 6))), 2000):
+        text, alpha = "", "abcdefgh"[:m]
+        while len(text) < n:
+            if len(text) < 2 or rng.randint(0, 99) < 40:
+                text += rng.choice(alpha)
+            else:
+                i = rng.randint(0, len(text) - 2)
+                j = rng.randint(i + 1, len(text))
+                text += text[i:j]
+        yield text, k
+
+
+def min_max_triangle_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(2, 2, 3), 100):
+        points = set()
+        while len(points) < 3*n:
+            x = rng.randint(0, n*n)
+            y = rng.randint(0, n*n)
+            points.add((x, y))
+        yield list(points),
+
 
 def shell_sort_generator(seed):
     mersenne = [1, 3, 7, 15, 31, 63, 127, 255, 511, 1023, 2047, 4095, 8191, 16383]
@@ -4745,6 +4784,9 @@ def reach_corner_generator(seed):
 
 
 def bulgarian_cycle_generator(seed):
+    yield [1],
+    yield [3],
+    yield [2, 0, 0, 2, 6, 12, 20, 30, 42, 56],
     rng = Random(seed)
     count_until_increase, goal, n, piles = 0, 2, 5, []
     for _ in range(300):
@@ -5580,7 +5622,7 @@ testcases = [
     (
         "bulgarian_cycle",
         bulgarian_cycle_generator,
-        "59be2b964195790855c6028c7296c9c894e90420677d3f065ac2fe5f92a477c7"
+        "5981d20cc0a8abbbf4598a18f9a78d4916773d08044a0a7171ca8f5a9921182a"
     ),
     (
         "prominences",
@@ -6151,11 +6193,12 @@ testcases = [
         nfa_generator,
         "cd6773bc72eb8399618a937604d264e732e32b64399598fb7d11bb80ffb87a12"
     ),
-    (
-        "condorcet_election",
-        condorcet_election_generator,
-        "fd57f0fef51bf6082dba7e43e70781f46a063663664e1b64ff95f378ea120718"
-    ),
+    # Removed from problem set July 1, 2025
+    #(
+    #    "condorcet_election",
+    #    condorcet_election_generator,
+    #    "fd57f0fef51bf6082dba7e43e70781f46a063663664e1b64ff95f378ea120718"
+    #),
     (
         "lychrel",
         lychrel_generator,
@@ -6605,6 +6648,21 @@ testcases = [
         "shell_sort",
         shell_sort_generator,
         "946145609c66699d5a3c30be7aff89514462232b226735e707e69bea3eefee94"
+    ),
+    (
+        "min_max_triangle",
+        min_max_triangle_generator,
+        "729e6378f96b938ed940754ed2b66f2c8a36415fbadb8a9182723c6eed6dcbbd"
+    ),
+    (
+        "maximal_repeats",
+        maximal_repeats_generator,
+        "fd68988c1f4f3aa72d4220e21578c4e52b606b8854cc49f9ed6025fa1370256a"
+    ),
+    (
+        "burrows_wheeler_encode",
+        burrows_wheeler_encode_generator,
+        "ecdcc8c3205f851b70be6137ae368fc396d73e9cd641bbfa7d53e99a1303e1d4"
     )
 ]
 
