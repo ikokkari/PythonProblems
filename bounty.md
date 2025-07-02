@@ -438,7 +438,7 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
-   <td>38. Condorcet election
+   <td>38. Maximal repeats
    </td>
    <td>
    </td>
@@ -1015,6 +1015,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Burrows–Wheeler transform</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Bron–Kerbosch maximal clique enumeration</td>
    <td>
    </td>
@@ -1064,6 +1069,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    <td>
    </td>
    </tr>
+   <tr>
+   <td>Minimize largest triangle</td>
+   <td>
+   </td>
+  </tr>
    <tr>
    <td>Optimal text filling</td>
    <td>
