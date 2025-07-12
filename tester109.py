@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.False
-version = "July 2, 2025"
+version = "July 12, 2025"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -338,6 +338,199 @@ def rearrange_graph(edges, rng):
 
 
 # XXX Test case generators for the individual functions.
+
+def descending_suffix_game_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(5, 3, 3), pyramid(2, 4, 5)), 100):
+        board = rng.sample(range(1, n+1), n - m)
+        yield board, n
+
+
+def maximal_confusion_generator(seed):
+    rng = Random(seed)
+    for n, p in islice(zip(pyramid(5, 2, 2), cycle([30, 40, 50])), 5000):
+        answers = [rng.choice("TF")]
+        for _ in range(n):
+            answers.append(answers[-1] if rng.randint(0, 99) < p else rng.choice("TF"))
+        yield "".join(answers), rng.randint(2, max(n // 3, 3))
+
+
+def approval_voting_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(3, 10, 11), pyramid(5, 3, 4)), 1000):
+        ballots = []
+        for _ in range(m):
+            ballot = "".join(rng.choice("YN") for _ in range(n))
+            ballots.append(ballot)
+        yield ballots,
+
+
+def cyk_parser_generator(seed):
+    rng = Random(seed)
+
+    for n, m in islice(zip(pyramid(3, 5, 6), pyramid(3, 4, 4)), 500):
+        nonterm, term, rules_set = ups[:n], lows[:m], set()
+        for c in term:
+            for d in rng.sample(nonterm, rng.randint(1, max(2, n - 3))):
+                rules_set.add((d, c))
+        for d in nonterm:
+            for _ in range(rng.randint(1, 3)):
+                rh1 = rng.choice(nonterm)
+                rh2 = rng.choice(nonterm)
+                rules_set.add((d, rh1 + rh2))
+        rules = {d:[] for d in nonterm}
+        for (d, rhs) in rules_set:
+            rules[d].append(rhs)
+
+        text = "".join(rng.choice(term) for _ in range(m))
+        yield text, rules
+
+
+def rational_roots_generator(seed):
+    for coeff in [(-4, -5, -5, -1), (9, -7, -2), (-8, 10), (9, -4), (-8, -6, -1), (5, -7), (9, -5),
+                  (-2, 8), (3, 4), (1, -4, 7, -2, -3, -8, -4), (-6, -6, 6, -4, -2, -4, -2, 1, -9), (-6, -3),
+                  (-10, -5, -6, 6, 6, -6, 5), (1, -8), (1, 0, -4), (3, -6), (2, -2), (3, -6), (7, -1),
+                  (1, 4), (4, 8, 4), (-10, 1), (10, -2), (4, 8), (1, 2), (8, 8), (-3, -6), (-8, 2, -2, -2, 3),
+                  (-1, 2), (-1, -2), (-4, -9), (2, 8), (1, -5), (-2, -8), (-1, -2), (-7, 8, -1), (6, -7, -3, 1),
+                  (4, -7, 5, 5, -7, 7, 3), (3, -3), (6, -5), (5, -8), (9, -10), (-6, 5), (-1, -1, -2, -5, -3, -1, 7, 8),
+                  (-10, 7, 2, -8), (-8, 8), (-10, -3), (-1, -3), (-4, -3), (-6, 4, 5, -5, -5, -4, -1, -2),
+                  (1, -7), (6, 7, -9, 9, 6, 5, 6, -1, 3, -8), (-8, 2, 1), (5, -13, 1, 2), (-252, 10756, -64383, 4544),
+                  (210, -47, -4, 1), (18, -27, 1, 4), (24, -14, -13, 2, 1), (6, 13, -116, -143, 60),
+                  (-70, 73, 8), (100, 20, 1), (-100, 0, 1), (2, 87, -180, 91), (-2, -1, 24642, 12321),
+                  (60, 148, 103, -2, -20, -2, 1), (-360, 531, 7309, -8130, -25000, -5856, 3456), (-4158, 57, 4300),
+                  (-15, 163, 2002), (728, 2658, -22225, -1335, 4262, 792)]:
+        yield coeff,
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(3, 3, 3), pyramid(11, 2, 2)), 5000):
+        coeff = [rng.randint(-10, 10) for _ in range(rng.randint(1, 10))]
+        while coeff[0] == 0:
+            coeff[0] = rng.randint(-10, 10)
+        while coeff[-1] == 0:
+            coeff[-1] = rng.randint(-10, 10)
+        yield tuple(coeff),
+
+
+def sublist_sum_k_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(2, 1, 1), 10000):
+        items = [rng.randint(1, n * n) for _ in range(n)]
+        s = sum(items)
+        if rng.randint(0, 99) < 20:
+            k = rng.randint(s // 8, 3 * s // 8)
+        else:
+            i = rng.randint(0, n - 2)
+            j = rng.randint(i + 1, n - 1)
+            k = sum(items[i:j]) + rng.choice([0, 0, 0, 1])
+            if k > 200 and rng.randint(0, 99) < 50:
+                k = k // rng.choice([2, 3, 5, 7, 11])
+        yield items, k
+
+
+def max_three_disjoint_sublists_generator(seed):
+    for items in [[2, 3, 4, -5, -5, -5], [-2, -4, -5, 1, 2, 3], [-2, -2, -2]]:
+        yield items,
+    rng = Random(seed)
+    for n in islice(pyramid(5, 1, 1), 1000):
+        items = []
+        for _ in range(n):
+            items.append(rng.randint(-n, -1) if rng.randint(0, 99) < 60 else rng.randint(1, 2*n))
+        yield items,
+
+
+def optimal_bridges_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(5, 1, 1), 200):
+        nn = isqrt(n)
+        perm = list(range(n))
+        rng.shuffle(perm)
+        yield perm, rng.randint(nn, max(n // 3, nn + 1))
+
+
+def expand_string_generator(seed):
+    rng = Random(seed)
+    alphabet = 'abcdefghijklmnopqrstuvwxyz'
+
+    def build(d, m):
+        if d < 1:
+            result = rng.choice(alphabet)
+            while rng.randint(0, 99) < 40:
+                result += rng.choice(alphabet)
+            return result
+        else:
+            result = ""
+            for _ in range(rng.randint(1, m)):
+                piece = build(rng.randint(0, d - 1), max(d - 1, m - 1))
+                result += piece if rng.randint(0, 99) < 50 else f"{rng.randint(2, m)}[{piece}]"
+            return result
+
+    for n, m in islice(zip(pyramid(2, 21, 30), pyramid(4, 17, 25)), 700):
+        yield build(n, m),
+
+
+def first_singleton_generator(seed):
+    rng = Random(seed)
+    alphabet = 'abcdefghijklmnopqrstuvwxyz'
+    for n, p in islice(zip(pyramid(4, 1, 1), cycle([20, 50, 80])), 3000):
+        alpha = rng.sample(alphabet, rng.randint(6, 25))
+        singles = rng.sample(alpha, rng.randint(3, 5))
+        doubles = [c for c in alpha if c not in singles]
+        text = rng.choice(alpha)
+        for _ in range(n):
+            if len(text) > 3 and rng.randint(0, 99) < p:
+                text += rng.choice(text)
+            else:
+                if len(singles) > 0 and rng.randint(0, 99) < 30:
+                    c = rng.choice(singles)
+                    singles = [d for d in singles if d != c]
+                    text += c
+                else:
+                    text += rng.choice(doubles)
+        yield text,
+
+
+def tarjans_scc_generator(seed):
+    rng = Random(seed)
+    for n, p in islice(zip(pyramid(5, 2, 2), cycle([20, 40, 60])), 2000):
+        remain, comps, edge_set = list(range(n)), [], set()
+        # Create each SCC
+        while len(remain) > 0:
+            comp = rng.sample(remain, rng.randint(1, len(remain)))
+            if len(comp) > 1:
+                for i in range(0, len(comp)):
+                    edge_set.add((comp[i], comp[(i+1) % len(comp)]))
+            comps.append(comp)
+            remain = [u for u in remain if u not in comp]
+        # Create more random edges
+        for _ in range(rng.randint(n, 2*n)):
+            i = rng.randint(0, len(comps) - 1)
+            j = rng.randint(i, len(comps) - 1)
+            u = rng.choice(comps[i])
+            v = rng.choice(comps[j])
+            edge_set.add((v, u))
+        # Convert edges to edge list and yield
+        edges = [[] for _ in range(n)]
+        for (u, v) in edge_set:
+            edges[u].append(v)
+        yield edges,
+
+
+def toads_and_frogs_generator(seed):
+    for board in ["T.F", "T..F", "TT.FF", "T..FT..F"]:
+        yield board,
+    rng = Random(seed)
+    for n, m, pp in islice(zip(pyramid(8, 2, 3), pyramid(2, 10, 12), cycle([20, 40, 60])), 150):
+        pos = sorted(rng.sample(range(n), 2*m))
+        while rng.randint(0, 100) < pp:
+            i = rng.randint(1, m - 1)
+            j = rng.randint(m, 2*m - 2)
+            pos[i], pos[j] = pos[j], pos[i]
+        board = ["." for _ in range(n)]
+        for p in pos[:m]:
+            board[p] = 'T'
+        for p in pos[m:]:
+            board[p] = 'F'
+        yield "".join(board),
+
 
 def burrows_wheeler_encode_generator(seed):
     rng = Random(seed)
@@ -1554,20 +1747,6 @@ def square_lamps_generator(seed):
 def lychrel_generator(seed):
     for n, giveup in zip(range(100, 20000), pyramid(100, 5, 5)):
         yield n, giveup
-
-
-def condorcet_election_generator(seed):
-    rng = Random(seed)
-    for c, n in islice(zip(pyramid(2, 5, 7 ), pyramid(1, 1, 1)), 800):
-        ballot = rng.sample(range(c), c)
-        ballots = []
-        while len(ballots) < n:
-            ballots.append(ballot[:])
-            for _ in range(rng.randint(0, 3)):
-                i = rng.randint(0, c-1)
-                j = rng.randint(0, c-1)
-                ballot[i], ballot[j] = ballot[j], ballot[i]
-        yield ballots,
 
 
 def nfa_generator(seed):
@@ -6663,6 +6842,66 @@ testcases = [
         "burrows_wheeler_encode",
         burrows_wheeler_encode_generator,
         "ecdcc8c3205f851b70be6137ae368fc396d73e9cd641bbfa7d53e99a1303e1d4"
+    ),
+    (
+        "toads_and_frogs",
+        toads_and_frogs_generator,
+        "7391cf0e1b70ca695766703c035f3bcc5efd620821fb41301395ee94a3387183"
+    ),
+    (
+        "tarjans_scc",
+        tarjans_scc_generator,
+        "4eaa45a190930b77e93ef2f8d9ff24ab07bf1fd40b5f1489fe33cc8ffd3f18a6"
+    ),
+    (
+        "first_singleton",
+        first_singleton_generator,
+        "a86fd74e08933b0f770e81692032a41c935ed22c13f7f7d98a2f8f99bdfdb91e"
+    ),
+    (
+        "expand_string",
+        expand_string_generator,
+        "fb8b15963d0e6cd5b213fc7ecadd645e793be2c31cdf67adfd1a70059f59aae4"
+    ),
+    (
+        "optimal_bridges",
+        optimal_bridges_generator,
+        "372de41579698654edd29b16c3b230d212e9f6001b10b54e5a87d8d1ede93ac0"
+    ),
+    (
+        "max_three_disjoint_sublists",
+        max_three_disjoint_sublists_generator,
+        "8572f80f9fc27506cc33f5d8c9e2703314edaa5031b36a58c57c171ea735b155"
+    ),
+    (
+        "sublist_sum_k",
+        sublist_sum_k_generator,
+        "6f13e3f0e1529d138e6b1311094955b0fb8044fc48f1088ee94f74c07a749f09"
+    ),
+    (
+        "rational_roots",
+        rational_roots_generator,
+        "9effd6af83d0976902c94ac67d56d6859853e097366946ae7906469967a8e0ce"
+    ),
+    (
+        "cyk_parser",
+        cyk_parser_generator,
+        "8093a88e46aedb02e8963073978fea1b4565fa7949e09e6b3807c0380bc9278b"
+    ),
+    (
+        "approval_voting",
+        approval_voting_generator,
+        "fa107f28ec9e073aeb56f9a4b7120c58c224464542d761ac5e0dfe51b5aad98f"
+    ),
+    (
+        "maximal_confusion",
+        maximal_confusion_generator,
+        "fa18d4d86fb5610431bbfa4090baf7c2148a48e15d5cf38009df905a4b146c3d"
+    ),
+    (
+        "descending_suffix_game",
+        descending_suffix_game_generator,
+        "d6131f1f8889ef1ff5caf5b068c890b80ece265b0bc30f1f0dbb808c0eebba66"
     )
 ]
 
