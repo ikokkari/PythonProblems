@@ -885,6 +885,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Approval voting</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Friendship paradox</td>
    <td>
    </td>
@@ -916,6 +921,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
   </tr>
    <tr>
    <td>Count slices with given sum</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>First sublist whose sum is some multiple of k</td>
    <td>
    </td>
   </tr>
@@ -990,12 +1000,22 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Kadane in triplicate</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Six of this, half a dozen of the other</td>
    <td>
    </td>
   </tr>
    <tr>
    <td>Factoradical dudes</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Tarjan's strongly connected components</td>
    <td>
    </td>
   </tr>
@@ -1011,6 +1031,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
   </tr>
    <tr>
    <td>Cousin explainer</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Maximize exam confusion</td>
    <td>
    </td>
   </tr>
@@ -1065,6 +1090,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Cocke–Younger–Kasami parsing</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Diamond sequence</td>
    <td>
    </td>
@@ -1081,6 +1111,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </tr>
    <tr>
    <td>S-expression evaluator</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Expand recursively run-length encoded string</td>
    <td>
    </td>
   </tr>
@@ -1120,6 +1155,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Descending suffix game</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>The Borgesian dictionary</td>
    <td>
    </td>
@@ -1145,10 +1185,20 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Toads and frogs</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Post correspondence problem</td>
    <td>
    </td>
    </tr>
+   <tr>
+   <td>Optimal bridge placement</td>
+   <td>
+   </td>
+  </tr>
    <tr>
    <td>The way of a man with array</td>
    <td>
