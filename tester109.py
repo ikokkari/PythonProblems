@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.False
-version = "July 12, 2025"
+version = "July 18, 2025"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -338,6 +338,33 @@ def rearrange_graph(edges, rng):
 
 
 # XXX Test case generators for the individual functions.
+
+def knaves_of_round_table_generator(seed):
+    rng = Random(seed)
+    for n, p in islice(zip(pyramid(3, 4, 5), cycle(range(20, 100, 20))), 3000):
+        truth = [int(rng.randint(0, 100) < p) for _ in range(n)]
+        answers = [None for _ in range(n)]
+        for i in range(n):
+            s = truth[(i+1) % n] + truth[(i-1) % n]
+            if truth[i]:
+                answers[i] = s
+            else:
+                v = rng.randint(0, 2)
+                while v == s:
+                    v = rng.randint(0, 2)
+                answers[i] = v
+        yield answers,
+        
+
+def albuquerque_stretch_generator(seed):
+    yield "albuquerque",
+    rng = Random(seed)
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        word_list = [w.strip() for w in f if 3 < len(w) < 7]
+    for n in islice(pyramid(2, 4, 5), 1000):
+        text = "".join(rng.sample(word_list, n))
+        yield text,
+
 
 def descending_suffix_game_generator(seed):
     rng = Random(seed)
@@ -6902,6 +6929,16 @@ testcases = [
         "descending_suffix_game",
         descending_suffix_game_generator,
         "d6131f1f8889ef1ff5caf5b068c890b80ece265b0bc30f1f0dbb808c0eebba66"
+    ),
+    (
+        "albuquerque_stretch",
+        albuquerque_stretch_generator,
+        "f4a47a2d775592f9db88edd1245ba84f2323366f28f74e2b4a8c344469ada6fb"
+    ),
+    (
+        "knaves_of_round_table",
+        knaves_of_round_table_generator,
+        "4c90be9f31dfad32c7da09010e4dfd0b543cc33ff7777c7ec01537ef1d8905b9"
     )
 ]
 
