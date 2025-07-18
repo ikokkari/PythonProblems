@@ -895,6 +895,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
    </tr>
    <tr>
+   <td>Right turn at Albuquerque</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Generalized Fibonacci sequence</td>
    <td>
    </td>
@@ -926,6 +931,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
   </tr>
    <tr>
    <td>First sublist whose sum is some multiple of k</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Poker test of randomness</td>
    <td>
    </td>
   </tr>
@@ -1005,6 +1015,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Knaves of the round table</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Six of this, half a dozen of the other</td>
    <td>
    </td>
@@ -1054,11 +1069,6 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    <td>
    </td>
   </tr>
-   <tr>
-   <td>Poker test of randomness</td>
-   <td>
-   </td>
-   </tr>
    <tr>
    <td>Gauss circle</td>
    <td>
