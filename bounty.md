@@ -890,6 +890,16 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Vigenère cipher</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Bug in a line</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Friendship paradox</td>
    <td>
    </td>
@@ -915,6 +925,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>First singleton</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Shell sort</td>
    <td>
    </td>
@@ -931,6 +946,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
   </tr>
    <tr>
    <td>First sublist whose sum is some multiple of k</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Ones mule, zeros pool</td>
    <td>
    </td>
   </tr>
@@ -975,7 +995,22 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Rational roots of a polynomial</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Multiple winner election</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Maximum interval clique</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Maximum overlap intervals</td>
    <td>
    </td>
   </tr>
@@ -1065,6 +1100,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
   </tr>
    <tr>
+   <td>Queue jockeys</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Smallie Bigs</td>
    <td>
    </td>
@@ -1101,6 +1141,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
   </tr>
    <tr>
    <td>Cocke–Younger–Kasami parsing</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Avoidant subset of points on a circular line</td>
    <td>
    </td>
   </tr>
@@ -1145,6 +1190,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
    </td>
    </tr>
    <tr>
+   <td>Falling squares</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Tchuka Ruma</td>
    <td>
    </td>
@@ -1186,6 +1236,11 @@ Starting August 2024, a third problem collection is being collected. Same rules 
   </tr>
    <tr>
    <td>Colonel Blotto and the spymaster</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Unamerican gladiators</td>
    <td>
    </td>
   </tr>
