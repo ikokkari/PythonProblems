@@ -35,7 +35,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.False
-version = "July 18, 2025"
+version = "July 31, 2025"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -338,6 +338,106 @@ def rearrange_graph(edges, rng):
 
 
 # XXX Test case generators for the individual functions.
+
+def one_zero_generator(seed):
+    for n in range(1, 2000):
+        yield n,
+
+
+def bug_in_a_line_generator(seed):
+    for n in range(1, 5):
+        for board in product('RYG', repeat=n):
+            yield "".join(board),
+    rng = Random(seed)
+    for n in islice(pyramid(5, 3, 4), 3000):
+        board = [rng.choice('RYG') for _ in range(n)]
+        board[0] = rng.choice('YG')
+        board[1] = rng.choice('YG')
+        yield "".join(board),
+
+
+def maximum_overlap_intervals_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(3, 2, 2), 2000):
+        perm = list(range(0, 2 * n))
+        rng.shuffle(perm)
+        events = []
+        for i in range(0, 2*n, 2):
+            s, e = perm[i], perm[i + 1]
+            events.append((min(s, e), max(s, e)))
+        yield sorted(events),
+
+
+def gladiators_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(2, 10, 20), 250):
+        gladiators = [rng.randint(1, n*n) for _ in range(2 * n)]
+        yield gladiators[:n], gladiators[n:]
+
+
+def maximum_interval_clique_generator(seed):
+    rng = Random(seed)
+    for n in chain(islice(pyramid(3, 2, 2), 500), range(1000, 1500)):
+        perm = list(range(0, 2 * n))
+        rng.shuffle(perm)
+        events = []
+        for i in range(0, 2*n, 2):
+            s, e = perm[i], perm[i + 1]
+            events.append((min(s, e), max(s, e)))
+        yield sorted(events),
+
+
+def vigenere_generator(seed):
+    rng = Random(seed)
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        word_list = [w.strip() for w in f if 4 < len(w) < 8]
+    for n in islice(pyramid(2, 5, 6), 1000):
+        text = "".join(rng.sample(word_list, n))
+        key = "".join(rng.sample(word_list, n // 2))
+        yield text, key, +1
+        yield text, key, -1
+
+
+def farthest_points_generator(seed):
+    rng = Random(seed)
+    for n, p in islice(zip(pyramid(6, 3, 4), pyramid(20, 1, 1)), 500):
+        pos = sorted(rng.sample(range(p), n))
+        k = rng.randint(3, max(4, n // 3))
+        yield pos, p, k
+
+
+def queue_jockeys_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(2, 4, 5), pyramid(4, 2, 3)), 500):
+        perm = list(range(n))
+        rng.shuffle(perm)
+        moves = [rng.randint(0, n-1) for _ in range(m)]
+        yield perm, moves
+
+    def gen(n_, m_, s):
+        rng2 = Random(s)
+        for _ in range(m_):
+            yield rng2.randint(0, n_ - 1)
+
+    for n in range(1000, 1100):
+        perm = list(range(n))
+        rng.shuffle(perm)
+        yield perm, gen(n, n * 20, seed + n)
+
+
+def falling_squares_generator(seed):
+    rng, s = Random(seed), 1
+    for i, n in enumerate(islice(pyramid(3, 2, 2), 3000)):
+        squares, m = [], 10
+        if i > 300 and i % 10 == 0:
+            s = 2 * s
+        for _ in range(n):
+            x = rng.randint(0, s * m)
+            h = rng.randint(1, s * isqrt(m))
+            m += 1
+            squares.append((x, h))
+        yield squares,
+
 
 def knaves_of_round_table_generator(seed):
     rng = Random(seed)
@@ -849,7 +949,7 @@ def bays_durham_shuffle_generator(seed):
         yield (rng.randint(0, m) for _ in range(n)), k
 
 
-def maximal_repeated_suffix_generator(seed):
+def maximum_repeated_suffix_generator(seed):
     rng = Random(seed)
     for n, m in islice(zip(pyramid(2, 1, 1), pyramid(3, 10, 12)), 10000):
         items = []
@@ -860,8 +960,9 @@ def maximal_repeated_suffix_generator(seed):
                 i = rng.randint(0, len(items) - 2)
                 j = rng.randint(i, len(items))
                 items += items[i:j]
-        i = rng.randint(0, len(items) - 2)
-        items += items[i:]
+        if rng.randint(0, 100) < 90:
+            i = rng.randint(0, len(items) - 2)
+            items += items[i:]
         yield items,
 
 
@@ -6756,9 +6857,9 @@ testcases = [
         "45626a82c31325959799e3d09fd0397fa792947f2cb5b117c04c00b38956dc77"
     ),
     (
-        "maximal_repeated_suffix",
-        maximal_repeated_suffix_generator,
-        "aefd8494e6f4839afd7ff1acdfe19017d4efd1c6423acb1940e9b8542c79da9e"
+        "maximum_repeated_suffix",
+        maximum_repeated_suffix_generator,
+        "f6833c6dd732623ebc379a88298073bef65a7235885255500688397bc47381f1"
     ),
     (
         "bays_durham_shuffle",
@@ -6939,6 +7040,51 @@ testcases = [
         "knaves_of_round_table",
         knaves_of_round_table_generator,
         "4c90be9f31dfad32c7da09010e4dfd0b543cc33ff7777c7ec01537ef1d8905b9"
+    ),
+    (
+        "falling_squares",
+        falling_squares_generator,
+        "2dd379e49f035d7095be6d80fa7caef2d5a57e508ea0524405ebaa8cf33b4eaf"
+    ),
+    (
+        "queue_jockeys",
+        queue_jockeys_generator,
+        "e43c1c0213fde0dc5fdf4676ee371dcd0e27ba0680d48845f34ce6029b19d764"
+    ),
+    (
+        "farthest_points",
+        farthest_points_generator,
+        "5ba7e29eed7e7b53ef55b7f653482471528445eadd4cf7b40507bbab589a17e8"
+    ),
+    (
+        "vigenere",
+        vigenere_generator,
+        "819976cc7d87485f851b9e0757aac254455ffe6bf403703cb10075a6b25d456d"
+    ),
+    (
+        "maximum_interval_clique",
+        maximum_interval_clique_generator,
+        "80d027fa2df64b69acfe52b6ba59522d0eaa2204398e44a11a685a67a007d763"
+    ),
+    (
+        "gladiators",
+        gladiators_generator,
+        "3aac72f991a60868851bc73438b37b443a4b38f690f053f73bea95d00bcff919"
+    ),
+    (
+        "maximum_overlap_intervals",
+        maximum_overlap_intervals_generator,
+        "2ac1d71e32c74a4fddf832b8d9947fc9aaede2032e7080e270d832bc456e6b66"
+    ),
+    (
+        "bug_in_a_line",
+        bug_in_a_line_generator,
+        "203f79eb2534118989f8d7fc7f322fdb5adb9deede35c48c626b434cab2e359e"
+    ),
+    (
+        "one_zero",
+        one_zero_generator,
+        "7259484c1becc0e065d55e9cdb30e21ea9fb35103277c6a195b16f62db786688"
     )
 ]
 
