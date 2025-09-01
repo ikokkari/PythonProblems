@@ -25,6 +25,8 @@ from datetime import date
 # the tester to run the tests for these functions first, regardless of their
 # position in the labs109.py file. Use the limit of -1 to say "all test cases".
 
+# ZZZ
+
 verbose_execution = {
     #   "function_one": 42,   # Print the first 42 test cases of function_one
     #   "function_two": -1,   # Print all test cases of function_two, however many there are
@@ -35,7 +37,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.False
-version = "July 31, 2025"
+version = "August 31, 2025"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -338,6 +340,202 @@ def rearrange_graph(edges, rng):
 
 
 # XXX Test case generators for the individual functions.
+
+def lcsis_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(0, 2, 2), 200):
+        k = (n + 3) ** 2
+        seq = sorted(rng.sample(range(k), n), reverse=True)
+        itemss = []
+        for _ in range(2):
+            m = rng.randint(n, 3 * n + 3)
+            items, seqq = [], seq[:]
+            while seqq:
+                if rng.randint(0, 100) < 50:
+                    items.append(seqq.pop())
+                else:
+                    items.append(rng.randint(0, m))
+            itemss.append(items)
+        yield itemss[0], itemss[1]
+
+
+def liquid_sort_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(3, 6, 8), 250):
+        tubes = [[] for _ in range(rng.randint(n + 1, n + 2))]
+        liquid = [m // 4 for m in range(4 * n)]
+        rng.shuffle(liquid)
+        for x in liquid:
+            i = rng.randint(0, n - 1)
+            while len(tubes[i]) == 4:
+                i = (i + 1) % n
+            tubes[i].append(x)
+        yield tubes,
+
+
+def mixed_sort_generator(seed):
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        word_list = [w.strip() for w in f if 4 < len(w) < 8]
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(3, 1, 1), pyramid(10, 1, 1)), 1000):
+        k = rng.randint(0, n)
+        ints = [rng.randint(-m, m) for _ in range(k)]
+        strs = rng.sample(word_list, n - k)
+        items = ints + strs
+        rng.shuffle(items)
+        yield items,
+
+
+def largest_rectangle_generator(seed):
+    rng = Random(seed)
+    for n, m, p in islice(zip(pyramid(2, 2, 2), pyramid(10, 1, 1), cycle([40, 60, 90])), 5000):
+        h = rng.randint(1, m)
+        height = [h]
+        for _ in range(n):
+            if rng.randint(0, 99) < p:
+                h = abs(h + rng.randint(-3, 3))
+            else:
+                h = rng.randint(1, m)
+            height.append(h)
+        yield height,
+
+
+def spiral_walk_generator(seed):
+    rng = Random(seed)
+    yield from [(1, 0, 0), (0, 1, 0), (1, 0, 1), (0, 1, 1), (-1, 0, 1), (0, -1, 1)]
+    for n in chain(islice(pyramid(2, 2, 2), 500), islice(scale_random(100, 6, 5), 200)):
+        m = isqrt(n) + 2
+        dx = rng.randint(-m, m)
+        dy = rng.randint(-m, m)
+        yield dx, dy, n
+
+
+def strahler_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(2, 2, 2), 1000):
+        flows = [[], [0]]
+        for i in range(2, n):
+            m = rng.randint(1, i - 1)
+            flow = rng.sample(range(i), m)
+            flows.append(flow)
+        yield flows,
+
+
+def random_walk_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(2, 4, 5), pyramid(5, 8, 10)), 500):
+        a = rng.randint(1, m)
+        b = rng.randint(a + 1, m + 1)
+        left_p = F(a, b)
+        a = rng.randint(1, m)
+        b = rng.randint(a + 1, m + 1)
+        right_p = (1 - left_p) * F(a, b)
+        curr_p = 1 - left_p - right_p
+        pos = rng.sample(range(-n, n + 1), isqrt(n))
+        yield [left_p, curr_p, right_p], n, pos
+
+
+def candy_split_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(3, 2, 2), pyramid(2, 1, 1)), 1500):
+        candies = [2 * rng.randint(0, m) for _ in range(n)]
+        yield candies,
+
+
+def car_match_generator(seed):
+    rng = Random(seed)
+    for n, m, p in islice(zip(pyramid(4, 6, 8), pyramid(5, 3, 4), cycle([50, 70, 90, 100])), 200):
+        rows = [[] for _ in range(n)]
+        colour, trucks = 0, []
+        for t in range(m):
+            if t % 3 == 0:
+                colour = rng.choice(range(5))
+            trucks.append(colour)
+            for _ in range(3):
+                rows[rng.choice(range(n))].append(colour if rng.randint(0, 100) < p else rng.choice(range(5)))
+        rows = [row[::-1] for row in rows]
+        yield rows, trucks
+
+
+def goldbach_generator(seed):
+    n, rng = 4, Random(seed)
+    for m in islice(pyramid(40, 1, 1), 5000):
+        yield n,
+        n += 2 * rng.randint(1, m)
+
+
+def is_prime_generator(seed):
+    some_primes = [
+            47, 61, 67, 79, 89, 97,
+            179, 223, 317, 467, 569, 601, 727, 757, 787, 919, 929, 967,
+            1289, 1451, 1721, 2887, 3001, 3697, 4339, 4517, 6353, 6719, 9511,
+            18913, 20233, 31891, 34939, 43613, 51539, 65423, 73999, 78853, 78977, 80071, 89069,
+            100517, 100703, 124769, 312383, 344249, 502703, 601319, 655211, 889951,
+            1433477, 1984007, 2570651, 4322909, 4324601, 4325813, 5873227, 6000061, 6540407, 8214091, 9874693,
+            10001713, 12914771, 14001989, 42324409, 54003253, 51001889, 72173327, 78298873, 88824301, 92323657,
+            123126557, 133849141, 231232117, 236476577, 312136789, 374614003, 378298727, 432232223,
+            588323209, 636474869, 636478343, 718398173, 812134459, 931233647, 932498947, 943235653,
+            1234568837, 1534569727, 1999970333, 2071119119
+    ]
+    some_composites = [
+            3613 * 4057, 65633 * 2713, 84223 * 569, 1013 * 6353, 655507 * 101, 3307 * 3307,
+            67481 * 23, 4321787 * 53, 32969 * 62987, 1451 * 499 * 359, 44483 * 119, 971 * 191,
+            1249 * 50951, 6907 * 6907, 30859 * 31883, 37649 * 7879, 56009 * 13, 147607 * 137,
+            148301 * 593, 1171 * 1867, 7001 * 967, 544897 * 201, 1451 * 787, 727 * 757 * 787,
+            565559 * 137, 239 * 613 * 349, 1069 * 157 * 71, 1985713 * 47, 276047 * 97, 45347263,
+            45347769,
+            # https://oeis.org/A014233, some Miller - Rabin pseudoprimes
+            2047, 1373653, 25326001,
+            # https: //oeis.org/A001567, some Fermat pseudoprimes
+            341, 561, 645, 1105, 1387, 1729, 1905, 2047, 2465, 2701, 2821, 3277, 4033, 4369, 4371,
+            4681, 5461, 6601, 7957, 8321, 8481, 8911, 10261, 10585, 11305, 12801, 13741, 13747,
+            13981, 14491, 15709, 15841, 16705, 18705, 18721, 19951, 23001, 23377, 25761, 29341,
+            2615977, 26634301, 69741001, 1693101241,
+            # https: //oeis.org/A006972, some Lucas - Carmichael numbers
+            399, 935, 2015, 2915, 4991, 5719, 7055, 8855, 12719, 18095, 20705, 20999, 22847, 29315,
+            31535, 46079, 51359, 60059, 63503, 67199, 73535, 76751, 80189, 81719, 88559, 90287,
+            104663, 117215, 120581, 147455, 152279, 155819, 162687, 191807, 194327, 196559, 214199,
+            9868715, 11521439, 43383167, 126806399, 632309759, 1454412959,
+            # https://oeis.org/A257750, some quasi - Carmichael numbers
+            77, 143, 165, 187, 209, 221, 231, 247, 273, 299, 323, 357, 391, 399, 437, 493, 527,
+            561, 589, 598, 713, 715, 899, 935, 943, 989, 1015, 1073, 1105, 1147, 1189, 1247, 1271,
+            1295, 1333, 1517, 1537, 1547, 1591, 1595, 1705, 1729, 1739, 1763, 1829, 1885, 1886, 1927,
+            63169, 198547, 500039, 3534541, 5971357, 9445027, 13989667,
+            # https://oeis.org/A001262, some strong pseudoprimes, base 2
+            2047, 3277, 4033, 4681, 8321, 15841, 29341, 42799, 49141, 52633, 65281, 74665, 80581,
+            85489, 88357, 90751, 104653, 130561, 196093, 220729, 233017, 252601, 253241, 256999,
+            271951, 280601, 314821, 357761, 390937, 458989, 476971, 486737, 3605429, 21417991,
+            77812153, 82870517, 180497633, 327398009, 705351583, 1027744453,
+            # https://oeis.org/A020229, some strong pseudoprimes, base 3
+            121, 703, 1891, 3281, 8401, 8911, 10585, 12403, 16531, 18721, 19345, 23521, 31621, 44287,
+            47197, 55969, 63139, 74593, 79003, 82513, 87913, 88573, 97567, 105163, 111361, 112141,
+            148417, 152551, 182527, 188191, 211411, 218791, 221761, 226801, 2226043, 35728129,
+            69444841, 117987841, 220534651, 378682537, 487890703, 1095485821,
+            # https://oeis.org/A020231, some strong pseudoprimes, base 5
+            781, 1541, 5461, 5611, 7813, 13021, 14981, 15751, 24211, 25351, 29539, 38081, 40501,
+            44801, 53971, 79381, 100651, 102311, 104721, 112141, 121463, 133141, 141361, 146611,
+            195313, 211951, 216457, 222301, 251521, 289081, 290629, 298271, 315121, 1197761,
+            5481451, 27722857, 45006391, 75663451, 105957601, 528968917, 643767931, 1063398043
+    ]
+    for n in chain(some_primes, some_composites):
+        yield n,
+
+
+def knight_watch_generator(seed):
+    rng = Random(seed)
+    for n, k in islice(zip(pyramid(4, 6, 6), pyramid(2, 10, 11)), 300):
+        m = rng.randint(n, 2 * n)
+        tabu = rng.sample(list(product(range(n), repeat=2)), m)
+        (sx, sy) = tabu.pop()
+        yield n, sx, sy, k, tabu
+
+
+def conway_subprime_generator(seed):
+    rng = Random(seed)
+    for b, n in islice(zip(count(2), pyramid(1, 2, 2)), 1000):
+        for a in rng.sample(range(1, b + 1), n):
+            yield a, b
+
 
 def one_zero_generator(seed):
     for n in range(1, 2000):
@@ -7085,6 +7283,71 @@ testcases = [
         "one_zero",
         one_zero_generator,
         "7259484c1becc0e065d55e9cdb30e21ea9fb35103277c6a195b16f62db786688"
+    ),
+    (
+        "conway_subprime",
+        conway_subprime_generator,
+        "e1b3f4aa1c7063d4a625a43cf3aecb6db726fc375a902fe462f5c5643bbb725e"
+    ),
+    (
+        "knight_watch",
+        knight_watch_generator,
+        "b9a051157f25825246d81ce5a72562054299d122c51a5917966a2c1f0a7b6410"
+    ),
+    (
+        "is_prime",
+        is_prime_generator,
+        "6485b6675ba161ce25d4ecd643a412f55a086bad7fc9786b34a672b14be71fd7"
+    ),
+    (
+        "goldbach",
+        goldbach_generator,
+        "04201fc7d17eec10d7ac1f2e3035a4efa88b56dcb272c308b43f07064261cbc7"
+    ),
+    (
+        "car_match",
+        car_match_generator,
+        "4edb912344062a353a842ce17069a8c375344de5f9cd22fcf9ac4056829ef97c"
+    ),
+    (
+        "candy_split",
+        candy_split_generator,
+        "aeead0c98eb576c30843f79fe494889a71bb38f2eaadb1c990177b9e1c613aa8"
+    ),
+    (
+        "random_walk",
+        random_walk_generator,
+        "0354d39616a79a2e45a6023dda07e0fcae2590b4a539ebcaa3768c9298e27e42"
+    ),
+    (
+        "strahler",
+        strahler_generator,
+        "a144edf60d0832a4ce441e27fa9ce9c02c682beac11f12f9b1c8a0f79c8830c9"
+    ),
+    (
+        "spiral_walk",
+        spiral_walk_generator,
+        "f31f7ec0c885afe72261a9bd24ac0e73b548673221835af14ddbf5eee7dfb678"
+    ),
+    (
+        "largest_rectangle",
+        largest_rectangle_generator,
+        "5e16cb4ecfe007531225efb1dfdaf3e99036cd0912f76153a944f6ef60006359"
+    ),
+    (
+        "mixed_sort",
+        mixed_sort_generator,
+        "a3945fea7ec047c54bee63883e5ff3f68e75dc93bd70e70b0a555e8de096651a"
+    ),
+    (
+        "liquid_sort",
+        liquid_sort_generator,
+        "1fb89b433f8900e81e946cb974be6435a46822d0f4952cdcd02c9b5f45cdb577"
+    ),
+    (
+        "lcsis",
+        lcsis_generator,
+        "27d19c7e888798d919a18fc6a8dcd388439aa5b9b00afa9cca0ac2823a7d58b9"
     )
 ]
 
