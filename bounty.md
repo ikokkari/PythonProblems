@@ -930,7 +930,17 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
   </tr>
    <tr>
+   <td>Candy sharing game</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Shell sort</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Mixed type sorting</td>
    <td>
    </td>
   </tr>
@@ -960,10 +970,25 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
   </tr>
    <tr>
-   <td>Lehmer code: encoding</td>
+   <td>Primality buildup</td>
    <td>
    </td>
   </tr>
+   <tr>
+   <td>Goldbach verification</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Conway's subprime sequence</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Lehmer code: encoding</td>
+   <td>
+   </td>
+  </tr>   
    <tr>
    <td>Sum of square roots</td>
    <td>
@@ -1001,6 +1026,11 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Multiple winner election</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Spiral walk</td>
    <td>
    </td>
   </tr>
@@ -1050,6 +1080,11 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
   </tr>
    <tr>
+   <td>Largest rectangle in histogram</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Knaves of the round table</td>
    <td>
    </td>
@@ -1081,6 +1116,16 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Cousin explainer</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>One-dimensional random walk</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Knight watch</td>
    <td>
    </td>
   </tr>
@@ -1259,6 +1304,16 @@ Starting August 2024, a third problem collection is being collected until it als
    <td>
    </td>
    </tr>
+   <tr>
+   <td>Liquid sort</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Car match game</td>
+   <td>
+   </td>
+  </tr>
    <tr>
    <td>Optimal bridge placement</td>
    <td>
