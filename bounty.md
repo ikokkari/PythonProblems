@@ -1000,6 +1000,16 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
    </tr>
    <tr>
+   <td>Maximum number of blocks during shutdown</td>
+   <td>
+   </td>
+   </tr>
+   <tr>
+   <td>List of all factors</td>
+   <td>
+   </td>
+   </tr>
+   <tr>
    <td>Fourth seat opening</td>
    <td>
    </td>
@@ -1034,6 +1044,11 @@ Starting August 2024, a third problem collection is being collected until it als
    <td>
    </td>
   </tr>
+   <tr>
+   <td>Equal sum partition</td>
+   <td>
+   </td>
+   </tr>
    <tr>
    <td>Maximum interval clique</td>
    <td>
@@ -1079,6 +1094,11 @@ Starting August 2024, a third problem collection is being collected until it als
    <td>
    </td>
   </tr>
+   <tr>
+   <td>Yellowstone sequence</td>
+   <td>
+   </td>
+   </tr>
    <tr>
    <td>Largest rectangle in histogram</td>
    <td>
@@ -1160,7 +1180,7 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
   </tr>
    <tr>
-   <td>Zeckendorf decode</td>
+   <td>Zeckendorf decoding</td>
    <td>
    </td>
    </tr>
@@ -1319,6 +1339,11 @@ Starting August 2024, a third problem collection is being collected until it als
    <td>
    </td>
   </tr>
+   <tr>
+   <td>Levine's sequence</td>
+   <td>
+   </td>
+   </tr>
    <tr>
    <td>The way of a man with array</td>
    <td>
