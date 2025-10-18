@@ -37,7 +37,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.False
-version = "August 31, 2025"
+version = "October 18, 2025"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -340,6 +340,74 @@ def rearrange_graph(edges, rng):
 
 
 # XXX Test case generators for the individual functions.
+
+def all_factors_generator(seed):
+    for n in range(2, 1000):
+        yield n,
+    rng = Random(seed)
+    n = 1000
+    for _ in range(700):
+        n += rng.randint(1, n // 50)
+        yield n,
+
+
+def levine_sequence_generator(seed):
+    rng = Random(seed)
+    for n, m in islice(zip(pyramid(2, 13, 15), pyramid(2, 8, 12)), 100):
+        items = [rng.randint(1, m) for _ in range(n)]
+        k = rng.randint(1, 1 + m)
+        yield items, k
+
+
+def yellowstone_sequence_generator(seed):
+    for n in range(10000):
+        yield n,
+
+
+def tanton_necklace_generator(seed):
+    rng = Random(seed)
+    for n, p in islice(zip(pyramid(3, 4, 5), cycle([20, 30, 50, 70])), 2000):
+        beads, pc, oc = [], 0, 0
+        for _ in range(2 * n):
+            b = rng.choice("po") if (not beads or rng.randint(0, 99) < p) else rng.choice(beads)
+            if b == 'p' and pc == n:
+                b = 'o'
+            if b == 'o' and oc == n:
+                b = 'p'
+            beads.append(b)
+            if b == 'p':
+                pc += 1
+            else:
+                oc += 1
+        yield "".join(beads), rng.randint(2, n - 1)
+
+
+def equal_sum_partition_generator(seed):
+    rng = Random(seed)
+    for n, p in islice(zip(pyramid(6, 4, 5), cycle([0, 2, 4])), 1500):
+        items = []
+        s = rng.randint(n, 2 * n)
+        for _ in range(rng.randint(3, n)):
+            block = []
+            ss = s
+            while ss > 0:
+                e = isqrt(ss * ss - rng.randint(1, ss * ss)) + 1
+                ss -= e
+                block.append(e)
+                if rng.randint(0, 100) < p:
+                    block.append(rng.randint(1, 2 * ss + 2))
+            rng.shuffle(block)
+            items.extend(block)
+        yield items,
+
+
+def max_blocks_generator(seed):
+    rng = Random(seed)
+    for n in islice(pyramid(5, 2, 2), 4000):
+        perm = list(range(n))
+        rng.shuffle(perm)
+        yield perm,
+
 
 def lcsis_generator(seed):
     rng = Random(seed)
@@ -7348,6 +7416,36 @@ testcases = [
         "lcsis",
         lcsis_generator,
         "27d19c7e888798d919a18fc6a8dcd388439aa5b9b00afa9cca0ac2823a7d58b9"
+    ),
+    (
+        "max_blocks",
+        max_blocks_generator,
+        "91cc131e28b7a563c1e7c384f78ce57d7e2243fce2d16fbd3cd1e05c526eea3a"
+    ),
+    (
+        "equal_sum_partition",
+        equal_sum_partition_generator,
+        "9c9eed4fdaf446fdb0443ed4e04f820c29ae7bff426daceb1dc3e51550600628"
+    ),
+    (
+        "tanton_necklace",
+        tanton_necklace_generator,
+        "b6ba76fcdb3c74134ea562eb6d606a2fcbd365ea97954670374b8570a043c171"
+    ),
+    (
+        "yellowstone_sequence",
+        yellowstone_sequence_generator,
+        "510cf93f380cd4949949201e52b1b93760b3f4d0cf453be0a42692c9c11eddb7"
+    ),
+    (
+        "levine_sequence",
+        levine_sequence_generator,
+        "b39311d562a3c17cca28215f0e2de3fb20fefa428840a39e3bc76e9acf5c3c22"
+    ),
+    (
+        "all_factors",
+        all_factors_generator,
+        "b7c48002d0548eca9a6ae177dad9b5fcae648faecdf75c717096bafe888c7090"
     )
 ]
 
@@ -7457,5 +7555,6 @@ def discrepancy(teacher, student, test_generator, stop_at_first=False, print_all
 
 run_all()
 
+
 # teacher student generator
-#discrepancy(labs109.bulgarian_cycle, bulgarian_cycle, bulgarian_cycle_generator, print_all=True, stop_at_first=False)
+#discrepancy(labs109.max_blocks, max_blocks, max_blocks_generator, print_all=True, stop_at_first=False)
