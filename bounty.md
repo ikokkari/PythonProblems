@@ -1150,6 +1150,11 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
   </tr>
    <tr>
+   <td>Longest Fibonacci-like subsequence</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Maximize exam confusion</td>
    <td>
    </td>
@@ -1331,6 +1336,11 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Car match game</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Life is like a box of dominos</td>
    <td>
    </td>
   </tr>
