@@ -37,7 +37,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "November 29, 2025"
+version = "December 14, 2025"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -51,7 +51,7 @@ version_prefix = '<$$$$>'
 function_prefix = '<****>'
 
 # Timeout cutoff for individual function tests, in seconds.
-timeout_cutoff = 100
+timeout_cutoff = 20
 
 # How many test cases to record in the file for each function.
 testcase_cutoff = 300
@@ -341,6 +341,23 @@ def rearrange_graph(edges, rng):
 
 
 # XXX Test case generators for the individual functions.
+
+def haar_wavelet_encode(rng):
+    for m, k in islice(zip(pyramid(2, 10, 15), pyramid(5, 2, 2)), 1000):
+        yield [rng.randint(-k, k) for _ in range(2**m)],
+
+
+def rowland_prime_pump_generator(rng):
+    some_primes = [7, 197, 421, 443, 829, 1303, 1613, 1787, 2131, 2161, 2699, 2903, 3371, 3851,
+                   4007, 4357, 5087, 5437, 5821, 6011, 6673, 7127, 7673, 7759]
+    for a_start, k in zip(some_primes, range(len(some_primes))):
+        yield a_start, k + 20
+
+
+def self_square_generator(rng):
+    for n in range(2000):
+        yield n,
+
 
 def domino_box_generator(rng):
     for n in islice(pyramid(3, 5, 7), 130):
@@ -7214,7 +7231,27 @@ testcases = [
         "domino_box",
         domino_box_generator,
         "79f2cd2c384f7550c27ed63a253b9340f8da190eb1be867e4e408091441c5510"
-    )
+    ),
+    (
+        "self_square",
+        self_square_generator,
+        "4cfe49b2b7c6afa5f2254349b20b06415cbf8c0f445d2bb400541b9094bc7d55"
+    ),
+    (
+        "rowland_prime_pump",
+        rowland_prime_pump_generator,
+        "d2cd45539575fab0dbc96ff62f183f3397a31eba411086cdae942df4d8afc828"
+    ),
+    (
+        "haar_wavelet_encode",
+        haar_wavelet_encode,
+        "d83400fadc252ce7c35cd7c8a83d9e6f2f3b098e455cc71d75a37eb3bd77ae54"
+    ),
+    (
+        "haar_wavelet_decode",
+        haar_wavelet_encode,
+        "49fb6bb0878d5cdc773a1e11d16e6250620e8ac3a88d52fac831a42bb57ea0de"
+    ),
 ]
 
 # YYY
