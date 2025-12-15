@@ -935,12 +935,27 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
   </tr>
    <tr>
+   <td>Haar wavelet transform: Encode</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Haar wavelet transform: Decode</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Shell sort</td>
    <td>
    </td>
   </tr>
    <tr>
    <td>Mixed type sorting</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Infinite self-square integer</td>
    <td>
    </td>
   </tr>
@@ -981,6 +996,11 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Conway's subprime sequence</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Rowland's prime pump</td>
    <td>
    </td>
   </tr>
