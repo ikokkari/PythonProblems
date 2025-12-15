@@ -1360,7 +1360,7 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
   </tr>
    <tr>
-   <td>Life is like a box of dominos</td>
+   <td>Life is like a box of dominoes</td>
    <td>
    </td>
   </tr>
