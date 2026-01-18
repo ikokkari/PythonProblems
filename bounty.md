@@ -881,17 +881,17 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Multiply and sort</td>
-   <td>
+   <td>Thomas Brooks, January 18, 2026
    </td>
   </tr>
    <tr>
    <td>Approval voting</td>
-   <td>
+   <td>Thomas Brooks, January 18, 2026
    </td>
   </tr>
    <tr>
    <td>Vigenère cipher</td>
-   <td>
+   <td>Thomas Brooks, January 18, 2026
    </td>
   </tr>
    <tr>
