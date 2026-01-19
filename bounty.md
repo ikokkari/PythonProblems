@@ -896,22 +896,22 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Bug in a line</td>
-   <td>
+   <td>Thomas Brooks, January 19, 2026
    </td>
   </tr>
    <tr>
    <td>Friendship paradox</td>
-   <td>
+   <td>Thomas Brooks, January 19, 2026
    </td>
    </tr>
    <tr>
    <td>Right turn at Albuquerque</td>
-   <td>
+   <td>Thomas Brooks, January 19, 2026
    </td>
   </tr>
    <tr>
    <td>Generalized Fibonacci sequence</td>
-   <td>
+   <td>Thomas Brooks, January 19, 2026
    </td>
   </tr>
    <tr>
