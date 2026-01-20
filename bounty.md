@@ -921,12 +921,12 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Double-ended pop</td>
-   <td>
+   <td>Thomas Brooks, January 20, 2026
    </td>
   </tr>
    <tr>
    <td>First singleton</td>
-   <td>
+   <td>Thomas Brooks, January 20, 2026
    </td>
   </tr>
    <tr>
@@ -1080,8 +1080,7 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
   </tr>
    <tr>
-   <td>Split at None
-   </td>
+   <td>Split at None</td>
    <td>Karel Tutsu, August 30, 2024</td>
   </tr>
    <tr>
@@ -1106,7 +1105,7 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Haircut</td>
-   <td>
+   <td>Thomas Brooks, January 20, 2026
    </td>
   </tr>
    <tr>
