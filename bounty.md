@@ -1206,7 +1206,7 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Zeckendorf decoding</td>
-   <td>
+   <td>Thomas Brooks, January 20, 2026
    </td>
    </tr>
    <tr>
@@ -1256,12 +1256,12 @@ Starting August 2024, a third problem collection is being collected until it als
    </tr>
    <tr>
    <td>S-expression evaluator</td>
-   <td>
+   <td>Thomas Brooks, January 20, 2026
    </td>
   </tr>
    <tr>
    <td>Expand recursively run-length encoded string</td>
-   <td>
+   <td>Thomas Brooks, January 20, 2026
    </td>
   </tr>
    <tr>
