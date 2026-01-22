@@ -946,12 +946,12 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Shell sort</td>
-   <td>
+   <td>Thomas Brooks, January 22, 2026
    </td>
   </tr>
    <tr>
    <td>Mixed type sorting</td>
-   <td>
+   <td>Thomas Brooks, January 20, 2026
    </td>
   </tr>
    <tr>
