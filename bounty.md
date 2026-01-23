@@ -956,7 +956,7 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Infinite self-square integer</td>
-   <td>
+   <td>Thomas Brooks, January 23, 2026
    </td>
   </tr>
    <tr>
@@ -1370,7 +1370,7 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Levine's sequence</td>
-   <td>
+   <td>Thomas Brooks, January 20, 2026
    </td>
    </tr>
    <tr>
