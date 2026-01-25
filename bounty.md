@@ -986,7 +986,7 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Primality buildup</td>
-   <td>
+   <td>Thomas Brooks, January 25, 2026
    </td>
   </tr>
    <tr>
