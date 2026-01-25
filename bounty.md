@@ -966,7 +966,7 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Count slices with given sum</td>
-   <td>
+   <td>Thomas Brooks, January 25, 2026 
    </td>
   </tr>
    <tr>
@@ -991,7 +991,7 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Goldbach verification</td>
-   <td>
+   <td>Thomas Brooks, January 25, 2026
    </td>
   </tr>
    <tr>
