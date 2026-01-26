@@ -37,7 +37,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "December 14, 2025"
+version = "January 25, 2026"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -342,7 +342,169 @@ def rearrange_graph(edges, rng):
 
 # XXX Test case generators for the individual functions.
 
-def haar_wavelet_encode(rng):
+def bowling_paths_generator(rng):
+    for score in range(301):
+        yield score
+
+
+def pseudo_smarandache_generator(rng):
+    for n in range(1, 10000):
+        yield n,
+
+
+def postage_stamp_generator(rng):
+    for n, m in islice(zip(pyramid(2, 2, 2), count(10)), 250):
+        stamps = [1] + sorted(rng.sample(range(2, m), n))
+        for k in rng.sample(range(2, 2 * n + 4), 3):
+            yield stamps, k
+
+
+def frobenius_generator(rng):
+    for n, k in islice(zip(pyramid(2, 3, 3), pyramid(2, 7, 9)), 1000):
+        for _ in range(n):
+            nums = rng.sample(__primes, k)
+            yield sorted(nums),
+
+
+def pollard_rho_generator(rng):
+    PRIMES_25BIT = [
+        26797907, 31414613, 25537943, 28685731, 32173283,
+        21134899, 24464971, 20782999, 33383071, 28036597,
+        22238383, 30404951, 32241289, 30643609, 23551501,
+        19057373, 26002337, 25647019, 31727669, 28355893,
+        19310029, 24570103, 21760549, 17287709, 29810897,
+        17893243, 20013731, 32600467, 22831087, 32059619,
+        19946887, 17788153, 30188827, 20958323, 22682923,
+        23542429, 24509713, 17332493, 27796133, 21085739,
+    ]
+    PRIMES_32BIT = [
+        2963404501, 3614474503, 2248506499, 2262889561, 3758106601,
+        2320360421, 4212401929, 3020445331, 2792349533, 2776874897,
+        3566060053, 2685904541, 3328299127, 3467131123, 2624486353,
+        #2471683741, 3576987941, 3969802987, 3260543423, 3367726651,
+        #3544886617, 4291790627, 4162240099, 2922379127, 3064847971
+        #2501467237, 3273721487, 3855589811, 3137243293, 2698974667,
+        #2272016953, 4037950613, 2569799209, 3668678119, 2195357737,
+        #3608016169, 2791475257, 3481232023, 4029428089, 2350043363,
+    ]
+    for p, q in product(PRIMES_25BIT, PRIMES_32BIT):
+        yield p * q,
+
+
+def cutting_sticks_generator(rng):
+    for sticks in [[5, 10], [6], [1, 2, 3, 4, 5]]:
+        yield sticks,
+    for n in islice(pyramid(5, 2, 2), 200):
+        m = (n * (n + 1)) // 2
+        sticks = []
+        while m >= n:
+            s = rng.randint(n, m)
+            sticks.append(s)
+            m -= s
+        if m > 0:
+            sticks[-1] += m
+        yield sticks,
+
+
+def klee_measure_generator(rng):
+    for n, m, p in islice(zip(pyramid(3, 1, 1),
+                              chain(count(30, 500), scale_random(12345, 20, 2)),
+                              cycle([30, 50, 80])), 4000):
+        events = []
+        s = rng.randint(-m, m)
+        for _ in range(n):
+            e = rng.randint(s + 1, s + 1 + isqrt(m))
+            events.append((s, e))
+            s = rng.randint(s, e) if rng.randint(0, 99) < p else rng.randint(-m, m)
+        rng.shuffle(events)
+        yield events,
+
+
+def square_and_twice_prime_generator(rng):
+    for n in range(1, 300):
+        yield n,
+    for n in islice(scale_random(12345, 3, 10), 130):
+        yield n,
+
+
+def no_dogs_allowed_generator(rng):
+    for n, p in islice(zip(pyramid(3, 3, 7), cycle([10, 30, 50])), 70):
+        m = rng.randint(3, n)
+        if rng.randint(0, 99) < 50:
+            n, m = m, n
+        grid = [[rng.choice("dog") for _ in range(m)] for _ in range(n)]
+        while rng.randint(0, 99) > p:
+            word = rng.choice(["dog", "god"])
+            if rng.randint(0, 100) < 50:
+                x = rng.randint(0, n - 3)
+                y = rng.randint(0, m - 1)
+                grid[x][y] = word[0]
+                grid[x+1][y] = word[1]
+                grid[x+2][y] = word[2]
+            else:
+                x = rng.randint(0, n - 1)
+                y = rng.randint(0, m - 3)
+                grid[x][y] = word[0]
+                grid[x][y+1] = word[1]
+                grid[x][y+2] = word[2]
+
+        yield ["".join(row) for row in grid],
+
+def count_dogs_generator(rng):
+    for n in islice(pyramid(4, 3, 5), 3000):
+        m = rng.randint(3, n)
+        if rng.randint(0, 99) < 50:
+            grid = ["".join(rng.choice("dog") for _ in range(n)) for _ in range(m)]
+        else:
+            grid = ["".join(rng.choice("dog") for _ in range(m)) for _ in range(n)]
+        yield grid,
+
+
+def meaowsephus_generator(rng):
+    for n in islice(pyramid(3, 4, 5), 2000):
+        lives = [rng.randint(1, n + 2) for _ in range(n)]
+        k = rng.randint(1, n // 2 + 1)
+        yield lives, k
+
+
+def damm_checkdigit_generator(rng):
+    for n in islice(pyramid(2, 4, 5), 500):
+        digits = "".join(rng.choice("0123456789") for _ in range(n))
+        yield digits,
+
+
+def three_way_partition_generator(rng):
+    for items in [[0], [1], [2], [0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]]:
+        yield items,
+    for n, p in islice(zip(pyramid(3, 2, 2), cycle([20, 50, 80])), 500):
+        items = [rng.randint(0, 2)]
+        for _ in range(n - 1):
+            items.append(rng.choice(items) if rng.randint(0, 99) < p else rng.randint(0, 2))
+        yield items,
+
+
+def is_organ_pipe_generator(rng):
+    for items in [[42], [1, 2], [2, 1], [5, 5], [1, 2, 3], [3, 2, 1], [1, 2, 2, 1]]:
+        yield items,
+    for n in islice(pyramid(4, 5, 6), 2000):
+        up = rng.randint(1, n)
+        down = n - up + 1
+        top = max(up, down)
+        top = rng.randint(top + 1, 2 * top)
+        ups = sorted(rng.sample(range(0, top - 1), up))
+        downs = sorted(rng.sample(range(0, top - 1), down), reverse=True)
+        items = ups + [top] + downs
+        if rng.randint(0, 99) < 50:
+            if rng.randint(0, 99) < 30:
+                i = rng.randint(1, len(items) - 1)
+                items[i] = items[i - 1]
+            else:
+                i, j = rng.sample(range(len(items)), 2)
+                items[i], items[j] = items[j], items[i]
+        yield items,
+
+
+def haar_wavelet_encode_generator(rng):
     for m, k in islice(zip(pyramid(2, 10, 15), pyramid(5, 2, 2)), 1000):
         yield [rng.randint(-k, k) for _ in range(2**m)],
 
@@ -7244,14 +7406,84 @@ testcases = [
     ),
     (
         "haar_wavelet_encode",
-        haar_wavelet_encode,
+        haar_wavelet_encode_generator,
         "d83400fadc252ce7c35cd7c8a83d9e6f2f3b098e455cc71d75a37eb3bd77ae54"
     ),
     (
         "haar_wavelet_decode",
-        haar_wavelet_encode,
+        haar_wavelet_encode_generator,
         "49fb6bb0878d5cdc773a1e11d16e6250620e8ac3a88d52fac831a42bb57ea0de"
     ),
+    (
+        "is_organ_pipe",
+        is_organ_pipe_generator,
+        "52288be12bcacf65564b558038c428c9336d8b1918a47513669b1ca4d98308d6"
+    ),
+    (
+        "three_way_partition",
+        three_way_partition_generator,
+        "9db8eb2e997e394441a62dff8b279beab72d3fbdf8c4a1d8040ce29691f67a29"
+    ),
+    (
+        "damm_checkdigit",
+        damm_checkdigit_generator,
+        "06089f114d886b8e46c6cf7d2ad967e5fdab8c8b6632745073690149a72f28d5"
+    ),
+    (
+        "meaowsephus",
+        meaowsephus_generator,
+        "d01cd6e1da2ac893be495e64cee098dbb60c0f33fca94671fc57446fe0d447e4"
+    ),
+    (
+        "count_dogs",
+        count_dogs_generator,
+        "ef6b978f5a17e9dcd18630016163c32eaa051880e20cf5151a6ed781e8b42415"
+    ),
+    (
+        "no_dogs_allowed",
+        no_dogs_allowed_generator,
+        "68f317c349c197c7e9c6bb5d0c976cbb73830628da917800460244a2d3479d27"
+    ),
+    (
+        "square_and_twice_prime",
+        square_and_twice_prime_generator,
+        "184337cd2adc01eda4cc3f86834ceb7b530666b08a440e5b5952908bba10b126"
+    ),
+    (
+        "klee_measure",
+        klee_measure_generator,
+        "2b898c488cf51ee5c82092245f570c140ff60699837d99079772a66442620106"
+    ),
+    (
+        "cutting_sticks",
+        cutting_sticks_generator,
+        "c1f9d8f18febdab88c11e26ca0f5f82d7035eed43f50cadcee6ebb4a586af822"
+    ),
+    (
+        "pollard_rho",
+        pollard_rho_generator,
+        "14c8ac0086b4fd431a563afe22d0d7aa77bd35bc4630b385c34725f408b5e819"
+    ),
+    (
+        "frobenius",
+        frobenius_generator,
+        "fe11cd15dabd27d3b8d28db14b6dd002f537dac7358528deb6dbc839de22d501"
+    ),
+    (
+        "postage_stamp",
+        postage_stamp_generator,
+        "8dffdeb04ab412592ee225c465e9ef596f6b675ad1bb0efe5fdf1e374f8b8b36"
+    ),
+    (
+        "pseudo_smarandache",
+        pseudo_smarandache_generator,
+        "8f5be79710ca3110a1c38759fc1cb3d50268e1c80c39e7e0873d6fbe3c93613f"
+    ),
+    (
+        "bowling_paths",
+        bowling_paths_generator,
+        "ee1c30cb4e09c1391c679576a4dd5c48b4e2d71bbdea2c52baa56ed150ad9074"
+    )
 ]
 
 # YYY
@@ -7319,7 +7551,7 @@ def run_all():
 
 def discrepancy(teacher, student, test_generator, stop_at_first=False, print_all=False):
     shortest_args, disc_teacher, disc_student, disc, cases = None, None, None, 0, 0
-    for n, args in enumerate(test_generator(fixed_seed)):
+    for n, args in enumerate(test_generator):
         # Turn the args into a tuple, if they aren't one already.
         if type(args) != tuple:
             args = (args,)
@@ -7362,4 +7594,4 @@ run_all()
 
 
 # teacher student generator
-#discrepancy(labs109.max_blocks, max_blocks, max_blocks_generator, print_all=True, stop_at_first=False)
+#discrepancy(labs109.conway_subprime, conway_subprime, conway_subprime_generator(Random(fixed_seed)), print_all=True, stop_at_first=False)
