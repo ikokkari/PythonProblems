@@ -1023,11 +1023,6 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
   </tr>
    <tr>
-   <td>Mixed type sorting</td>
-   <td>Thomas Brooks, January 20, 2026
-   </td>
-  </tr>
-   <tr>
    <td>The nine lives of Meaowsephus</td>
    <td>Thomas Brooks, January 20, 2026
    </td>
