@@ -214,7 +214,7 @@ I will therefore offer a bounty of 100 CAD for each bonus problem to the first p
    <tr>
    <td>T111: Levine's sequence
    </td>
-   <td>
+   <td>Thomas Brooks, January 20, 2026
    </td>
   </tr>
    <tr>
@@ -943,6 +943,21 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
   </tr>
    <tr>
+   <td>Once you go down, you can't come up again</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Damm those errors</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Tanton necklace</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Bug in a line</td>
    <td>Thomas Brooks, January 19, 2026
    </td>
@@ -960,6 +975,11 @@ Starting August 2024, a third problem collection is being collected until it als
    <tr>
    <td>Generalized Fibonacci sequence</td>
    <td>Thomas Brooks, January 19, 2026
+   </td>
+  </tr>
+   <tr>
+   <td>Pollard's rho integer factorization</td>
+   <td>
    </td>
   </tr>
    <tr>
@@ -1003,8 +1023,13 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
   </tr>
    <tr>
-   <td>Infinite self-square integer</td>
-   <td>Thomas Brooks, January 23, 2026
+   <td>Mixed type sorting</td>
+   <td>Thomas Brooks, January 20, 2026
+   </td>
+  </tr>
+   <tr>
+   <td>The nine lives of Meaowsephus</td>
+   <td>Thomas Brooks, January 20, 2026
    </td>
   </tr>
    <tr>
@@ -1028,7 +1053,22 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
   </tr>
    <tr>
+   <td>The backwards god</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Klee's measure problem</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Poker test of randomness</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Three-way partition</td>
    <td>
    </td>
   </tr>
@@ -1040,6 +1080,16 @@ Starting August 2024, a third problem collection is being collected until it als
    <tr>
    <td>Goldbach verification</td>
    <td>Thomas Brooks, January 25, 2026
+   </td>
+  </tr>
+   <tr>
+   <td>A square and twice a prime</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Pseudo-Smarandache function</td>
+   <td>
    </td>
   </tr>
    <tr>
@@ -1063,6 +1113,16 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
    </tr>
    <tr>
+   <td>Infinite self-square integer</td>
+   <td>Thomas Brooks, January 23, 2026
+   </td>
+  </tr>
+   <tr>
+   <td>Strahler numbers</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Loopless walk</td>
    <td>
    </td>
@@ -1083,12 +1143,12 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
    </tr>
    <tr>
-   <td>Convert fraction to simple continued fraction</td>
+   <td>Convert a fraction to a simple continued fraction</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Convert simple continued fraction to fraction</td>
+   <td>Convert a simple continued fraction to a fraction</td>
    <td>
    </td>
   </tr>
@@ -1168,6 +1228,16 @@ Starting August 2024, a third problem collection is being collected until it als
    </tr>
    <tr>
    <td>Largest rectangle in histogram</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Frobenius nuggets</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>Postage stamp problem</td>
    <td>
    </td>
   </tr>
@@ -1297,6 +1367,11 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
   </tr>
    <tr>
+   <td>Cutting sticks</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
    <td>Optimal text filling</td>
    <td>
    </td>
@@ -1309,6 +1384,11 @@ Starting August 2024, a third problem collection is being collected until it als
    <tr>
    <td>Expand recursively run-length encoded string</td>
    <td>Thomas Brooks, January 20, 2026
+   </td>
+  </tr>
+   <tr>
+   <td>Longest common strictly increasing subsequence</td>
+   <td>
    </td>
   </tr>
    <tr>
@@ -1391,39 +1471,8 @@ Starting August 2024, a third problem collection is being collected until it als
    <td>
    </td>
   </tr>
-   <tr>
-   <td>Post correspondence problem</td>
-   <td>
-   </td>
-   </tr>
-   <tr>
-   <td>Liquid sort</td>
-   <td>
-   </td>
-  </tr>
-   <tr>
-   <td>Car match game</td>
-   <td>
-   </td>
-  </tr>
-   <tr>
    <td>Life is like a box of dominoes</td>
    <td>
    </td>
   </tr>
-   <tr>
-   <td>Optimal bridge placement</td>
-   <td>
-   </td>
-  </tr>
-   <tr>
-   <td>Levine's sequence</td>
-   <td>Thomas Brooks, January 20, 2026
-   </td>
-   </tr>
-   <tr>
-   <td>The way of a man with array</td>
-   <td>
-   </td>
-   </tr>
 </table>
