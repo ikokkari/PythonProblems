@@ -248,7 +248,7 @@ I will therefore offer a bounty of 100 CAD for each bonus problem to the first p
    </td>
   </tr>
    <tr>
-   <td>T117: Count bowling balls
+   <td>T117: Count bowling paths
    </td>
    <td>
    </td>
