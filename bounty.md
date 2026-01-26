@@ -205,6 +205,54 @@ I will therefore offer a bounty of 100 CAD for each bonus problem to the first p
    <td>
    </td>
   </tr>
+   <tr>
+   <td>T110: The way of a man with array
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>T111: Levine's sequence
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>T112: Post correspondence problem
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>T113: Optimal bridge placement
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>T114: No dogs, no masters
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>T115: Car match game
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>T116: Liquid sort
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>T117: Count bowling balls
+   </td>
+   <td>
+   </td>
+  </tr>
 </table>
      
 Starting March 2023, the author started creating another set of Python problems, separate from the main corpus of the *109 Python Problems*. (One can only quit for so long without the inevitable relapse.) **The following problems don't have money bounties**, but the first person to submit a working solution for each of the following problems will still get his or her name etched in the table below for perpetuity, plus the bragging rights and the good feeling for the work well done.
