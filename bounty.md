@@ -220,7 +220,7 @@ I will therefore offer a bounty of 100 CAD for each bonus problem to the first p
    <tr>
    <td>T112: Post correspondence problem
    </td>
-   <td>
+   <td>Thomas Brooks, January 27, 2026
    </td>
   </tr>
    <tr>
@@ -984,7 +984,7 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Bays–Durham shuffle</td>
-   <td>
+   <td>Thomas Brooks, January 27, 2026
    </td>
   </tr>
    <tr>
@@ -999,12 +999,12 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Candy sharing game</td>
-   <td>
+   <td>Thomas Brooks, January 27, 2026
    </td>
   </tr>
    <tr>
    <td>Haar wavelet transform: Encode</td>
-   <td>
+   <td>Thomas Brooks, January 27, 2026
    </td>
   </tr>
    <tr>
@@ -1044,7 +1044,7 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Ones mule, zeros pool</td>
-   <td>
+   <td>Thomas Brooks, January 27, 2026
    </td>
   </tr>
    <tr>
@@ -1059,7 +1059,7 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Poker test of randomness</td>
-   <td>
+   <td>Thomas Brooks, January 27, 2026
    </td>
   </tr>
    <tr>
@@ -1094,7 +1094,7 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Rowland's prime pump</td>
-   <td>
+   <td>Thomas Brooks, January 27, 2026
    </td>
   </tr>
    <tr>
@@ -1333,7 +1333,7 @@ Starting August 2024, a third problem collection is being collected until it als
   </tr>
    <tr>
    <td>Average run length test of randomness</td>
-   <td>
+   <td>Thomas Brooks, January 27, 2026
    </td>
   </tr>
    <tr>
