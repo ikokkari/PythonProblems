@@ -253,6 +253,42 @@ I will therefore offer a bounty of 100 CAD for each bonus problem to the first p
    <td>
    </td>
   </tr>
+   <tr>
+   <td>T118: Expiring cookies
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>T119: Sonata pattern matching
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>T120: Fox and hounds
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>T121: Toads and frogs
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>T122: Unamerican gladiators
+   </td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>T123: Life is like a box of dominoes
+   </td>
+   <td>
+   </td>
+  </tr>
 </table>
      
 Starting March 2023, the author started creating another set of Python problems, separate from the main corpus of the *109 Python Problems*. (One can only quit for so long without the inevitable relapse.) **The following problems don't have money bounties**, but the first person to submit a working solution for each of the following problems will still get his or her name etched in the table below for perpetuity, plus the bragging rights and the good feeling for the work well done.
@@ -928,545 +964,546 @@ Starting August 2024, a third problem collection is being collected until it als
    </td>
   </tr>
    <tr>
-   <td>Multiply and sort</td>
+   <td>1. Multiply and sort</td>
    <td>Thomas Brooks, January 18, 2026
    </td>
   </tr>
    <tr>
-   <td>Approval voting</td>
+   <td>2. Approval voting</td>
    <td>Thomas Brooks, January 18, 2026
    </td>
   </tr>
    <tr>
-   <td>Vigenère cipher</td>
+   <td>3. Vigenère cipher</td>
    <td>Thomas Brooks, January 18, 2026
    </td>
   </tr>
    <tr>
-   <td>Once you go down, you can't come up again</td>
+   <td>4. Once you go down, you can't come up again</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Damm those errors</td>
+   <td>5. Baum–Sweet sequence</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>6. Damm those errors</td>
    <td>Thomas Brooks, January 22, 2026
    </td>
   </tr>
    <tr>
-   <td>Tanton necklace</td>
+   <td>7. Tanton necklace</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Bug in a line</td>
+   <td>8. Bug in a line</td>
    <td>Thomas Brooks, January 19, 2026
    </td>
   </tr>
    <tr>
-   <td>Friendship paradox</td>
+   <td>9. Friendship paradox</td>
    <td>Thomas Brooks, January 19, 2026
    </td>
    </tr>
    <tr>
-   <td>Right turn at Albuquerque</td>
+   <td>10. Right turn at Albuquerque</td>
    <td>Thomas Brooks, January 19, 2026
    </td>
   </tr>
    <tr>
-   <td>Generalized Fibonacci sequence</td>
+   <td>11. Generalized Fibonacci sequence</td>
    <td>Thomas Brooks, January 19, 2026
    </td>
   </tr>
    <tr>
-   <td>Pollard's rho integer factorization</td>
+   <td>12. Pollard's rho integer factorization</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Bays–Durham shuffle</td>
+   <td>13. Bays–Durham shuffle</td>
    <td>Thomas Brooks, January 27, 2026
    </td>
   </tr>
    <tr>
-   <td>Double-ended pop</td>
+   <td>14. Double-ended pop</td>
    <td>Thomas Brooks, January 20, 2026
    </td>
   </tr>
    <tr>
-   <td>First singleton</td>
+   <td>15. First singleton</td>
    <td>Thomas Brooks, January 20, 2026
    </td>
   </tr>
    <tr>
-   <td>Candy sharing game</td>
+   <td>16. Candy sharing game</td>
    <td>Thomas Brooks, January 27, 2026
    </td>
   </tr>
    <tr>
-   <td>Haar wavelet transform: Encode</td>
+   <td>17. Haar wavelet transform: Encode</td>
    <td>Thomas Brooks, January 27, 2026
    </td>
   </tr>
    <tr>
-   <td>Haar wavelet transform: Decode</td>
+   <td>18. Haar wavelet transform: Decode</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Shell sort</td>
+   <td>19. Shell sort</td>
    <td>Thomas Brooks, January 22, 2026
    </td>
   </tr>
    <tr>
-   <td>Mixed type sorting</td>
+   <td>20. Mixed type sorting</td>
    <td>Thomas Brooks, January 20, 2026
    </td>
   </tr>
    <tr>
-   <td>The nine lives of Meaowsephus</td>
+   <td>21. The nine lives of Meaowsephus</td>
    <td>Thomas Brooks, January 20, 2026
    </td>
   </tr>
    <tr>
-   <td>Maximum repeated suffix</td>
+   <td>22. Maximum repeated suffix</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Count slices with given sum</td>
+   <td>23. Count slices with given sum</td>
    <td>Thomas Brooks, January 25, 2026 
    </td>
   </tr>
    <tr>
-   <td>First sublist whose sum is some multiple of k</td>
+   <td>24. First sublist whose sum is some multiple of k</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Ones mule, zeros pool</td>
+   <td>25. Ones mule, zeros pool</td>
    <td>Thomas Brooks, January 27, 2026
    </td>
   </tr>
    <tr>
-   <td>The backwards god</td>
+   <td>26. The backwards god</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Klee's measure problem</td>
+   <td>27. Klee's measure problem</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Poker test of randomness</td>
+   <td>28. Poker test of randomness</td>
    <td>Thomas Brooks, January 27, 2026
    </td>
   </tr>
    <tr>
-   <td>Three-way partition</td>
+   <td>29. Three-way partition</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Primality buildup</td>
+   <td>30. Primality buildup</td>
    <td>Thomas Brooks, January 25, 2026
    </td>
   </tr>
    <tr>
-   <td>Goldbach verification</td>
+   <td>31. Goldbach verification</td>
    <td>Thomas Brooks, January 25, 2026
    </td>
   </tr>
    <tr>
-   <td>A square and twice a prime</td>
+   <td>32. A square and twice a prime</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Pseudo-Smarandache function</td>
+   <td>33. Pseudo-Smarandache function</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Conway's subprime sequence</td>
+   <td>34. Conway's subprime sequence</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Rowland's prime pump</td>
+   <td>35. Rowland's prime pump</td>
    <td>Thomas Brooks, January 27, 2026
    </td>
   </tr>
    <tr>
-   <td>Lehmer code: encoding</td>
+   <td>36. Lehmer code: encoding</td>
    <td>
    </td>
   </tr>   
    <tr>
-   <td>Sum of square roots</td>
+   <td>37. Sum of square roots</td>
    <td>
    </td>
    </tr>
    <tr>
-   <td>Infinite self-square integer</td>
+   <td>38. Night shift</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>39. Infinite self-square integer</td>
    <td>Thomas Brooks, January 23, 2026
    </td>
   </tr>
    <tr>
-   <td>Strahler numbers</td>
+   <td>40. Strahler numbers</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Loopless walk</td>
+   <td>41. Loopless walk</td>
    <td>
    </td>
    </tr>
    <tr>
-   <td>Maximum number of blocks during shutdown</td>
+   <td>42. Maximum number of blocks during shutdown</td>
    <td>
    </td>
    </tr>
    <tr>
-   <td>List of all factors</td>
+   <td>43. List of all factors</td>
    <td>
    </td>
    </tr>
    <tr>
-   <td>Fourth seat opening</td>
+   <td>44. Fourth seat opening</td>
    <td>
    </td>
    </tr>
    <tr>
-   <td>Convert a fraction to a simple continued fraction</td>
+   <td>45. Convert a fraction to a simple continued fraction</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Convert a simple continued fraction to a fraction</td>
+   <td>46. Convert a simple continued fraction to a fraction</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Sturm und drangle</td>
+   <td>47. Sturm und drangle</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Rational roots of a polynomial</td>
+   <td>48. Rational roots of a polynomial</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Multiple winner election</td>
+   <td>49. Multiple winner election</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Spiral walk</td>
+   <td>50. Spiral walk</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Equal sum partition</td>
+   <td>51. Equal sum partition</td>
    <td>
    </td>
    </tr>
    <tr>
-   <td>Maximum interval clique</td>
+   <td>52. Maximum interval clique</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Maximum overlap intervals</td>
+   <td>53. Maximum overlap intervals</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Split at None</td>
+   <td>54. Split at None</td>
    <td>Karel Tutsu, August 30, 2024</td>
   </tr>
    <tr>
-   <td>Chunk sorting</td>
+   <td>55. Chunk sorting</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Merge the two biggest</td>
+   <td>56. Merge the two biggest</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Lehmer code: decoding</td>
+   <td>57. Lehmer code: decoding</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Bayesian updating of dice</td>
+   <td>58. Bayesian updating of dice</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Haircut</td>
+   <td>59. Haircut</td>
    <td>Thomas Brooks, January 20, 2026
    </td>
   </tr>
    <tr>
-   <td>Kadane in triplicate</td>
+   <td>60. Kadane in triplicate</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Yellowstone sequence</td>
+   <td>61. Yellowstone sequence</td>
    <td>
    </td>
    </tr>
    <tr>
-   <td>Largest rectangle in histogram</td>
+   <td>62. Largest rectangle in histogram</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Frobenius nuggets</td>
+   <td>63. Frobenius nuggets</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Postage stamp problem</td>
+   <td>64. Postage stamp problem</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Knaves of the round table</td>
+   <td>65. Knaves of the round table</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Six of this, half a dozen of the other</td>
+   <td>66. Six of this, half a dozen of the other</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Factoradical dudes</td>
+   <td>67. Factoradical dudes</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Tarjan's strongly connected components</td>
+   <td>68. Tarjan's strongly connected components</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Copeland harder</td>
+   <td>69. Copeland harder</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Instant runoff voting</td>
+   <td>70. Instant runoff voting</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Cousin explainer</td>
+   <td>71. Cousin explainer</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>One-dimensional random walk</td>
+   <td>72. One-dimensional random walk</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Knight watch</td>
+   <td>73. Knight watch</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Longest Fibonacci-like subsequence</td>
+   <td>74. Longest Fibonacci-like subsequence</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Maximize exam confusion</td>
+   <td>75. Maximize exam confusion</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Burrows–Wheeler transform</td>
+   <td>76. Burrows–Wheeler transform</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Bron–Kerbosch maximal clique enumeration</td>
+   <td>77. Bron–Kerbosch maximal clique enumeration</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Queue jockeys</td>
+   <td>78. Queue jockeys</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Smallie Bigs</td>
+   <td>79. Distance from land</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Gauss circle</td>
+   <td>80. Smallie Bigs</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Zeckendorf decoding</td>
+   <td>81. Gauss circle</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>82. Zeckendorf decoding</td>
    <td>Thomas Brooks, January 20, 2026
    </td>
    </tr>
    <tr>
-   <td>Sultan's daughter</td>
+   <td>83. Sultan's daughter</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Limited swap sorting</td>
+   <td>84. Limited swap sorting</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Average run length test of randomness</td>
+   <td>85. Average run length test of randomness</td>
    <td>Thomas Brooks, January 27, 2026
    </td>
   </tr>
    <tr>
-   <td>Count increasing paths</td>
+   <td>86. Count increasing paths</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Cocke–Younger–Kasami parsing</td>
+   <td>87. Cocke–Younger–Kasami parsing</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Avoidant subset of points on a circular line</td>
+   <td>88. Avoidant subset of points on a circular line</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Diamond sequence</td>
+   <td>89. Ehrenfeucht–Mycielski sequence</td>
+   <td>
+   </td>
+  </tr>
+   <tr>
+   <td>90. Diamond sequence</td>
    <td>
    </td>
    </tr>
    <tr>
-   <td>Minimize largest triangle</td>
+   <td>91. Minimize largest triangle</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Cutting sticks</td>
+   <td>92. Cutting sticks</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Optimal text filling</td>
+   <td>93. Optimal text filling</td>
    <td>
    </td>
    </tr>
    <tr>
-   <td>S-expression evaluator</td>
+   <td>94. S-expression evaluator</td>
    <td>Thomas Brooks, January 20, 2026
    </td>
   </tr>
    <tr>
-   <td>Expand recursively run-length encoded string</td>
+   <td>95. Expand recursively run-length encoded string</td>
    <td>Thomas Brooks, January 20, 2026
    </td>
   </tr>
    <tr>
-   <td>Longest common strictly increasing subsequence</td>
+   <td>96. Longest common strictly increasing subsequence</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Maximum palindromic integer</td>
+   <td>97. Maximum palindromic integer</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Optimal palindromic split</td>
+   <td>98. Optimal palindromic split</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Semiconnected guys</td>
+   <td>99. Semiconnected guys</td>
    <td>
    </td>
    </tr>
    <tr>
-   <td>Falling squares</td>
+   <td>100. Falling squares</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Tchuka Ruma</td>
+   <td>101. Tchuka Ruma</td>
    <td>
    </td>
    </tr>
    <tr>
-   <td>Slater–Vélez sequence</td>
+   <td>102. Slater–Vélez sequence</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Odds and evens</td>
+   <td>103. Odds and evens</td>
    <td>Thomas Brooks, June 18, 2025
    </td>
   </tr>
    <tr>
-   <td>The prodigal sequence</td>
+   <td>104. The prodigal sequence</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Descending suffix game</td>
+   <td>105. Descending suffix game</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>The Borgesian dictionary</td>
+   <td>106. The Borgesian dictionary</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>The Dictorian borgesitory</td>
+   <td>107. The Dictorian borgesitory</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>The art of strategic sacrifice</td>
+   <td>108. The art of strategic sacrifice</td>
    <td>
    </td>
   </tr>
    <tr>
-   <td>Colonel Blotto and the spymaster</td>
-   <td>
-   </td>
-  </tr>
-   <tr>
-   <td>Unamerican gladiators</td>
-   <td>
-   </td>
-  </tr>
-   <tr>
-   <td>Fox and hounds</td>
-   <td>
-   </td>
-  </tr>
-   <tr>
-   <td>Toads and frogs</td>
-   <td>
-   </td>
-  </tr>
-   <td>Life is like a box of dominoes</td>
+   <td>109. Colonel Blotto and the spymaster</td>
    <td>
    </td>
   </tr>
