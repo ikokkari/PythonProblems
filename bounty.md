@@ -26,9 +26,7 @@ Conversion notes:
 
 # 109 Problems Bonus Bounty List
 
-The problem collection "109 Python Problems for CCPS 109" is now complete, and no further problems will ever be added to this collection. In addition to the actual problems, the collection [109 Python problems for CCPS 109](https://github.com/ikokkari/PythonProblems) includes fourteen bonus problems intended for students who are looking for a serious challenge. For personal reasons, it is extremely important to me that all these bonus problem specifications and their private model solutions contain no bugs, so that the checksums hardcoded in the automated tester are true and achievable by everyone who chooses to work hard to solve these problems.
-
-I will therefore offer a bounty of 100 CAD for each bonus problem to the first person to email me (ilkka.kokkarinen@gmail.com) a working solution to pass my automated tests for that problem. The solution must pass these tests within the twenty second time limit when executed on my machine. This bounty is paid to Sick Kids Toronto. And for whatever it's worth, you get your name permanently displayed in the table below as long as this problem collection exists.
+The problem collection "109 Python Problems for CCPS 109" is now complete, and no further problems will ever be added to this collection. In addition to the actual problems, the collection [109 Python problems for CCPS 109](https://github.com/ikokkari/PythonProblems) includes fourteen bonus problems intended for students who are looking for a serious challenge. For personal reasons, it is extremely important to me that all these bonus problem specifications and their private model solutions contain no bugs, so that the checksums hardcoded in the automated tester are true and achievable by everyone who chooses to work hard to solve these problems. The first student to send me working solution to each problem gets their name etched into the bounty tables below. 
 
 <table>
   <tr>
@@ -291,7 +289,7 @@ I will therefore offer a bounty of 100 CAD for each bonus problem to the first p
   </tr>
 </table>
      
-Starting March 2023, the author started creating another set of Python problems, separate from the main corpus of the *109 Python Problems*. (One can only quit for so long without the inevitable relapse.) **The following problems don't have money bounties**, but the first person to submit a working solution for each of the following problems will still get his or her name etched in the table below for perpetuity, plus the bragging rights and the good feeling for the work well done.
+Starting March 2023, the author started creating another set of Python problems, separate from the main corpus of the *109 Python Problems*. (One can only quit for so long without the inevitable relapse.)
      
 <table>
   <tr>
@@ -954,7 +952,7 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
 </table>
 
-A third problem collection reached 123 problems in January 31, 2026. Same rules as with the second collection.
+A third problem collection was started August 2024, and it reached 123 problems in January 31, 2026.
 
 <table>
 <tr>
