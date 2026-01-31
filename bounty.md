@@ -954,7 +954,7 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
 </table>
 
-Starting August 2024, a third problem collection is being collected until it also reaches 123 problems one day. Same rules as with the second collection.
+A third problem collection reached 123 problems in January 31, 2026. Same rules as with the second collection.
 
 <table>
 <tr>
