@@ -29,7 +29,7 @@ from datetime import date
 
 verbose_execution = {
     #   "function_one": 42,   # Print the first 42 test cases of function_one
-    #   "function_two": -1,   # Print all test cases of function_two, however manYY there are
+    #   "function_two": -1,   # Print all test cases of function_two, however many there are
     #   "function_three": 0   # Be silent with function_three (but run it early)
 }
 
@@ -37,7 +37,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "January 25, 2026"
+version = "January 31, 2026"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -56,8 +56,7 @@ timeout_cutoff = 20
 # How many test cases to record in the file for each function.
 testcase_cutoff = 300
 
-# Is the script allowed to create a new expected_answers file? Do not
-# change this unless you know what you are doing.
+# Is the script allowed to create a new expected_answers file?
 can_record = False
 
 # For instructors who want to add their own problems to this set:
@@ -341,6 +340,88 @@ def rearrange_graph(edges, rng):
 
 
 # XXX Test case generators for the individual functions.
+
+def distance_from_land_generator(rng):
+    for n, p in islice(zip(pyramid(3, 3, 3), cycle([10, 20, 30])), 2000):
+        m = rng.randint(3, n)
+        if rng.randint(0, 99) < 50:
+            n, m = m, n
+        map = ["".join([("L" if rng.randint(0, 99) < p else "S") for _ in range(m)]) for _ in range(n)]
+        if any(map[x][y] == 'L' for x in range(n) for y in range(m)):
+            yield map,
+
+
+def baum_sweet_generator(rng):
+    for n in range(1000000):
+        yield n,
+
+
+def ehrenfeucht_mycielski_generator(rng):
+    k = 10
+    for n in range(1, 7):
+        for ones in range(0, n + 1):
+            for p in combinations(range(n), ones):
+                prefix = ["1" if i in p else "0" for i in range(n)]
+                yield "".join(prefix), k
+                k += 1
+
+
+def night_shift_generator(rng):
+    # Example programs copied from https://esolangs.org/wiki/Night_Shift
+    invert_bits = ["0000-01000", "0001-11000", "000-001", "01001-0011", "11001-0010", "001-/"]
+    extract_first_bit = ["0000-010010", "0001-110010", "00100-0010", "00101-0010", "0010-0011", "010011-0", "110011-1"]
+    extract_last_bit = ["00000-0000", "00001-0001", "00010-0000", "00011-0001", "0000-0", "0001-1"]
+    remove_first_bit = ["0000-001", "0001-001", "001-/"]
+    remove_last_bit = ["00000-010000", "00001-010001", "00010-110000", "00011-110001", "0000-001",
+                       "0001-001", "01001-0010", "11001-0011", "001-/"]
+    increment_binary = ["0000-01000", "0001-11000", "000-0010", "010010-00111", "110010-00100",
+                        "0010 - 00111", "010011-00110", "110011-00111", "0011-/"]
+    for n in islice(pyramid(2, 3, 4), 1000):
+        data = "".join(rng.choice("01") for _ in range(n))
+        for rules in [invert_bits, extract_first_bit, extract_last_bit, remove_first_bit, remove_last_bit, increment_binary]:
+            yield data, rules
+
+
+def sonata_match_generator(rng):
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [w.strip() for w in f]
+    for n, m in islice(zip(pyramid(5, 2, 4), pyramid(2, 4, 5)), 260):
+        assigned, var_type = dict(), dict()
+        chosen_vars = rng.sample(ups, m)
+        for v in chosen_vars:
+            var_type[v] = rng.choice([True, False])
+            if var_type[v]:
+                assigned[v] = rng.choice(lows)
+            else:
+                while True:
+                    word = rng.choice(words)
+                    if rng.randint(0, 99) < 100 - 5 * len(word):
+                        break
+                assigned[v] = word if rng.randint(0, 99) < 80 else ""
+        text, pattern = "", ""
+        for _ in range(n):
+            if rng.randint(0, 99) < 50:
+                c = rng.choice(lows)
+                pattern += c
+                text += c
+            else:
+                v = rng.choice(chosen_vars)
+                text += assigned[v]
+                pattern += ("^" if var_type[v] else "_") + v
+        while rng.randint(0, 99) < 20:
+            i = rng.choice(range(len(text)))
+            text = text[:i] + rng.choice(lows) + text[i+1:]
+        yield text, pattern
+
+
+def expiring_cookies_generator(rng):
+    for n, m in islice(zip(pyramid(4, 2, 3), count(10)), 500):
+        cookies = [1 for _ in range(n)]
+        for _ in range(m):
+            cookies[isqrt(rng.randint(0, n * n - 1))] += 1
+        cookies.sort()
+        yield cookies,
+
 
 def bowling_paths_generator(rng):
     for score in range(301):
@@ -7483,6 +7564,36 @@ testcases = [
         "bowling_paths",
         bowling_paths_generator,
         "ee1c30cb4e09c1391c679576a4dd5c48b4e2d71bbdea2c52baa56ed150ad9074"
+    ),
+    (
+        "expiring_cookies",
+        expiring_cookies_generator,
+        "4d341dd237dedc0d5c6c6dbe860137efb9842efdde2719ddbbfcab1299ec0fec"
+    ),
+    (
+        "sonata_match",
+        sonata_match_generator,
+        "8600ff32d6ac1ac723356304c351c00ddb262f29bed7f3d585304f1846fc4552"
+    ),
+    (
+        "night_shift",
+        night_shift_generator,
+        "595783b92175dc3f9f822e1dbd3f826210891d9b56d6e1a63e7975359d4a8a05"
+    ),
+    (
+        "ehrenfeucht_mycielski",
+        ehrenfeucht_mycielski_generator,
+        "b47e4c88744427e51f0ffb1df3817b060a7405396e4692974d99636f73dd4cf9"
+    ),
+    (
+        "baum_sweet",
+        baum_sweet_generator,
+        "035429366eb7a7d6baa60801780f705fff7e15882b90eff3748b7cc8a014a164"
+    ),
+    (
+        "distance_from_land",
+        distance_from_land_generator,
+        "3bbad11840abadeeff03750a14e8c6b975d72f773b636b559a29d3eaba3ff831"
     )
 ]
 
