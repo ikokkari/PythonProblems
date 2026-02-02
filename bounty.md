@@ -140,7 +140,7 @@ The problem collection "109 Python Problems for CCPS 109" is now complete, and n
    <tr>
    <td>A113: Probabilistic tic-tac-toe
    </td>
-   <td>
+   <td>Thomas Brooks, February 2, 2026
    </td>
   </tr>
    <tr>
@@ -1143,7 +1143,7 @@ A third problem collection was started August 2024, and it reached 123 problems 
   </tr>   
    <tr>
    <td>37. Sum of square roots</td>
-   <td>
+   <td>Thomas Brooks, February 2, 2026
    </td>
    </tr>
    <tr>
