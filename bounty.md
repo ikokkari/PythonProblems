@@ -993,7 +993,7 @@ A third problem collection was started August 2024, and it reached 123 problems 
   </tr>
    <tr>
    <td>7. Tanton necklace</td>
-   <td>
+   <td>Thomas Brooks, February 6, 2026
    </td>
   </tr>
    <tr>
@@ -1103,7 +1103,7 @@ A third problem collection was started August 2024, and it reached 123 problems 
   </tr>
    <tr>
    <td>29. Three-way partition</td>
-   <td>
+   <td>Thomas Brooks, February 6, 2026
    </td>
   </tr>
    <tr>
@@ -1183,7 +1183,7 @@ A third problem collection was started August 2024, and it reached 123 problems 
    </tr>
    <tr>
    <td>45. Convert a fraction to a simple continued fraction</td>
-   <td>
+   <td>Thomas Brooks, February 6, 2026
    </td>
   </tr>
    <tr>
@@ -1203,7 +1203,7 @@ A third problem collection was started August 2024, and it reached 123 problems 
   </tr>
    <tr>
    <td>49. Multiple winner election</td>
-   <td>
+   <td>Thomas Brooks, February 6, 2026
    </td>
   </tr>
    <tr>
@@ -1292,7 +1292,7 @@ A third problem collection was started August 2024, and it reached 123 problems 
   </tr>
    <tr>
    <td>67. Factoradical dudes</td>
-   <td>
+   <td>Thomas Brooks, February 6, 2026
    </td>
   </tr>
    <tr>
