@@ -37,7 +37,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "January 31, 2026"
+version = "February 8, 2026"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -342,13 +342,17 @@ def rearrange_graph(edges, rng):
 # XXX Test case generators for the individual functions.
 
 def distance_from_land_generator(rng):
-    for n, p in islice(zip(pyramid(3, 3, 3), cycle([10, 20, 30])), 2000):
+    for n in islice(pyramid(3, 3, 3), 3000):
         m = rng.randint(3, n)
         if rng.randint(0, 99) < 50:
             n, m = m, n
-        map = ["".join([("L" if rng.randint(0, 99) < p else "S") for _ in range(m)]) for _ in range(n)]
-        if any(map[x][y] == 'L' for x in range(n) for y in range(m)):
-            yield map,
+        map = [["S" for _ in range(m)] for _ in range(n)]
+        for _ in range(rng.randint(1, 4 * isqrt(n * m))):
+            x = rng.randint(0, n - 1)
+            y = rng.randint(0, m - 1)
+            map[x][y] = "L"
+        map = ["".join(map[x]) for x in range(n)]
+        yield map,
 
 
 def baum_sweet_generator(rng):
@@ -448,7 +452,7 @@ def frobenius_generator(rng):
 
 
 def pollard_rho_generator(rng):
-    PRIMES_25BIT = [
+    PRIMES = [
         26797907, 31414613, 25537943, 28685731, 32173283,
         21134899, 24464971, 20782999, 33383071, 28036597,
         22238383, 30404951, 32241289, 30643609, 23551501,
@@ -457,19 +461,13 @@ def pollard_rho_generator(rng):
         17893243, 20013731, 32600467, 22831087, 32059619,
         19946887, 17788153, 30188827, 20958323, 22682923,
         23542429, 24509713, 17332493, 27796133, 21085739,
-    ]
-    PRIMES_32BIT = [
         2963404501, 3614474503, 2248506499, 2262889561, 3758106601,
         2320360421, 4212401929, 3020445331, 2792349533, 2776874897,
         3566060053, 2685904541, 3328299127, 3467131123, 2624486353,
-        #2471683741, 3576987941, 3969802987, 3260543423, 3367726651,
-        #3544886617, 4291790627, 4162240099, 2922379127, 3064847971
-        #2501467237, 3273721487, 3855589811, 3137243293, 2698974667,
-        #2272016953, 4037950613, 2569799209, 3668678119, 2195357737,
-        #3608016169, 2791475257, 3481232023, 4029428089, 2350043363,
     ]
-    for p, q in product(PRIMES_25BIT, PRIMES_32BIT):
-        yield p * q,
+    for _ in range(200):
+        p1, p2 = rng.sample(PRIMES, 2)
+        yield p1 * p2
 
 
 def cutting_sticks_generator(rng):
@@ -609,21 +607,17 @@ def domino_box_generator(rng):
 
 
 def longest_fib_subsequence_generator(rng):
-    for n, p in islice(zip(pyramid(5, 1, 1), cycle([30, 50, 60])), 3000):
-        f1 = rng.randint(1, n)
-        f2 = rng.randint(1, n)
-        items, m = [], 5
+    for n, m in islice(zip(pyramid(5, 1, 1), pyramid(2, 1, 2)), 3000):
+        items, pairs = [], []
+        for _ in range(m):
+            a = rng.randint(1, n)
+            b = rng.randint(1, n)
+            pairs.append((a, b))
         for _ in range(n):
-            if rng.randint(0, 99) < p:
-                e, f1, f2 = f1, f2, f1 + f2
-            elif len(items) < 3 or rng.randint(0, 99) < 50:
-                e = rng.randint(1, (3 * m) // 2)
-            else:
-                i = rng.randint(0, len(items) - 2)
-                j = rng.randint(i + 1, len(items) - 1)
-                e = items[i] + items[j]
-            m = max(m, e)
-            items.append(e)
+            p = rng.randint(0, len(pairs) - 1)
+            a, b = pairs[p]
+            items.append(a)
+            pairs[p] = (b, a + b)
         yield items,
 
 
@@ -3114,8 +3108,7 @@ def stalin_sort_generator(rng):
     yield [1, 2],
     yield [2, 1],
     yield [42, 42],
-    m = 5
-    for n in islice(pyramid(3, 1, 1), 1000):
+    for n, m in islice(zip(pyramid(3, 1, 1), pyramid(10, 1, 1)), 1000):
         yield [rng.randint(-(m * m), (m * m)) for _ in range(n)],
         items = list(range(n, -n, -1))
         for _ in range(rng.randint(0, n // 2)):
@@ -6449,12 +6442,12 @@ testcases = [
     (
         "stalin_sort",
         stalin_sort_generator,
-        "ee869e50c9b9def412fadb0d142a8e601d9d550921d04a1736e3a99b98a8deba"
+        "d1c87fd7fc8592551340a2ce38be902820b89c4817cb04a12f7635897daf6ff8"
     ),
     (
         "insertion_sort_swaps",
         stalin_sort_generator,
-        "1c863b25d97baaaee165ee9a07e26b09ee6575634d5180a413836a14e6132d3b"
+        "dfe82a0b9c96861963b9fc178e4f7cd35175e22070d6a5eb668e3f35529af455"
     ),
     (
         "optimal_blackjack",
@@ -7468,7 +7461,7 @@ testcases = [
     (
         "longest_fib_subsequence",
         longest_fib_subsequence_generator,
-        "fd6d84bb89f7793361b7a0edf022c8c1c7bec22c670b69fb8619e91118d42d11"
+        "5a5dcd99f1ab7e52e25af38e9da69b01643a831e701fc2e450b2ca6d218a95c3"
     ),
     (
         "domino_box",
@@ -7543,7 +7536,7 @@ testcases = [
     (
         "pollard_rho",
         pollard_rho_generator,
-        "14c8ac0086b4fd431a563afe22d0d7aa77bd35bc4630b385c34725f408b5e819"
+        "a663fc8a6dbe642254934ae57f3d30480eb94685ec3892fd337e37094dc29f4b"
     ),
     (
         "frobenius",
@@ -7593,7 +7586,7 @@ testcases = [
     (
         "distance_from_land",
         distance_from_land_generator,
-        "3bbad11840abadeeff03750a14e8c6b975d72f773b636b559a29d3eaba3ff831"
+        "7f0c597828290c9c80b28cb2766e604ff947931faa4a4e1bb0d6d9b65726bae2"
     )
 ]
 
