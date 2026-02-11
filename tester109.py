@@ -28,6 +28,7 @@ from datetime import date
 # ZZZ
 
 verbose_execution = {
+    "square_root_sum": 0
     #   "function_one": 42,   # Print the first 42 test cases of function_one
     #   "function_two": -1,   # Print all test cases of function_two, however many there are
     #   "function_three": 0   # Be silent with function_three (but run it early)
@@ -37,7 +38,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "February 8, 2026"
+version = "February 10, 2026"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -1726,21 +1727,21 @@ def loopless_walk_generator(rng):
                 steps.append(rng.choice(lows))
         yield "".join(steps)
 
+# Superior test case generator created by Claude Opus 4.6.
 
 def square_root_sum_generator(rng):
-    for n in islice(pyramid(3, 2, 2), 2000):
-        n1, n2, d = [], [], rng.randint(0, 1)
-        for _ in range(n):
-            p = rng.randint(2, 3 * n) if n1 == [] else max(n1[-1], n2[-1])
-            p1 = rng.randint(p + 1, p + 4)
-            p2 = p1 + 1
-            if d == 0:
-                n1.append(p1)
-                n2.append(p2)
-            else:
-                n1.append(p2)
-                n2.append(p1)
-            d = 1 - d
+    for n in islice(pyramid(3, 2, 2), 300):
+        # Numbers of the form X^2 + small offset require precision
+        # proportional to the number of digits in X to compare,
+        # since sqrt(X^2 + i) = X + i/(2X) - i^2/(8X^3) + ...
+        # and the leading terms cancel between the two sums.
+        digits = 10 * n
+        X = rng.randint(10**(digits - 1), 10**digits)
+        base = X * X
+        offsets = list(range(1, 2 * n + 1))
+        rng.shuffle(offsets)
+        n1 = sorted([base + off for off in offsets[:n]])
+        n2 = sorted([base + off for off in offsets[n:]])
         yield n1, n2
 
 
@@ -7006,7 +7007,7 @@ testcases = [
     (
         "square_root_sum",
         square_root_sum_generator,
-        "f1e732e1c1e8e4d901b30c928851acdcbe3a007f3128f76344f74e3b8ac4edb3"
+        "54e87a423d1cf24f27cadb8ab6d3132e5a97825cfc9dd1754cdf10207881a12b"
     ),
     (
         "loopless_walk",
