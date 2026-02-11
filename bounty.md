@@ -26,7 +26,7 @@ Conversion notes:
 
 # 109 Problems Bonus Bounty List
 
-The problem collection "109 Python Problems for CCPS 109" is now complete, and no further problems will ever be added to this collection. In addition to the actual problems, the collection [109 Python problems for CCPS 109](https://github.com/ikokkari/PythonProblems) includes fourteen bonus problems intended for students who are looking for a serious challenge. For personal reasons, it is extremely important to me that all these bonus problem specifications and their private model solutions contain no bugs, so that the checksums hardcoded in the automated tester are true and achievable by everyone who chooses to work hard to solve these problems. The first student to send me working solution to each problem gets their name etched into the bounty tables below. 
+The problem collection "109 Python Problems for CCPS 109" is now complete, and no further problems will ever be added to this collection. In addition to the actual problems, each of the three problem collections here includes fourteen bonus problems intended for students who are looking for a serious challenge. For personal reasons, it is extremely important to me that all these bonus problem specifications and their private model solutions contain no bugs, so that the checksums hardcoded in the automated tester are true and achievable by everyone who chooses to work hard to solve these problems. The first student to send me working solution to each problem gets their name etched forever into the bounty table below. 
 
 <table>
   <tr>
@@ -289,8 +289,8 @@ The problem collection "109 Python Problems for CCPS 109" is now complete, and n
   </tr>
 </table>
      
-Starting March 2023, the author started creating another set of Python problems, separate from the main corpus of the *109 Python Problems*. (One can only quit for so long without the inevitable relapse.)
-     
+Starting March 2023, the author started creating another set of Python problems, separate from the main corpus of the *109 Python Problems*. (One can only quit for so long without the inevitable relapse.) Here are the students who first sent me the working solution for each particular problem.
+      
 <table>
   <tr>
    <td><b>Problem</b>
@@ -952,7 +952,7 @@ Starting March 2023, the author started creating another set of Python problems,
   </tr>
 </table>
 
-A third problem collection was started August 2024, and it reached 123 problems in January 31, 2026.
+A third problem collection was started August 2024, and it was completed to also contain 109 + 14 = 123 problems in January 31, 2026. Here are the students who first sent me a working solution to each problem.
 
 <table>
 <tr>
