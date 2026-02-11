@@ -254,7 +254,7 @@ The problem collection "109 Python Problems for CCPS 109" is now complete, and n
    <tr>
    <td>T118: Expiring cookies
    </td>
-   <td>
+   <td>Thomas Brooks, February 9, 2026
    </td>
   </tr>
    <tr>
