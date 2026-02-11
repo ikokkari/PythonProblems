@@ -28,7 +28,6 @@ from datetime import date
 # ZZZ
 
 verbose_execution = {
-    "square_root_sum": 0
     #   "function_one": 42,   # Print the first 42 test cases of function_one
     #   "function_two": -1,   # Print all test cases of function_two, however many there are
     #   "function_three": 0   # Be silent with function_three (but run it early)
