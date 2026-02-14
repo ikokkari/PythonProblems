@@ -1487,7 +1487,7 @@ A third problem collection was started August 2024, and it was completed to also
   </tr>
    <tr>
    <td>106. The Borgesian dictionary</td>
-   <td>
+   <td>Thomas Brooks, February 23, 2026
    </td>
   </tr>
    <tr>
