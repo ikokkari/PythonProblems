@@ -68,7 +68,7 @@ The problem collection "109 Python Problems for CCPS 109" is now complete, and n
   <tr>
    <td>115: Ex iudiciis, lux
    </td>
-   <td>
+   <td>Thomas Brooks, February 15, 2026
    </td>
   </tr>
   <tr>
