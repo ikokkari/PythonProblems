@@ -57,7 +57,7 @@ timeout_cutoff = 20
 testcase_cutoff = 300
 
 # Is the script allowed to create a new expected_answers file?
-can_record = True
+can_record = False
 
 # For instructors who want to add their own problems to this set:
 #
