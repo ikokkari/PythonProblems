@@ -182,7 +182,7 @@ The problem collection "109 Python Problems for CCPS 109" is now complete, and n
    <tr>
    <td>A120: Pinch to a pound
    </td>
-   <td>
+   <td>Thomas Brooks, February 16, 2026
    </td>
   </tr>
    <tr>
