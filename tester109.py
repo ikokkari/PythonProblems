@@ -28,7 +28,7 @@ from datetime import date
 # ZZZ
 
 verbose_execution = {
-    #   "function_one": 42,   # Print the first 42 test cases of function_one
+    #  "function_one": 42,   # Print the first 42 test cases of function_one
     #   "function_two": -1,   # Print all test cases of function_two, however many there are
     #   "function_three": 0   # Be silent with function_three (but run it early)
 }
@@ -37,7 +37,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "February 10, 2026"
+version = "February 16, 2026"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -57,7 +57,7 @@ timeout_cutoff = 20
 testcase_cutoff = 300
 
 # Is the script allowed to create a new expected_answers file?
-can_record = False
+can_record = True
 
 # For instructors who want to add their own problems to this set:
 #
@@ -1840,33 +1840,25 @@ def power_prefix_generator(rng):
 def pinch_moves_generator(rng):
     yield ".BWW.WB", 'B'
     yield "RBW.BW", 'W'
-    
-    for n in islice(pyramid(8, 10, 10), 500):
-        board = ""
-        captured = False
-        player = rng.choice('BW')
-        other = 'W' if player == 'B' else 'B'
-        prev = rng.choice("BW")
-        while len(board) < n:
-            move = rng.randint(0, 100)
-            if move < 20 and not captured:
-                o1 = rng.randint(1, 3)
-                o2 = rng.randint(1, 3)
-                if rng.randint(0, 100) < 70:
-                    board += f"{other * o1}{'R' * rng.randint(1, 2)}{other * o2}"
-                else:
-                    board += f"{other * o1}{'R' * rng.randint(1, 2)}{other}{'R' * rng.randint(1, 2)}{other * o2}"
-                captured = True
-            elif move < 50:
-                board += '.'
-            elif move < 80:
-                board += f".{prev * rng.randint(1, 2)}"
-                prev = 'B' if prev == 'W' else 'W'
+
+    for n, m in islice(zip(pyramid(3, 7, 8), pyramid(2, 10, 10)), 1500):
+        blocks = "S"
+        while len(blocks) < n:
+            b = rng.choice("BWR.")
+            while b == blocks[-1]:
+                b = rng.choice("BWR.")
+            new_blocks = blocks + b
+            for tabu in ("SBW", "SWB", "BWB", "WBW", "R.", ".R", "WRB", "BRW"):
+                if new_blocks.endswith(tabu):
+                    break
             else:
-                p = rng.randint(0, 2)
-                o = rng.randint(0, 2)
-                board += f".{player * p}{other * o}" if rng.randint(0, 100) < 50 else f".{other * o}{player * p}"
-        yield board, player
+                blocks = new_blocks
+        if "." in blocks:
+            board = ""
+            for b in blocks[1:]:
+                board += b * rng.randint(1, m)
+            yield board, "B"
+            yield board, "W"
 
 
 def tom_and_jerry_generator(rng):
@@ -6951,7 +6943,7 @@ testcases = [
     (
         "pinch_moves",
         pinch_moves_generator,
-        "cb5932ed866518ab208c571cb411e7d467dc5806995e9dfa6578b92c3b340f5f"
+        "0a0013993cff8a52fac6c7e428d0a4feafedba5b3b7ce9787b8f1cb5ecf9d902"
     ),
     (
         "power_prefix",
