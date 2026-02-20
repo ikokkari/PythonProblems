@@ -37,7 +37,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "February 16, 2026"
+version = "February 20, 2026"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -1838,10 +1838,7 @@ def power_prefix_generator(rng):
 
 
 def pinch_moves_generator(rng):
-    yield ".BWW.WB", 'B'
-    yield "RBW.BW", 'W'
-
-    for n, m in islice(zip(pyramid(3, 7, 8), pyramid(2, 10, 10)), 1500):
+    for n, m in islice(zip(pyramid(3, 11, 12), pyramid(2, 10, 10)), 1500):
         blocks = "S"
         while len(blocks) < n:
             b = rng.choice("BWR.")
@@ -1853,12 +1850,13 @@ def pinch_moves_generator(rng):
                     break
             else:
                 blocks = new_blocks
-        if "." in blocks:
-            board = ""
-            for b in blocks[1:]:
-                board += b * rng.randint(1, m)
-            yield board, "B"
-            yield board, "W"
+        if not(blocks.endswith("BW") or blocks.endswith("WB")):
+            if "." in blocks:
+                board = ""
+                for b in blocks[1:]:
+                    board += b * rng.randint(1, m)
+                yield board, "B"
+                yield board, "W"
 
 
 def tom_and_jerry_generator(rng):
@@ -6943,7 +6941,7 @@ testcases = [
     (
         "pinch_moves",
         pinch_moves_generator,
-        "0a0013993cff8a52fac6c7e428d0a4feafedba5b3b7ce9787b8f1cb5ecf9d902"
+        "9073bcff14b2dab6c04b4cc55e8599e44e144e0dfcb5f70d5e3442f4d96bf62c"
     ),
     (
         "power_prefix",
@@ -7088,7 +7086,7 @@ testcases = [
     (
         "is_semiconnected",
         is_semiconnected_generator,
-        "45133ffcbe3f48cdbe9c49123790b4d04983b24958a652ecb7cdf1ac469ddfb8"
+        "47a3dbd984103ed9186b0156640b3a3f7f8de51ecf105987bfe7b08846f3ba1d"
     ),
     (
         "poker_test",
@@ -7690,4 +7688,4 @@ run_all()
 
 
 # teacher student generator
-#discrepancy(labs109.conway_subprime, conway_subprime, conway_subprime_generator(Random(fixed_seed)), print_all=True, stop_at_first=False)
+#discrepancy(labs109.pinch_moves, labs109.pinch_moves2, pinch_moves_generator(Random(fixed_seed)), print_all=False, stop_at_first=True)
