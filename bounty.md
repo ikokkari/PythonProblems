@@ -1501,7 +1501,7 @@ A third problem collection was started August 2024, and it was completed to also
    </td>
   </tr>
    <tr>
-   <td>109. Colonel Blotto and the spymaster</td>
+   <td>109. Colonel Blotto and the Spymaster</td>
    <td>
    </td>
   </tr>
