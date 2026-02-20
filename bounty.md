@@ -1452,7 +1452,7 @@ A third problem collection was started August 2024, and it was completed to also
   </tr>
    <tr>
    <td>99. Semiconnected guys</td>
-   <td>
+   <td>Thomas Brooks, February 19, 2026
    </td>
    </tr>
    <tr>
