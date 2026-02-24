@@ -74,9 +74,10 @@ can_record = False
 # 8. Once you have done the above for all the functions that you
 #    want to add, set the value of use_record back to True.
 # 9. Delete the expected_answers file from the same folder that
-#    this script is located in.
+#    this script is located in, and set can_record to True.
 # 10. Run this test script to generate the new expected answers file.
-# 11. Release the new version of tester and record to students.
+# 11. Set can_record back to False.
+# 12. Release the new version of tester and record to students.
 
 
 # Convert a dictionary or set result to a list sorted by keys to
