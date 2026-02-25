@@ -1302,7 +1302,7 @@ A third problem collection was started August 2024, and it was completed to also
   </tr>
    <tr>
    <td>69. Copeland harder</td>
-   <td>
+   <td>Thomas Brooks, February 24, 2026
    </td>
   </tr>
    <tr>
