@@ -983,7 +983,7 @@ A third problem collection was started August 2024, and it was completed to also
   </tr>
    <tr>
    <td>5. Baum–Sweet sequence</td>
-   <td>
+   <td>Erik Johnson, July 23, 2026
    </td>
   </tr>
    <tr>
