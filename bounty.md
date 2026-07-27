@@ -343,7 +343,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>8. Word positions
    </td>
-   <td>In Memory of Michael Hedges
+   <td>In Memory of Michael Hedges, July 26, 2026
    </td>
   </tr>
    <tr>
