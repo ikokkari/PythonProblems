@@ -444,7 +444,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>25. Square lamplighter
    </td>
-   <td>
+   <td>Erik Johnson, July 28, 2026
    </td>
   </tr>
    <tr>
