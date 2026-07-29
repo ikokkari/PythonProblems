@@ -319,7 +319,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>4. Lowest common dominator
    </td>
-   <td>
+   <td>In Memory of Michael Hedges, July 29, 2026
    </td>
   </tr>
    <tr>
