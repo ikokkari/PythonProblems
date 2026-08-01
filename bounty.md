@@ -672,7 +672,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>63. Markov distance
    </td>
-   <td>
+   <td>Erik Johnson, July 31, 2026
    </td>
   </tr>
    <tr>
