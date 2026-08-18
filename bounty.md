@@ -349,7 +349,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>9. Power prefix
    </td>
-   <td>
+   <td>Erik Johnson, August 18, 2026
    </td>
   </tr>
    <tr>
@@ -408,7 +408,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>19. The magic knight of Muhammad ibn Muhammad
    </td>
-   <td>
+   <td>Erik Johnson, August 18, 2026
    </td>
   </tr>
    <tr>
