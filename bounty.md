@@ -516,7 +516,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>37. Van der Corput sequence
    </td>
-   <td>
+   <td>"In memory of Ursula K. LeGuin", August 19, 2026
    </td>
   </tr>
    <tr>
