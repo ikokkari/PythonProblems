@@ -15,7 +15,6 @@ Using this Markdown file:
    formatting and use a linkchecker before you publish this page.
 
 Conversion notes:
-
 * Docs to Markdown version 1.0β33
 * Sat Oct 15 2022 17:36:30 GMT-0700 (PDT)
 * Source doc: 109 Python Problem Bounties
@@ -684,7 +683,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>65. St. Bitus‘ Dance
    </td>
-   <td>
+   <td>Erik Johnson, August 28, 2026
    </td>
   </tr>
    <tr>
