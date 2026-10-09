@@ -378,7 +378,7 @@ Starting March 2023, the author started creating another set of Python problems,
    <tr>
    <td>14. First fit bin packing
    </td>
-   <td>
+   <td>Erik Johnson, October 9, 2026
    </td>
   </tr>
    <tr>
