@@ -423,9 +423,9 @@ Starting March 2023, the author started creating another set of Python problems,
    </td>
   </tr>
    <tr>
-   <td>22. Count unicolour rectangles
+   <td>22. Count monochromatic rectangles
    </td>
-   <td>
+   <td>Erik Johnson, October 11, 2026
    </td>
   </tr>
    <tr>
