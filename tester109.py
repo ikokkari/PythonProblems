@@ -37,7 +37,7 @@ verbose_execution = {
 use_expected_answers = True
 
 # The release date of this version of the tester.
-version = "February 20, 2026"
+version = "November 26, 2026"
 
 # Fixed seed used to generate pseudorandom numbers.
 fixed_seed = 12345
@@ -53,7 +53,7 @@ function_prefix = '<****>'
 # Timeout cutoff for individual function tests, in seconds.
 timeout_cutoff = 20
 
-# How many test cases to record in the file for each function.
+# How many test cases to record in the expected_answers file for each function.
 testcase_cutoff = 300
 
 # Is the script allowed to create a new expected_answers file?
@@ -248,8 +248,7 @@ def test_all_functions(module, recorder=None, known=None):
     if recorder:
         print("\nRecording model answers complete.")
     else:
-        print(f"{accepted_count} out of {total} functions ", end="")
-        print(f"of {len(testcases)} possible work.")
+        print(f"{accepted_count} out of {total} functions passed the tests.")
     return accepted_count
 
 
@@ -341,6 +340,1808 @@ def rearrange_graph(edges, rng):
 
 
 # XXX Test case generators for the individual functions.
+
+
+def ladder_lottery_generator(rng):
+    yield 1, []
+    yield 3, [(1, 0, 1), (2, 1, 2)]
+    for i in range(400):
+        n = rng.randint(2, 8 if i < 200 else 200)
+        rungs, used = [], set()
+        for _ in range(rng.randint(0, 3 * n)):
+            height = rng.randint(1, 4 * n)
+            if rng.randint(0, 2):
+                a = rng.randrange(n - 1)
+                b = a + 1
+            else:
+                a, b = sorted(rng.sample(range(n), 2))
+            if (height, a) not in used and (height, b) not in used:
+                used.update(((height, a), (height, b)))
+                rungs.append((height, a, b))
+        rng.shuffle(rungs)
+        yield n, rungs
+
+        
+def palindrome_substring_generator(rng):
+    for s in ['', 'a', 'ab', 'abcabc', 'aabbccddabcd', 'racecar', 'carrace']:
+        yield s,
+    for i in range(500):
+        n = rng.randint(1, 30 if i < 300 else 5000)
+        letters = 'abcdefghijklmnopqrstuvwxyz'[:rng.choice([2, 3, 5, 10, 26])]
+        yield ''.join(rng.choice(letters) for _ in range(n)),
+
+        
+def terrace_pairs_generator(rng):
+    yield [],
+    yield [2, 2, 2],
+    yield [3, 1, 2, 1, 3],
+    for i in range(600):
+        n = rng.randint(1, 30 if i < 400 else 50000)
+        top = rng.choice([2, 3, 5, 10, 100])
+        yield [rng.randint(1, top) for _ in range(n)],
+
+        
+def ball_l1_sum_generator(rng):
+    for d in range(1, 13):
+        for r in range(0, 13):
+            if d * r <= 60:
+                yield d, r
+    for _ in range(30):
+        yield rng.randint(1, 6), rng.randint(10, 30)
+
+        
+def wildcard_distance_generator(rng):
+    yield 'beer', '4'
+    yield 'beer5ing', '4drinking'
+    yield '', ''
+    yield 'abc', 'abc'
+    yield 'abc', 'xyz'
+    for n in islice(pyramid(1, 8, 1), 400):
+        letters = 'abcdefghij'[:rng.choice([2, 3, 6, 10])]
+        def word():
+            return ''.join(rng.choice(letters) if rng.randint(0, 5) else str(rng.randint(1, 9))
+                           for _ in range(rng.randint(0, min(n, 30))))
+        yield word(), word()
+
+
+def sorting_swaps_generator(rng):
+    yield [0],
+    yield [1, 2, 0],
+    yield [1, 0, 3, 2],
+    for n in [n for n in range(2, 82) for _ in range(5)]:
+        perm = list(range(n))
+        rng.shuffle(perm)
+        if rng.randint(0, 3) == 0:
+            # Undo some of the shuffling to leave fixed points and short cycles.
+            for _ in range(rng.randint(1, n)):
+                i = rng.randrange(n)
+                j = perm.index(i)
+                perm[i], perm[j] = perm[j], perm[i]
+        yield perm,
+
+def parasitic_generator(rng):
+    for b in range(2, 21):
+        for k in range(1, b + 2):
+            yield b, k
+
+def ones_complexity_generator(rng):
+    for n in range(1, 31):
+        yield n,
+    for _ in range(25):
+        yield rng.randint(31, 2000),
+
+def __gear_set(rng, n):
+    gears = []
+    while len(gears) < n:
+        r = rng.randint(1, 20)
+        parent = None
+        if gears and (len(gears) == n - 1 or rng.randint(0, 19)):
+            # Usually mesh with the latest gear, sometimes with an earlier one.
+            parent = gears[-1] if rng.randint(0, 3) else rng.choice(gears)
+            x0, y0, r0 = parent
+            d = max(1, r + r0 - rng.randint(0, 3))
+            dx = rng.randint(-d, d)
+            dy = rng.choice([-1, 1]) * isqrt(d * d - dx * dx)
+            x, y = x0 + dx, y0 + dy
+        else:
+            x, y = rng.randint(0, 200), rng.randint(0, 200)
+        if not all((x - gx) ** 2 + (y - gy) ** 2 > max(r, gr) ** 2 for (gx, gy, gr) in gears):
+            continue
+        touching = [g for g in gears if (x - g[0]) ** 2 + (y - g[1]) ** 2 <= (r + g[2]) ** 2]
+        if len(touching) > 1 and rng.randint(0, 29):
+            continue
+        gears.append((x, y, r))
+    return gears
+
+def gear_speed_generator(rng):
+    yield [(0, 0, 2), (4, 0, 2), (8, 0, 2)],
+    yield [(0, 0, 3), (5, 0, 2)],
+    for n in islice(pyramid(2, 8, 1), 300):
+        yield __gear_set(rng, min(n, 40)),
+
+def fizzbuzz_prefix_generator(rng):
+    yield ['1', '2', 'fizz', '4', 'buzz', 'fizz', '7'],
+    yield ['1', 'bat', '3', 'batman', 'robin', 'batbat', '7', 'batmanman', '9'],
+    yield ['1', 'qizz', 'quzz', 'qizz', '5', 'quzzqizz', '007'],
+    yield ['1', '2', '3', '4', 'hunter2', 'is', 'my', 'password'],
+    for n in islice(pyramid(5, 10, 1), 400):
+        divisors = sorted(rng.sample(range(1, n + 1), rng.randint(0, min(4, n))))
+        words = {d: ''.join(rng.choice('abz') for _ in range(rng.randint(1, 3))) for d in divisors}
+        tokens = [''.join(words[d] for d in divisors if i % d == 0) or str(i) for i in range(1, n + 1)]
+        if rng.randint(0, 1):
+            i = rng.randrange(n)
+            tokens[i] = rng.choice([str(i + 1), str(i), 'a', 'z', tokens[i] + 'a', tokens[i][:-1] or 'b', tokens[i] + '1',
+                                    ''.join(reversed(tokens[i]))])
+        yield tokens,
+
+def familiar_pairs_generator(rng):
+    yield 3, [(0, 0, 1), (1, 0, 2), (0, 1, 2), (0, 2, 0), (1, 1, 0)]
+    for n in islice(pyramid(2, 5, 1), 300):
+        n = min(n, 60)
+        events = [(rng.randint(0, 1), rng.randrange(n), rng.randrange(n)) for _ in range(rng.randint(1, 2 * n))]
+        yield n, events
+
+def tired_monty_generator(rng):
+    for d in range(3, 6):
+        for p in [F(0), F(1, 2), F(1)]:
+            yield d, p
+    for _ in range(200):
+        d = rng.randint(3, 15)
+        q = rng.randint(1, 20)
+        yield d, F(rng.randint(0, q), q)
+
+def stamp_ways_generator(rng):
+    yield 0, 0, 0
+    yield 0, 10, 2
+    yield 2, 2, 4
+    for _ in range(400):
+        yield rng.randint(0, 30), rng.randint(0, 30), rng.randint(0, rng.choice([10, 100, 400]))
+
+
+# NCPC and BAPC inspired batch
+
+def best_die_generator(rng):
+    yield [[1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6]],
+    yield [[2, 2, 4, 4, 9, 9], [1, 1, 6, 6, 8, 8], [7, 7, 5, 5, 3, 3]],
+    # Efron's nontransitive dice, where every die is beaten by another.
+    yield [[4, 4, 4, 4, 0, 0], [3, 3, 3, 3, 3, 3], [6, 6, 2, 2, 2, 2], [5, 5, 5, 1, 1, 1]],
+    for _ in range(500):
+        k = rng.randint(2, 6)
+        faces = rng.randint(2, 8)
+        top = rng.randint(2, rng.choice([4, 8, 20]))
+        dice = [[rng.randint(1, top) for _ in range(faces)] for _ in range(k)]
+        if rng.randint(0, 3) == 0:
+            dice[rng.randrange(k)] = dice[0][:]
+        yield dice,
+
+        
+def setlists_generator(rng):
+    yield [1, 1, 1, 2, 2, 2, 3, 3, 3],
+    yield [1, 2, 1, 2, 3, 1, 2, 3],
+    for n in islice(pyramid(1, 3, 1), 600):
+        yield [rng.choice((1, 2, 2, 3)) for _ in range(n)],
+
+
+        
+def shortest_cycles_generator(rng):
+    yield 4, [(0, 1), (1, 2), (2, 3), (3, 0)]
+    yield 6, [(0, 1), (1, 2), (2, 0), (3, 4), (4, 5), (5, 3)]
+    for n in islice(pyramid(3, 6, 1), 400):
+        n = min(n, 60)
+        edges = set()
+        for v in range(1, n):
+            edges.add((rng.randrange(v), v))
+        for _ in range(rng.randint(0, n)):
+            u, v = rng.sample(range(n), 2)
+            edges.add((min(u, v), max(u, v)))
+        edges = list(edges)
+        rng.shuffle(edges)
+        yield n, edges
+
+        
+def sign_expectation_generator(rng):
+    for s in ['5', '12', '123', '100', '999']:
+        yield s,
+    for n in islice(pyramid(1, 10, 1), 300):
+        yield ''.join(rng.choice('0123456789') for _ in range(min(n, 40))),
+
+        
+def cash_total_generator(rng):
+    yield [],
+    yield [3, 4],
+    yield [199, 299, 104],
+    for n in islice(pyramid(1, 10, 1), 500):
+        yield [rng.randint(1, 2000) for _ in range(n)],
+
+        
+def __transform(rng, points):
+    # Rotate by a random Pythagorean angle, then reflect and translate.
+    a, b, c = rng.choice([(1, 0, 1), (0, 1, 1), (3, 4, 5), (4, 3, 5), (5, 12, 13), (8, 15, 17)])
+    a, b = rng.choice([1, -1]) * a, rng.choice([1, -1]) * b
+    flip = rng.choice([1, -1])
+    dx, dy = rng.randint(-50, 50), rng.randint(-50, 50)
+    out = [(a * x - b * flip * y + dx, b * x + a * flip * y + dy) for (x, y) in points]
+    k = rng.randrange(4)
+    out = out[k:] + out[:k]
+    if rng.randint(0, 1):
+        out.reverse()
+    return out
+
+
+def __random_shape(rng):
+    kind = rng.randrange(7)
+    if kind == 0:     # square
+        s = rng.randint(1, 9)
+        pts = [(0, 0), (s, 0), (s, s), (0, s)]
+    elif kind == 1:   # rectangle
+        w, h = rng.sample(range(1, 10), 2)
+        pts = [(0, 0), (w, 0), (w, h), (0, h)]
+    elif kind == 2:   # rhombus
+        u, v = rng.choice([((3, 4), (5, 0)), ((5, 0), (4, 3)), ((6, 8), (10, 0)), ((5, 12), (13, 0)), ((1, 2), (2, 1))])
+        pts = [(0, 0), u, (u[0] + v[0], u[1] + v[1]), v]
+    elif kind == 3:   # parallelogram
+        u, v = (rng.randint(1, 9), 0), (rng.randint(-5, 5), rng.randint(1, 9))
+        pts = [(0, 0), u, (u[0] + v[0], u[1] + v[1]), v]
+    elif kind == 4:   # kite
+        t = rng.randint(3, 12)
+        h = rng.randint(1, t - 1)
+        s = rng.randint(1, 9)
+        pts = [(0, 0), (s, h), (0, t), (-s, h)]
+    elif kind == 5:   # trapezium
+        w1, w2 = rng.sample(range(1, 12), 2)
+        c, h = rng.randint(-4, 4), rng.randint(1, 9)
+        pts = [(0, 0), (w1, 0), (c + w2, h), (c, h)]
+    else:             # anything convex
+        while True:
+            pts = [(rng.randint(0, 12), rng.randint(0, 12)) for _ in range(4)]
+            # Try the three essentially different orders of the four points.
+            for order in ([0, 1, 2, 3], [0, 1, 3, 2], [0, 2, 1, 3]):
+                q = [pts[i] for i in order]
+                crosses = [(q[(i + 1) % 4][0] - q[i][0]) * (q[(i + 2) % 4][1] - q[(i + 1) % 4][1]) -
+                           (q[(i + 1) % 4][1] - q[i][1]) * (q[(i + 2) % 4][0] - q[(i + 1) % 4][0]) for i in range(4)]
+                if all(c > 0 for c in crosses):
+                    break
+                if all(c < 0 for c in crosses):
+                    q.reverse()
+                    break
+            else:
+                continue
+            pts = q
+            break
+    return pts
+
+
+def quadrilateral_generator(rng):
+    for _ in range(600):
+        pts = __random_shape(rng)
+        if all(((pts[(i + 1) % 4][0] - pts[i][0]) * (pts[(i + 2) % 4][1] - pts[(i + 1) % 4][1]) -
+                (pts[(i + 1) % 4][1] - pts[i][1]) * (pts[(i + 2) % 4][0] - pts[(i + 1) % 4][0])) > 0 for i in range(4)):
+            yield __transform(rng, pts),
+
+            
+def __cube_edges(d):
+    return [(v, v ^ (1 << i)) for v in range(1 << d) for i in range(d) if v < v ^ (1 << i)]
+
+
+def is_hypercube_generator(rng):
+    yield 1, []
+    yield 2, [(0, 1)]
+    yield 4, [(0, 1), (1, 2), (2, 3), (3, 0)]
+    yield 4, [(0, 1), (1, 2), (2, 0), (2, 3)]
+    for _ in range(300):
+        d = rng.randint(1, 7)
+        n = 1 << d
+        edges = __cube_edges(d)
+        roll = rng.randint(0, 3)
+        if roll == 1 and len(edges) >= 2:
+            # Swap the endpoints of two edges, keeping every degree the same.
+            for _ in range(10):
+                (a, b), (c, e) = rng.sample(edges, 2)
+                es = {frozenset(x) for x in edges}
+                if len({a, b, c, e}) == 4 and frozenset((a, e)) not in es and frozenset((c, b)) not in es:
+                    edges = [x for x in edges if x not in ((a, b), (c, e))] + [(a, e), (c, b)]
+                    break
+        elif roll == 2 and edges:
+            edges = edges[:]
+            edges.pop(rng.randrange(len(edges)))
+        perm = list(range(n))
+        rng.shuffle(perm)
+        edges = [(perm[u], perm[v]) for (u, v) in edges]
+        rng.shuffle(edges)
+        yield n, edges
+
+        
+def subtree_counts_generator(rng):
+    yield 1, []
+    yield 4, [(0, 1), (1, 2), (2, 3)]
+    yield 4, [(0, 1), (0, 2), (0, 3)]
+    for n in islice(pyramid(2, 6, 1), 300):
+        n = min(n, 60)
+        edges = [(rng.randrange(max(0, v - rng.choice([1, 3, v])), v), v) for v in range(1, n)]
+        perm = list(range(n))
+        rng.shuffle(perm)
+        yield n, [(perm[u], perm[v]) for (u, v) in edges]
+
+        
+def two_cliques_generator(rng):
+    yield 2, []
+    yield 2, [(0, 1)]
+    yield 4, [(0, 1), (2, 3)]
+    for n in islice(pyramid(2, 6, 1), 400):
+        n = min(n, 40)
+        # Start from two cliques, then perturb the graph a little.
+        half = rng.sample(range(n), n // 2)
+        side = [1 if v in half else 0 for v in range(n)]
+        edges = {(u, v) for u in range(n) for v in range(u + 1, n) if side[u] == side[v]}
+        for _ in range(rng.choice([0, 0, 0, 1, 2])):
+            u, v = sorted(rng.sample(range(n), 2)) if n >= 2 else (0, 0)
+            if u != v:
+                edges ^= {(u, v)}
+        for _ in range(rng.randint(0, n)):
+            u, v = sorted(rng.sample(range(n), 2)) if n >= 2 else (0, 0)
+            if u != v and side[u] != side[v]:
+                edges.add((u, v))
+        edges = list(edges)
+        rng.shuffle(edges)
+        yield n, edges
+
+
+def spanning_trees_generator(rng):
+    yield 1, []
+    yield 4, [(0, 1), (1, 2), (2, 3), (3, 0)]
+    for n in range(2, 9):
+        yield n, [(i, j) for i in range(n) for j in range(i + 1, n)]
+    for n in [n for n in range(2, 16) for _ in range(20)]:
+        pairs = [(i, j) for i in range(n) for j in range(i + 1, n)]
+        density = rng.randint(3, 10)
+        edges = [(i, j) if rng.randint(0, 1) else (j, i)
+                 for (i, j) in pairs if rng.randint(1, 10) <= density]
+        rng.shuffle(edges)
+        yield n, edges
+
+def __debruijn_graph(k, n):
+    nodes = k ** (n - 1)
+    return nodes, [(v, (v * k + c) % nodes) for v in range(nodes) for c in range(k)]
+
+def eulerian_circuits_generator(rng):
+    for (k, n) in [(2, 2), (2, 3), (2, 4), (3, 2), (2, 5), (3, 3), (4, 2), (2, 6), (5, 2), (3, 4)]:
+        yield __debruijn_graph(k, n)
+    for n in [n for n in range(1, 9) for _ in range(40)]:
+        edges = []
+        for _ in range(rng.randint(1, n + 2)):
+            length = rng.randint(1, n + 1)
+            cycle = [rng.randrange(n) for _ in range(length)]
+            edges.extend((cycle[i], cycle[(i + 1) % length]) for i in range(length))
+        if rng.randint(0, 5) == 0:
+            # Spoil the balance of in-degrees and out-degrees.
+            edges.append((rng.randrange(n), rng.randrange(n)))
+        rng.shuffle(edges)
+        yield n, edges
+
+def assignment_generator(rng):
+    yield [[7]],
+    yield [[4, 1, 3], [2, 0, 5], [3, 2, 2]],
+    for n in [n for n in range(1, 13) for _ in range(25)]:
+        top = rng.choice([5, 20, 100, 1000])
+        yield [[rng.randint(-top // 5, top) for _ in range(n)] for _ in range(n)],
+
+def penney_odds_generator(rng):
+    for a in ['HHH', 'HHT', 'HTH', 'HTT', 'THH', 'THT', 'TTH', 'TTT']:
+        for b in ['HHH', 'HHT', 'HTH', 'HTT', 'THH', 'THT', 'TTH', 'TTT']:
+            if a != b:
+                yield a, b
+    count = 0
+    while count < 400:
+        a = ''.join(rng.choice('HT') for _ in range(rng.randint(1, 10)))
+        b = ''.join(rng.choice('HT') for _ in range(rng.randint(1, 10)))
+        if a not in b and b not in a:
+            yield a, b
+            count += 1
+
+
+def determinant_generator(rng):
+    yield [[5]],
+    yield [[1, 2], [3, 4]],
+    for n in [n for n in range(1, 13) for _ in range(30)]:
+        m = [[rng.randint(-9, 9) for _ in range(n)] for _ in range(n)]
+        roll = rng.randint(0, 5)
+        if roll == 0 and n > 1:
+            # Make a singular matrix by repeating a combination of other rows.
+            i, j = rng.sample(range(n), 2)
+            c = rng.randint(-2, 2)
+            m[i] = [c * x for x in m[j]]
+        elif roll == 1:
+            # Sprinkle zeros so that pivots are often zero.
+            for _ in range(n * n // 2):
+                m[rng.randrange(n)][rng.randrange(n)] = 0
+        yield m,
+
+
+def mat_power_generator(rng):
+    yield [[1, 1], [1, 0]], 10, 'count'
+    for semiring in ['count', 'shortest', 'longest', 'widest']:
+        for n in islice(pyramid(1, 10, 1), 120):
+            n = min(n, 8)
+            if semiring == 'count':
+                m = [[rng.choice([0, 0, 1, 1, 2]) for _ in range(n)] for _ in range(n)]
+                k = rng.randint(1, 10 * n + 50)
+            else:
+                lo = -9 if semiring != 'widest' else 1
+                m = [[rng.randint(lo, 99) if rng.randint(0, 2) else None for _ in range(n)] for _ in range(n)]
+                k = rng.randint(1, 10 ** rng.randint(1, 12))
+            yield m, k, semiring
+
+
+def count_asm_generator(rng):
+    for n in range(1, 11):
+        top = ((n - 1) * (n - 1)) // 4 + 1
+        ks = range(top + 1) if n <= 7 else sorted(rng.sample(range(top + 1), 4 if n < 10 else 2))
+        for k in ks:
+            yield n, k
+
+
+def permanent_generator(rng):
+    for n in range(1, 8):
+        yield [[1] * n for _ in range(n)],
+        yield [[int(i != j) for j in range(n)] for i in range(n)],
+    for n in [n for n in range(1, 13) for _ in range(20)]:
+        if rng.randint(0, 1):
+            m = [[rng.randint(0, 1) for _ in range(n)] for _ in range(n)]
+        else:
+            m = [[rng.randint(-3, 3) for _ in range(n)] for _ in range(n)]
+        yield m,
+
+
+def kronecker_power_generator(rng):
+    yield ['#.', '##'], 3
+    yield ['###', '#.#', '###'], 2
+    for _ in range(300):
+        h, w = rng.randint(1, 3), rng.randint(1, 3)
+        seed = [''.join(rng.choice('#.##') for _ in range(w)) for _ in range(h)]
+        k = 1
+        while (h * w) ** (k + 1) <= 20000 and rng.randint(0, 4):
+            k += 1
+        yield seed, k
+
+
+def __percent_format(k, n, d):
+    # Format the percentage 100k/n rounded half up to d decimals.
+    scale = 100 * 10 ** d
+    v = (2 * scale * k + n) // (2 * n)
+    s = str(v)
+    if d == 0:
+        return s
+    s = s.rjust(d + 1, '0')
+    return s[:-d] + '.' + s[-d:]
+
+
+def smallest_group_generator(rng):
+    for ps in [['50', '100', '50', '0'], ['100', '0'], ['33', '67'], ['33.3', '66.7'], ['25', '50', '100'], ['14.29', '28.57']]:
+        yield ps,
+    for i in range(600):
+        n = rng.randint(1, 10 + 5 * i)
+        d = rng.choice([0, 0, 0, 1, 1, 2])
+        count = rng.randint(1, 6)
+        yield [__percent_format(rng.randint(0, n), n, d) for _ in range(count)],
+
+
+def fitch_cheney_generator(rng):
+    ranks, suits = "A23456789TJQK", "CDHS"
+    deck = [r + s for s in suits for r in ranks]
+    key = lambda card: (ranks.index(card[0]), suits.index(card[1]))
+    yield ['5H', 'AS', '2D', '3C'],
+    for _ in range(1000):
+        hand = rng.sample(deck, 5)
+        # The assistant finds two cards of the same suit, and keeps the one
+        # from which the other is one to six steps ahead in cyclic rank order.
+        pairs = [(x, y) for x in hand for y in hand if x != y and x[1] == y[1]]
+        x, y = rng.choice(pairs)
+        distance = (ranks.index(y[0]) - ranks.index(x[0])) % 13
+        if distance > 6:
+            x, y, distance = y, x, 13 - distance
+        rest = sorted((c for c in hand if c not in (x, y)), key=key)
+        small, medium, large = rest
+        codes = [(small, medium, large), (small, large, medium), (medium, small, large),
+                 (medium, large, small), (large, small, medium), (large, medium, small)]
+        yield [x] + list(codes[distance - 1]),
+
+
+def urinals_generator(rng):
+    for n in range(1, 101):
+        yield n,
+    for k in islice(pyramid(100, 2, 1), 150):
+        yield rng.randint(k, 200 * k),
+    # A few rows long enough to make any Shlemiel the painter algorithm hopeless.
+    for _ in range(3):
+        yield rng.randint(500000, 1000000),
+
+
+def octal_grundy_generator(rng):
+    for code in ["0.77", "0.137", "0.07", "0.3", "0.333", "0.6", "0.4", "0.71"]:
+        yield code, 60
+    for n in islice(pyramid(5, 1, 0), 300):
+        digits = "".join(rng.choice("01234567") for _ in range(rng.randint(1, 4)))
+        if digits.strip("0") == "":
+            digits = digits[:-1] + rng.choice("1234567")
+        yield "0." + digits, n
+
+
+def lights_out_generator(rng):
+    yield ["#"],
+    yield ["#####"] * 5,
+    yield ["#....", ".....", ".....", ".....", "....."],
+    for n in islice(pyramid(1, 25, 5), 400):
+        rows, cols = rng.randint(1, min(n, 9)), rng.randint(1, min(n, 9))
+        lit = [[False] * cols for _ in range(rows)]
+        if rng.randint(0, 2):
+            # Press random buttons on a dark board, so that a solution exists.
+            for _ in range(rng.randint(0, rows * cols)):
+                r, c = rng.randrange(rows), rng.randrange(cols)
+                for (dr, dc) in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)):
+                    if 0 <= r + dr < rows and 0 <= c + dc < cols:
+                        lit[r + dr][c + dc] = not lit[r + dr][c + dc]
+        else:
+            lit = [[rng.randint(0, 1) == 1 for _ in range(cols)] for _ in range(rows)]
+        yield ["".join("#" if x else "." for x in row) for row in lit],
+
+
+def knight_swap_generator(rng):
+    yield ["W.W", "...", "B.B"],
+    yield ["WWW", "...", "BBB"],
+    for _ in range(200):
+        rows, cols = rng.randint(2, 4), rng.randint(3, 4)
+        cells = [(r, c) for r in range(rows) for c in range(cols)]
+        board = [["."] * cols for _ in range(rows)]
+        for (r, c) in rng.sample(cells, rng.randint(0, len(cells) // 4)):
+            board[r][c] = "#"
+        free = [(r, c) for (r, c) in cells if board[r][c] == "."]
+        k = rng.randint(1, min(3 if len(free) <= 10 else 2, len(free) // 2))
+        chosen = rng.sample(free, 2 * k)
+        for (r, c) in chosen[:k]:
+            board[r][c] = "W"
+        for (r, c) in chosen[k:]:
+            board[r][c] = "B"
+        yield ["".join(row) for row in board],
+
+
+def hamming_decode_generator(rng):
+    yield "0110011",
+    yield "1110011",
+    yield "011",
+    for r in islice(pyramid(2, 60, 20), 500):
+        r = min(r, 8)
+        n = 2 ** r - 1
+        bits = [0] * (n + 1)
+        for pos in range(1, n + 1):
+            if pos & (pos - 1):
+                bits[pos] = rng.randint(0, 1)
+        syndrome = 0
+        for pos in range(1, n + 1):
+            if bits[pos]:
+                syndrome ^= pos
+        # Setting the parity bits at the powers of two makes the syndrome zero.
+        for i in range(r):
+            if (syndrome >> i) & 1:
+                bits[1 << i] = 1
+        if rng.randint(0, 2):
+            bits[rng.randint(1, n)] ^= 1
+        yield "".join(str(b) for b in bits[1:]),
+
+
+def gray_rank_generator(rng):
+    yield [1, 1, 0], 2
+    for n in islice(pyramid(1, 40, 10), 600):
+        base = rng.randint(2, 10)
+        yield [rng.randrange(base) for _ in range(n)], base
+
+
+def ski_reduce_generator(rng):
+    for expr, limit in [("SKKx", 10), ("SIIx", 10), ("S(K(SI))Kxy", 20), ("SII(SII)", 50), ("KxIy", 5), ("S(KS)Kxyz", 20)]:
+        yield expr, limit
+    def random_term(leaves):
+        if leaves == 1:
+            return rng.choice("SSSKKKIIxyz")
+        k = rng.randint(1, leaves - 1)
+        return (random_term(k), random_term(leaves - k))
+    def show(t):
+        if not isinstance(t, tuple):
+            return t
+        f, a = t
+        return show(f) + (a if not isinstance(a, tuple) else "(" + show(a) + ")")
+    for n in islice(pyramid(2, 20, 5), 500):
+        yield show(random_term(n)), rng.randint(10, 100)
+
+
+def distinguish_generator(rng):
+    yield ['a', 'a', 'b'], [[1, 2], [0, 1], [2, 2]], 0, 1
+    for n in islice(pyramid(2, 10, 1), 400):
+        m = rng.randint(1, 3)
+        # Mostly quiet machines, where only a few states reveal themselves.
+        outputs = ['a'] * n
+        for q in rng.sample(range(n), rng.randint(1, max(1, n // 4))):
+            outputs[q] = rng.choice("bc")
+        delta = [[rng.randrange(n) if rng.randint(0, 4) == 0 else (q + 1 + a) % n for a in range(m)]
+                 for q in range(n)]
+        s, t = rng.sample(range(n), 2)
+        same = [q for q in range(n) if q != s and outputs[q] == outputs[s]]
+        if same and rng.randint(0, 4):
+            t = rng.choice(same)   # Usually start from two states that look alike.
+        if rng.randint(0, 3) == 0:
+            # Make t an exact copy of s, so that no experiment can tell them apart.
+            outputs[t], delta[t] = outputs[s], delta[s][:]
+        yield outputs, delta, s, t
+
+
+def wang_strip_generator(rng):
+    yield ["abab"], 2, 2
+    yield ["RGBY", "BYRG"], 2, 2
+    for n in islice(pyramid(1, 20, 5), 400):
+        colours = "abc"[:rng.randint(1, 3)]
+        tiles = sorted({"".join(rng.choice(colours) for _ in range(4)) for _ in range(rng.randint(1, 6))})
+        yield tiles, rng.randint(1, 4), rng.randint(1, min(30, 2 * n))
+
+
+def hereditary_goodstein_generator(rng):
+    yield 3, 10
+    yield 4, 6
+    for n in range(1, 40):
+        # How many terms stay below a few thousand digits for this start.
+        most = 10 if n <= 3 else 200 if n <= 15 else 30 if n == 16 else 8 if n == 17 else 4
+        for _ in range(5):
+            yield n, rng.randint(1, most)
+
+
+def tower_mod_generator(rng):
+    yield 3, 100, 10 ** 10
+    yield 2, 3, 1000
+    for k in islice(pyramid(1, 50, 10), 500):
+        a = rng.randint(1, 20)
+        height = rng.randint(0, 6 * k)
+        m = rng.randint(1, 10 ** min(k + 1, 9))
+        yield a, height, m
+
+
+def up_arrow_generator(rng):
+    for (a, n, b, cap) in [(2, 2, 4, 10 ** 6), (3, 3, 2, 10 ** 20), (2, 3, 4, 10 ** 30), (1, 5, 10 ** 9, 5)]:
+        yield a, n, b, cap
+    for _ in range(600):
+        a, n, b = rng.randint(1, 6), rng.randint(1, 6), rng.randint(0, 6)
+        yield a, n, b, 10 ** rng.randint(1, 40)
+
+
+def friedman_good_generator(rng):
+    yield "aaa",
+    yield "aaaa",
+    for n in islice(pyramid(1, 6, 2), 700):
+        letters = "abc"[:rng.randint(1, 3)]
+        word = "".join(rng.choice(letters) for _ in range(n))
+        if rng.randint(0, 1):
+            # Grow a word one letter at a time, keeping it good as long as possible.
+            word = ""
+            for _ in range(n):
+                options = [word + c for c in letters]
+                rng.shuffle(options)
+                good = [w for w in options if friedman_good_ok(w)]
+                if good:
+                    word = good[0]
+                elif rng.randint(0, 2):
+                    break  # Stuck, so serve the longest good word found.
+                else:
+                    word = options[0]
+        yield word,
+
+def friedman_good_ok(word):
+    def sub(small, big):
+        it = iter(big)
+        return all(c in it for c in small)
+    n = len(word)
+    return not any(sub(word[i - 1:2 * i], word[j - 1:2 * j])
+                   for j in range(1, n // 2 + 1) for i in range(1, j))
+
+
+
+def pancake_flips_generator(rng):
+    yield [2, 3, 4, 5, 1, 6, 7, 8],
+    yield [],
+    for n in islice(pyramid(1, 40, 10), 600):
+        n = min(n, 8)
+        items = rng.sample(range(-20, 100), n)
+        yield items,
+
+
+def nicomachus_generator(rng):
+    yield [2, 3, 2], [3, 5, 7]
+    yield [1, 0], [4, 6]
+    yield [1, 3], [4, 6]
+    for k in islice(pyramid(1, 100, 10), 600):
+        moduli = [rng.randint(2, 30 * k) for _ in range(k)]
+        if rng.randint(0, 3):
+            x = rng.randint(0, 10 ** (2 + k))
+            remainders = [x % m for m in moduli]
+        else:
+            remainders = [rng.randint(0, m - 1) for m in moduli]
+        yield remainders, moduli
+
+
+def even_wins_generator(rng):
+    yield 27, 0, 0, 4
+    for remaining in islice(pyramid(1, 3, 1), 600):
+        most = rng.randint(1, 8)
+        mine = rng.randint(0, remaining)
+        theirs = rng.randint(0, remaining)
+        if (remaining + mine + theirs) % 2 == 0:
+            theirs += 1   # The total number of objects is always odd.
+        yield remaining, mine, theirs, most
+
+
+def chomp_generator(rng):
+    yield [1],
+    yield [2, 2],
+    yield [3, 3],
+    for n in islice(pyramid(1, 40, 10), 400):
+        height = rng.randint(1, min(n, 6))
+        rows, width = [], rng.randint(1, min(n + 1, 8))
+        for _ in range(height):
+            rows.append(width)
+            width = rng.randint(1, width)
+        yield rows,
+
+
+def hexapawn_generator(rng):
+    yield ["BBB", "...", "WWW"], 'W'
+    for _ in range(400):
+        rows, cols = rng.randint(3, 5), rng.randint(2, 4)
+        board = [list("B" * cols)] + [list("." * cols) for _ in range(rows - 2)] + [list("W" * cols)]
+        player = 'W'
+        # Make some random moves, stopping before the game ends.
+        for _ in range(rng.randint(0, 2 * rows)):
+            forward = -1 if player == 'W' else 1
+            other = 'B' if player == 'W' else 'W'
+            moves = []
+            for r in range(rows):
+                for c in range(cols):
+                    if board[r][c] == player and 0 <= r + forward < rows:
+                        for nc in (c - 1, c, c + 1):
+                            if 0 <= nc < cols:
+                                t = board[r + forward][nc]
+                                if (nc == c and t == '.') or (nc != c and t == other):
+                                    moves.append((r, c, r + forward, nc))
+            safe = [m for m in moves if m[2] not in (0, rows - 1)]
+            if not safe:
+                break
+            r, c, nr, nc = rng.choice(safe)
+            board[r][c], board[nr][nc] = '.', player
+            if not any(other in row for row in board):
+                board[nr][nc] = '.'   # Undo a capture of the last enemy pawn.
+                board[r][c] = player
+                break
+            player = other
+        yield ["".join(row) for row in board], player
+
+
+def weekday_generator(rng):
+    for (y, m, d) in [(2026, 11, 24), (1582, 10, 15), (2000, 2, 29), (1900, 3, 1), (0, 1, 1), (-1, 12, 31)]:
+        yield y, m, d
+    lengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    for k in islice(pyramid(1, 40, 10), 800):
+        y = rng.randint(-10 ** k, 10 ** k) if rng.randint(0, 2) else rng.randint(1582, 2100)
+        m = rng.randint(1, 12)
+        leap = y % 4 == 0 and (y % 100 != 0 or y % 400 == 0)
+        d = rng.randint(1, 29 if m == 2 and leap else lengths[m - 1])
+        yield y, m, d
+
+
+def hall_of_mirrors_generator(rng):
+    yield ["..."] * 3,
+    yield ["./.", "...", "\\.."],
+    for n in islice(pyramid(1, 20, 2), 500):
+        density = rng.randint(0, 40)
+        yield ["".join(rng.choice("/\\") if rng.randint(0, 99) < density else "." for _ in range(n))
+               for _ in range(n)],
+
+# The die is cast
+
+def tip_die_for_tests(die, direction):
+    top, bottom, north, south, east, west = die
+    if direction == 'N':
+        return (south, north, top, bottom, east, west)
+    if direction == 'S':
+        return (north, south, bottom, top, east, west)
+    if direction == 'E':
+        return (west, east, north, south, top, bottom)
+    return (east, west, north, south, bottom, top)
+
+
+def die_agony_generator(rng):
+    yield [[1]], (1, 6, 2, 5, 3, 4)
+    yield [[3, 0], [0, 0]], (1, 6, 2, 5, 3, 4)
+    step = {'N': (-1, 0), 'S': (1, 0), 'E': (0, 1), 'W': (0, -1)}
+    for size in islice(pyramid(2, 40, 10), 400):
+        rows, cols = rng.randint(2, size), rng.randint(2, size)
+        die = tuple(rng.randint(1, 9) for _ in range(6))
+        grid = [[None] * cols for _ in range(rows)]
+        # Roll the die along a random walk that tends towards the goal,
+        # writing each score into the square entered.
+        r, c, d, score, moves = rows - 1, 0, die, 0, 0
+        while (r, c) != (0, cols - 1) and moves < 4 * (rows + cols):
+            options = []
+            for direction in "NNNEEESW":
+                nr, nc = r + step[direction][0], c + step[direction][1]
+                if 0 <= nr < rows and 0 <= nc < cols:
+                    nd = tip_die_for_tests(d, direction)
+                    new_score = score + (moves + 1) * nd[0]
+                    if grid[nr][nc] in (None, new_score):
+                        options.append((nr, nc, nd, new_score))
+            if not options:
+                break
+            r, c, d, score = rng.choice(options)
+            grid[r][c] = score
+            moves += 1
+        top = max([v for row in grid for v in row if v is not None] + [10])
+        grid = [[rng.randint(1, top) if v is None else v for v in row] for row in grid]
+        if rng.randint(0, 4) == 0:   # Sabotage one square of the path.
+            rr, cc = rng.randrange(rows), rng.randrange(cols)
+            grid[rr][cc] += 1
+        yield grid, die
+
+# Mingle all the way
+
+def intercal_generator(rng):
+    for (a, op, b) in [(65535, '$', 0), (0, '$', 65535), (179, '~', 201), (0, '~', 0), (5, '$', 3)]:
+        yield a, op, b
+    for bits in islice(pyramid(1, 6, 1), 800):
+        a, b = rng.getrandbits(bits), rng.getrandbits(bits)
+        if rng.randint(0, 3) == 0:
+            b = rng.getrandbits(rng.randint(1, bits))
+        yield a, rng.choice("$~"), b
+
+# Slash and burn
+
+def slashes_generator(rng):
+    yield "Hello, world!", 10
+    yield "/world/planet/Hello, world!", 10
+    yield "/a/aa/a", 50
+    yield "/foo/Hello, world!//Hello, world!/bar/foo", 100
+    for n in islice(pyramid(1, 40, 10), 600):
+        alphabet = "abc"[:rng.randint(1, 3)]
+        program = ""
+        for _ in range(n):
+            roll = rng.randint(0, 9)
+            if roll < 4:
+                program += "".join(rng.choice(alphabet) for _ in range(rng.randint(1, 4)))
+            elif roll < 8:
+                pattern = "".join(rng.choice(alphabet) for _ in range(rng.randint(1, 3)))
+                # A replacement shorter than its pattern can't loop forever, so
+                # make most replacements shorter to keep the loops occasional.
+                most = len(pattern) - 1 if rng.randint(0, 3) else 3
+                replacement = "".join(rng.choice(alphabet) for _ in range(rng.randint(0, most)))
+                program += "/" + pattern + "/" + replacement + "/"
+            elif roll < 9 or rng.randint(0, 4) > 0:
+                program += "\\" + rng.choice("/\\" + alphabet)
+            else:
+                program += "/"
+        yield program, rng.randint(5, 200)
+
+
+def moessner_generator(rng):
+    yield list(range(1, 16)), [3, 2]
+    yield list(range(1, 21)), [4, 3, 2]
+    yield list(range(1, 13)), [2]
+    for n in islice(pyramid(3, 3, 1), 500):
+        items = [rng.randint(-5, 20) for _ in range(n)]
+        ks = [rng.randint(2, 6) for _ in range(rng.randint(1, 4))]
+        yield items, ks
+
+
+def is_practical_generator(rng):
+    for n in range(1, 101):
+        yield n,
+    primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
+    for _ in range(500):
+        # Build a number one prime power at a time, so that it is often but not always practical.
+        n, sigma = 1, 1
+        while n < 1000:
+            p = rng.choice([q for q in primes if q <= sigma + 1 + rng.randint(0, 6)] or [2])
+            e = rng.randint(1, 3)
+            n, sigma = n * p ** e, sigma * (p ** (e + 1) - 1) // (p - 1)
+            if n > 10 ** 5:
+                break
+        if n > 2 * 10 ** 5:
+            continue
+        yield n,
+
+
+def is_weird_generator(rng):
+    for n in range(1, 101):
+        yield n,
+    for n in [70, 836, 4030, 5830, 7192, 7912, 9272, 10430, 10570, 10792, 10990, 11410, 11690, 12110, 12530, 12670, 13370, 13510, 13790, 13930, 14770, 15610, 15890, 16030, 16310, 16730, 16870, 17272, 17570, 17990, 18410, 18830, 18970, 19390, 19670, 19810, 20510, 21490, 21770, 21910, 22190, 23170, 23590, 24290, 24430, 24710, 25130, 25690, 26110, 26530, 26810, 27230, 27790, 28070, 28630, 29330, 29470, 30170, 30310, 30730, 31010, 31430, 31990, 32270, 32410, 32690, 33530, 34090, 34370, 34930, 35210, 35630, 36470, 36610, 37870, 38290, 38990, 39410, 39830, 39970]:
+        yield n,
+        yield n + 2 * rng.randint(1, 50),
+    for _ in range(200):
+        yield 2 * rng.randint(50, 20000),
+
+
+def vdw_colourings_generator(rng):
+    for k in range(2, 6):
+        for n in range(1, {2: 5, 3: 11, 4: 37, 5: 17}[k]):
+            yield n, k
+
+
+def squared_rectangle_generator(rng):
+    yield 33, [18, 15, 7, 8, 14, 4, 10, 1, 9]
+    yield 1, [1, 1, 1]
+    yield 2, [1, 1]
+    for width in islice(pyramid(1, 6, 1), 600):
+        height = rng.randint(1, 2 * width)
+        heights, squares = [0] * width, []
+        # Fill a width by height rectangle with random squares, always
+        # choosing a size that fits both the gap and the remaining height.
+        while min(heights) < height:
+            low = min(heights)
+            x = heights.index(low)
+            gap = 0
+            while x + gap < width and heights[x + gap] == low:
+                gap += 1
+            biggest = min(gap, height - low)
+            s = biggest if rng.randint(0, 2) == 0 else rng.randint(1, biggest)
+            squares.append(s)
+            for i in range(x, x + s):
+                heights[i] += s
+        roll = rng.randint(0, 4)
+        if roll == 1:   # Change the size of one square.
+            i = rng.randrange(len(squares))
+            squares[i] = max(1, squares[i] + rng.choice([-2, -1, 1, 2]))
+        elif roll == 2 and len(squares) > 1:   # Swap two squares.
+            i, j = rng.randrange(len(squares)), rng.randrange(len(squares))
+            squares[i], squares[j] = squares[j], squares[i]
+        elif roll == 3:   # Drop the last square or add one more.
+            if rng.randint(0, 1) and len(squares) > 1:
+                squares.pop()
+            else:
+                squares.append(rng.randint(1, width))
+        yield width, squares
+
+
+def ulam_generator(rng):
+    yield 1, 2, 20
+    yield 2, 3, 10
+    yield 1, 3, 1
+    for n in range(2, 300):
+        a = rng.randint(1, 10)
+        b = a + rng.randint(1, 10)
+        yield a, b, n
+    for _ in range(10):
+        yield 1, 2, rng.randint(500, 1000)
+
+
+def deadfish_generator(rng):
+    yield "iissso",
+    yield "",
+    yield "dddo",
+    for n in islice(pyramid(1, 2, 1), 600):
+        code, squares = "", 0
+        for _ in range(n):
+            c = rng.choice("iiiidddooss")
+            if c == "s":
+                if squares == 6:
+                    c = "o"
+                squares += 1
+            code += c
+        yield code,
+
+
+def tag_system_generator(rng):
+    collatz = {"a": "bc", "b": "a", "c": "aaa"}
+    for k in range(1, 28):
+        yield collatz, "a" * k, 2, 10000
+    for _ in range(500):
+        m = rng.randint(1, 4)
+        symbols = "abcde"[:rng.randint(2, 5)]
+        rules = {}
+        for s in symbols[:-1] if rng.randint(0, 2) else symbols:
+            rules[s] = "".join(rng.choice(symbols) for _ in range(rng.randint(0, m + 1)))
+        word = "".join(rng.choice(symbols) for _ in range(rng.randint(1, 12)))
+        yield rules, word, m, rng.randint(5, 300)
+
+
+def tidy_tower_generator(rng):
+    for tower in ["R", "Y", "RR", "RG", "RGBG", "RGBY", "RYBG", "RGBYRGBYBGBGBG"]:
+        yield tower,
+    for n in islice(pyramid(2, 3, 1), 1500):
+        # Each cube turns from the one below by a gap chosen from a biased
+        # palette, so that the counts of each kind of gap vary a lot.
+        pool = [g for g in range(4) for _ in range(rng.randint(0, 5))] or [0]
+        tower, turn = "", rng.randint(0, 3)
+        for _ in range(n):
+            tower += "RGBY"[turn]
+            turn = (turn + rng.choice(pool)) % 4
+        yield tower,
+
+
+def exclusivity_probes_generator(rng):
+    yield 2, 2, 2, {}
+    yield 3, 1, 3, {}
+    yield 3, 3, 2, {}
+    yield 3, 3, 2, {"000": False}
+    yield 3, 2, 2, {"000": True}
+    for n in [1, 2, 3]:
+        for d in range(1, n + 1):
+            for m in range(0, 2 ** n + 1):
+                strings = ["".join(b) for b in product("01", repeat=n)]
+                if any(all(sum(a != b for a, b in zip(s, t)) >= d for (s, t) in combinations(c, 2))
+                       for c in combinations(strings, m)):
+                    yield n, m, d, {}
+    for _ in range(300):
+        n = rng.choice([3, 4, 4, 4, 5])
+        d = rng.randint(1, n)
+        m = rng.randint(1, {3: 4, 4: 5, 5: 3}[n])
+        strings = ["".join(b) for b in product("01", repeat=n)]
+        worlds = [set(c) for c in combinations(strings, m)
+                  if all(sum(a != b for a, b in zip(s, t)) >= d for (s, t) in combinations(c, 2))]
+        if len(worlds) < 2:
+            continue
+        hidden = rng.choice(worlds)
+        # Probes already made, until only a handful of worlds remain.
+        cap = rng.randint(3, 12)
+        probes, order = {}, strings[:]
+        rng.shuffle(order)
+        for s in order:
+            if len(worlds) <= cap:
+                break
+            remaining = [w for w in worlds if (s in w) == (s in hidden)]
+            if len(remaining) >= 2:   # Leave something to find out.
+                probes[s] = s in hidden
+                worlds = remaining
+        yield n, m, d, probes
+
+
+def repetition_free_generator(rng):
+    for text in ["", "a", "aa", "aaa", "abab", "ABCACCAB", "ABCACCBA", "mississippi", "banana"]:
+        yield text,
+    for n in islice(pyramid(3, 1, 0), 500):
+        alphabet = "abcdefghij"[:rng.randint(1, 5)]
+        roll = rng.randint(0, 2)
+        if roll == 0:   # Random text.
+            text = "".join(rng.choice(alphabet) for _ in range(n))
+        elif roll == 1:   # Random text with a long piece planted twice.
+            piece = "".join(rng.choice(alphabet) for _ in range(rng.randint(1, n)))
+            text = "".join(rng.choice(alphabet) for _ in range(rng.randint(0, n)))
+            i = rng.randint(0, len(text))
+            text = text[:i] + piece + text[i:]
+            i = rng.randint(0, len(text))
+            text = text[:i] + piece + text[i:]
+        else:   # A short pattern repeated, with some mutations.
+            pattern = "".join(rng.choice(alphabet) for _ in range(rng.randint(1, 6)))
+            text = list((pattern * (n // len(pattern) + 1))[:n])
+            for _ in range(rng.randint(0, 3)):
+                text[rng.randint(0, n - 1)] = rng.choice(alphabet)
+            text = "".join(text)
+        yield text,
+
+
+def stack_the_deck_generator(rng):
+    yield [3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1, 2, 8, 1], 8
+    yield [5, 2, 2, 3, 3, 4, 4, 1], 8
+    yield [8, 6, 5, 7, 8, 6, 3, 7], 8
+    for k in islice(pyramid(1, 50, 5), 900):
+        deck = [v for v in range(1, k + 1) for _ in range(2)]
+        rng.shuffle(deck)
+        prefix = deck[:rng.randint(0, 2 * k - 1)]
+        if rng.randint(0, 1):
+            # Swap cards around so that no card in the prefix leaps past the
+            # end of the deck, which would make for a quick and boring loss.
+            for i in range(len(prefix)):
+                if prefix[i] > 2 * k - i - 1:
+                    j = rng.randint(0, i)
+                    if prefix[j] <= 2 * k - i - 1 and prefix[i] <= 2 * k - j - 1:
+                        prefix[i], prefix[j] = prefix[j], prefix[i]
+        yield prefix, k
+
+
+def stack_the_bottom_generator(rng):
+    yield [3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1, 2, 8, 1], 8
+    yield [], 8
+    for k in islice(pyramid(1, 50, 5), 900):
+        n = 2 * k
+        left = [0] + [2] * k
+        safe = [False] * (n + 1)
+        suffix = []
+        risk = rng.randint(0, 6)
+        # Build the opponent's cards from the bottom up, mostly but not
+        # always choosing cards that lead to the final ace.
+        for p in range(n, n - rng.randint(n // 2, n), -1):
+            good = [v for v in range(1, k + 1) if left[v] > 0 and
+                    ((p == n and v == 1) or (p < n and p + v <= n and safe[p + v]))]
+            if good and rng.randint(0, 9) >= risk:
+                v = rng.choice(good)
+            else:
+                v = rng.choice([v for v in range(1, k + 1) if left[v] > 0])
+            left[v] -= 1
+            safe[p] = v in good
+            suffix.insert(0, v)
+        yield suffix, k
+
+
+def upside_down_generator(rng):
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [w.strip() for w in f]
+    # Words that a calculator can spell, and some that it cannot.
+    good = [w for w in words if all(c in "oizehsglb" for c in w)]
+    for w in ["hello", "o", "oo", "boob", "shoe", "cat", "zoo", "he"]:
+        yield w,
+    for w in rng.sample(good, 400):
+        yield w,
+    for w in rng.sample(words, 400):
+        yield w,
+
+
+def renumber_generator(rng):
+    for n in islice(pyramid(1, 5, 1), 600):
+        numbers, line_no = [], 0
+        for _ in range(n):
+            line_no += rng.choice([10, 10, 10, 5, 1, rng.randint(1, 50)])
+            numbers.append(line_no)
+        program = []
+        for num in numbers:
+            parts = []
+            for _ in range(rng.randint(1, 3)):
+                roll = rng.randint(0, 6)
+                target = str(rng.choice(numbers))
+                if roll == 0:
+                    parts.append("GOTO " + target)
+                elif roll == 1:
+                    parts.append("GOSUB " + target)
+                elif roll == 2:
+                    parts.append("IF X > " + str(rng.randint(0, 99)) + " THEN GOTO " + target)
+                elif roll == 3:
+                    parts.append('PRINT "' + random_string("ABCDEFG ", rng.randint(1, 8), rng) + '"')
+                elif roll == 4:
+                    parts.append("LET X = X + " + str(rng.randint(1, 99)))
+                elif roll == 5:
+                    parts.append("RETURN")
+                else:
+                    parts.append("INPUT X")
+            program.append(str(num) + " " + " : ".join(parts))
+        start = rng.choice([1, 10, 100, 1000])
+        step = rng.choice([1, 2, 5, 10, 100])
+        yield program, start, step
+
+
+def short_names_generator(rng):
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [w.strip() for w in f]
+    exts = ["txt", "bat", "exe", "doc", "docx", "html", "jpeg", "c", "tar.gz", "", "md"]
+    yield ["Program Files", "readme.txt", "README.TXT", "a+b.c", "archive.tar.gz"],
+    # Enough collisions to need a two-digit tail.
+    yield ["longfilename" + str(i) + ".txt" for i in range(12)],
+    for n in islice(pyramid(1, 6, 1), 500):
+        names = []
+        # A few shared prefixes, so that the numeric tails collide often.
+        stems = [rng.choice(words) for _ in range(rng.randint(1, 3))]
+        for _ in range(n):
+            base = rng.choice(stems)
+            roll = rng.randint(0, 9)
+            if roll < 3:
+                base += " " + rng.choice(words)
+            elif roll < 5:
+                base += rng.choice("+,;=[]-_ ") + str(rng.randint(0, 99))
+            elif roll < 6:
+                base += "." + rng.choice(words)
+            if rng.randint(0, 1):
+                base = base.upper() if rng.randint(0, 1) else base.capitalize()
+            ext = rng.choice(exts)
+            names.append(base + ("." + ext if ext else ""))
+        yield names,
+
+
+def ipd_tournament_generator(rng):
+    kinds = ["always_cooperate", "always_defect", "tit_for_tat", "suspicious_tit_for_tat",
+             "grudger", "pavlov", "tit_for_two_tats", "alternate"]
+    yield kinds, 200
+    for n in islice(pyramid(2, 20, 1), 500):
+        k = min(n, 10)
+        yield [rng.choice(kinds) for _ in range(k)], rng.randint(1, 5 * n)
+
+
+def adventure_endings_generator(rng):
+    yield {1: []},
+    yield {1: [5, 9], 5: [9, 12], 9: [], 12: []},
+    for n in islice(pyramid(3, 6, 1), 1200):
+        # The pages that start the chapters, every chapter at least one page.
+        pages, p = [1], 1
+        for _ in range(n - 1):
+            p += rng.randint(1, 6)
+            pages.append(p)
+        # The reading order of the chapters is mostly by page number, with
+        # some chapters moved earlier, so that some jumps go backwards.
+        order = [1] + sorted(pages[1:], key=lambda q: q + rng.randint(0, 3 * n))
+        book = {}
+        for i, q in enumerate(order):
+            later = order[i + 1:]
+            # The last chapters must be endings; the others branch.
+            if len(later) < 2 or (i > 0 and rng.randint(0, 99) < 25):
+                book[q] = []
+            else:
+                k = rng.randint(2, min(4, len(later)))
+                # Prefer the chapters soon after this one in the reading order.
+                window = later[:max(k, rng.randint(2, 8))]
+                book[q] = sorted(rng.sample(window, k), key=lambda x: rng.random())
+        yield book,
+
+
+def hackenbush_value_generator(rng):
+    yield [],
+    yield [""],
+    for n in islice(pyramid(1, 6, 1), 2000):
+        stalks = []
+        for _ in range(rng.randint(1, 1 + n // 6)):
+            # Stalks built from runs of each colour, so that the initial run
+            # and the later colour changes both vary.
+            stalk = ""
+            while len(stalk) < rng.randint(0, n):
+                stalk += rng.choice("BR") * rng.randint(1, 4)
+            stalks.append(stalk)
+        yield stalks,
+
+
+def deconstructive_generator(rng):
+    for n in range(1, 200):
+        yield n,
+    for n in islice(pyramid(200, 2, 1), 150):
+        yield n * rng.randint(1, 50),
+
+
+def consecutive_mod_generator(rng):
+    for n in range(1, 30):
+        for m in [3, 7, 9, 11, 1000]:
+            yield n, m
+    for k in islice(pyramid(2, 60, 1), 300):
+        n = rng.randint(10 ** (k - 1), 10 ** min(k, 5))  # Up to a hundred thousand.
+        roll = rng.randint(0, 99)
+        if roll < 30:
+            m = 10 ** rng.randint(1, 12)  # Powers of ten keep the last digits.
+        elif roll < 50:
+            m = rng.choice([3, 9, 11, 99, 101, 999, 1001])
+        else:
+            m = rng.randint(1, 10 ** rng.randint(1, 20))
+        yield n, m
+
+
+def smarandache_generator(rng):
+    for n in range(1, 500):
+        yield n,
+    for n in islice(pyramid(3, 3, 1), 700):
+        roll = rng.randint(0, 99)
+        if roll < 30:
+            # Prime powers, where the answer is less obvious.
+            p = rng.choice([2, 3, 5, 7, 11, 13])
+            yield p ** rng.randint(1, min(30, n)),
+        elif roll < 50:
+            # Products of small factorials and other highly composite numbers.
+            v = 1
+            for _ in range(rng.randint(1, 4)):
+                k = rng.randint(1, 12)
+                f = 1
+                for i in range(2, k + 1):
+                    f *= i
+                v *= f
+            yield v,
+        else:
+            yield rng.randint(1, 10 ** min(n, 9)),
+
+
+def cribbage_hand_generator(rng):
+    # The perfect 29 hand, and a few other classics.
+    yield [('five', 'clubs'), ('five', 'diamonds'), ('five', 'hearts'), ('jack', 'spades')], ('five', 'spades')
+    yield [('three', 'hearts'), ('three', 'clubs'), ('four', 'spades'), ('five', 'diamonds')], ('ten', 'clubs')
+    yield [('two', 'hearts'), ('four', 'hearts'), ('six', 'hearts'), ('eight', 'hearts')], ('king', 'hearts')
+    for _ in range(2000):
+        roll = rng.randint(0, 99)
+        if roll < 40:
+            cards = rng.sample(__gin_deck, 5)
+        else:
+            # Hands rich in fives, tens, runs, pairs and flushes.
+            base = rng.randint(1, 11)
+            pool = [c for c in __gin_deck if base <= __gin_ranks[c[0]] <= base + 3 or
+                    c[0] in ('five', 'ten', 'jack', 'queen', 'king')]
+            if roll < 60:
+                suit = rng.choice(__suits)
+                same = [c for c in __gin_deck if c[1] == suit]
+                cards = rng.sample(same, 4) + [rng.choice([c for c in __gin_deck if c not in same] + same[:0])]
+                if rng.randint(0, 1):
+                    rest = [c for c in same if c not in cards]
+                    cards[4] = rng.choice(rest)
+            else:
+                cards = rng.sample(pool, 5)
+        yield cards[:4], cards[4]
+
+
+def elevator_generator(rng):
+    yield 0, []
+    for n in islice(pyramid(1, 6, 1), 1500):
+        floors = rng.randint(2, 3 + 2 * n)
+        start = rng.randint(0, floors)
+        t, requests = 0, []
+        for _ in range(rng.randint(1, n + 1)):
+            # Requests arrive in bursts, sometimes long after the previous one.
+            t += rng.choice([0, 0, 1, 2, rng.randint(0, 3 * floors)])
+            requests.append((t, rng.randint(0, floors)))
+        yield start, requests
+
+
+def farey_neighbours_generator(rng):
+    for n in range(1, 8):
+        for d in range(2, 9):
+            for p in range(1, d):
+                yield F(p, d), n
+    for n in islice(pyramid(8, 3, 1), 600):
+        if rng.randint(0, 99) < 50:
+            d = rng.randint(2, n)  # A fraction that belongs to the sequence.
+        else:
+            d = rng.randint(n + 1, 50 * n)  # A fraction that falls between.
+        yield F(rng.randint(1, d - 1), d), n
+
+
+def nonogram_line_generator(rng):
+    yield [], "?????"
+    yield [5], "?????"
+    for n in islice(pyramid(1, 60, 1), 2500):
+        # A random solution row with random density of black cells.
+        density = rng.randint(20, 80)
+        row = "".join("#" if rng.randint(0, 99) < density else "." for _ in range(n))
+        clue = [len(b) for b in row.split(".") if b]
+        # Reveal some of its cells, and sometimes corrupt one of them.
+        known = rng.randint(0, 60)
+        line = [c if rng.randint(0, 99) < known else "?" for c in row]
+        if rng.randint(0, 99) < 40:
+            for _ in range(rng.randint(1, 2)):
+                i = rng.randint(0, n - 1)
+                line[i] = "#" if row[i] == "." else "."
+        yield clue, "".join(line)
+
+
+def segment_toggles_generator(rng):
+    for a in range(0, 12):
+        for b in range(a, 12):
+            yield a, b
+    for n in islice(pyramid(2, 4, 1), 800):
+        a = rng.randint(0, 10 ** n)
+        # Spans that often cross a power of ten, where a new digit appears.
+        if rng.randint(0, 99) < 30:
+            a = max(0, 10 ** rng.randint(1, n) - rng.randint(1, 50))
+        yield a, a + rng.randint(0, 20 * n)
+
+
+def rail_fence_decrypt_generator(rng):
+    yield "WECRLTEERDSOEEFEAOCAIVDEN", 3
+    letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    for n in islice(pyramid(1, 3, 1), 2000):
+        text = random_string(letters, n, rng)
+        # Every number of rails from one to a few more than the length of
+        # the text is possible, with the small numbers being most common.
+        if rng.randint(0, 99) < 70:
+            rails = rng.randint(1, min(n + 1, 6))
+        else:
+            rails = rng.randint(1, n + 3)
+        yield text, rails
+
+
+def golomb_generator(rng):
+    for n in range(1, 300):
+        yield n,
+    for d in islice(pyramid(3, 15, 1), 150):
+        d = min(d, 9)
+        yield rng.randint(10 ** (d - 1), 10 ** d),
+
+
+def best_scrabble_word_generator(rng):
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [w.strip() for w in f]
+    # Words longer than eight letters could never fit on the rack anyway.
+    words = [w for w in words if len(w) <= 8]
+    # The letter distribution of the English Scrabble tile bag, blanks included.
+    bag = ("e" * 12 + "a" * 9 + "i" * 9 + "o" * 8 + "nrt" * 6 + "lsud" * 4 + "g" * 3 +
+           "bcmpfhvwy" * 2 + "kjxqz" + "??")
+    for n in islice(pyramid(1, 20, 1), 250):
+        rack = "".join(rng.sample(bag, min(7, n)))
+        # A random sample of the word list, so that each test is different.
+        sample = rng.sample(words, rng.randint(2000, 8000))
+        yield rack, sample
+
+
+def kaprekar_generator(rng):
+    yield 3524, 4, 10
+    yield 1111, 4, 10
+    for (width, base) in [(3, 10), (4, 10), (2, 10), (5, 10), (6, 10)]:
+        for _ in range(20):
+            yield rng.randint(0, base ** width - 1), width, base
+    for n in islice(pyramid(1, 5, 1), 1500):
+        base = rng.randint(2, min(36, 2 + 2 * n))
+        width = rng.randint(1, min(8, 1 + n // 3))
+        yield rng.randint(0, base ** width - 1), width, base
+
+
+def patience_piles_generator(rng):
+    yield [],
+    for n in islice(pyramid(1, 3, 2), 1200):
+        if rng.randint(0, 99) < 50:
+            cards = list(range(n))
+            rng.shuffle(cards)
+        else:
+            cards = [rng.randint(0, n // 2) for _ in range(n)]
+        yield cards,
+    # A few long ones to defeat the quadratic approaches.
+    for n in [10 ** 4, 3 * 10 ** 4, 10 ** 5]:
+        cards = list(range(n))
+        rng.shuffle(cards)
+        yield cards,
+
+
+def soundex_generator(rng):
+    # The classic test names, each one exercising some rule.
+    for name in ["Robert", "Rupert", "Rubin", "Ashcraft", "Ashcroft", "Tymczak",
+                 "Pfister", "Lee", "Lloyd", "Gauss", "Ghosh", "Hilbert",
+                 "Heilbronn", "Honeyman", "Washington", "Jackson"]:
+        yield name,
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        words = [w.strip() for w in f]
+    for w in rng.sample(words, 2000):
+        yield w[0].upper() + w[1:],
+    # Synthetic names packed with the tricky cases: consonants of the same
+    # code separated by H or W, by vowels, or following the first letter.
+    tricky = ["bp", "pf", "cs", "kz", "dt", "mn", "sch", "chs", "shc", "rhr",
+              "twd", "nwm", "lhl", "a", "e", "i", "o", "u", "y", "h", "w"]
+    letters = "abcdefghijklmnopqrstuvwxyz"
+    for n in islice(pyramid(1, 3, 1), 1500):
+        name = ""
+        while len(name) < n:
+            if rng.randint(0, 99) < 50:
+                name += rng.choice(tricky)
+            else:
+                name += rng.choice(letters)
+        yield name[0].upper() + name[1:],
+
+
+# Who said that?
+
+def look_and_say_parent_generator(rng):
+    for n in islice(pyramid(1, 3, 1), 3000):
+        # Build a genuine parent from random runs of random lengths.
+        runs, prev = [], None
+        while sum(r for (r, d) in runs) < n:
+            d = rng.choice("0123456789" if rng.randint(0, 99) < 70 else "123")
+            if d == prev:
+                continue
+            runs.append((rng.randint(1, 3 if rng.randint(0, 99) < 70 else 9), d))
+            prev = d
+        digits = "".join(str(r) + d for (r, d) in runs)
+        roll = rng.randint(0, 99)
+        if roll < 50:
+            yield digits,  # A genuine description.
+        elif roll < 65:
+            # Zero out some count.
+            i = 2 * rng.randint(0, len(digits) // 2 - 1)
+            yield digits[:i] + "0" + digits[i + 1:],
+        elif roll < 80 and len(runs) > 1:
+            # Make two consecutive runs describe the same digit.
+            i = 2 * rng.randint(1, len(digits) // 2 - 1)
+            yield digits[:i + 1] + digits[i - 1] + digits[i + 2:],
+        else:
+            # Break the even length, or replace with random digits.
+            if rng.randint(0, 1):
+                yield digits + rng.choice("123456789"),
+            else:
+                yield "".join(rng.choice("0123") for _ in range(len(digits))),
+
+
+# Chord of the rings
+
+def chord_name_generator(rng):
+    names = ["C", "D", "E", "F", "G", "A", "B"]
+    pcs = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
+    # Spell each pitch class in two ways, so that enharmonic spellings appear.
+    spell = {}
+    for n in names:
+        for acc in ["", "#", "b"]:
+            pc = (pcs[n] + (1 if acc == "#" else -1 if acc == "b" else 0)) % 12
+            spell.setdefault(pc, []).append(n + acc)
+    for _ in range(3000):
+        roll = rng.randint(0, 99)
+        if roll < 75:
+            third, fifth = rng.choice([(4, 7), (3, 7), (3, 6)])
+            root = rng.randint(0, 11)
+            pitches = [root, (root + third) % 12, (root + fifth) % 12]
+            # Choose the bass note, then the order of the other two.
+            bass = pitches.pop(rng.randint(0, 2))
+            rng.shuffle(pitches)
+            pitches = [bass] + pitches
+        elif roll < 85:
+            root = rng.randint(0, 11)  # Augmented triads have no unique root.
+            pitches = [root, (root + 4) % 12, (root + 8) % 12]
+            rng.shuffle(pitches)
+        else:
+            pitches = [rng.randint(0, 11) for _ in range(3)]
+        yield [rng.choice(spell[p]) for p in pitches],
+
+
+# Fair shares
+
+def fair_pick_generator(rng):
+    for k in range(2, 6):
+        for n in range(1, 30):
+            yield n, k
+    for n in islice(pyramid(30, 3, 2), 600):
+        yield n, rng.randint(2, 26)
+
+
+# Does the coffee get through?
+
+def percolates_generator(rng):
+    for n in islice(pyramid(1, 6, 1), 1500):
+        h, w = rng.randint(1, n), rng.randint(1, n)
+        # Open cell probability near the percolation threshold of about 59%,
+        # so that both answers occur often enough.
+        p = rng.choice([40, 55, 59, 59, 63, 75])
+        grid = []
+        for _ in range(h):
+            grid.append("".join("." if rng.randint(0, 99) < p else "#" for _ in range(w)))
+        yield grid,
+
+
+def juggler_generator(rng):
+    # Every start value up to two hundred, so the first failures are small.
+    for n in range(1, 200):
+        yield n,
+    # Then random start values with gradually more digits.
+    for d in islice(pyramid(3, 3, 1), 1200):
+        n = rng.randint(10 ** (d - 1), 10 ** d - 1)
+        # Odd start values make the terms grow first, which is more interesting.
+        if n % 2 == 0 and rng.randint(0, 99) < 60:
+            n += 1
+        yield n,
+
+
+# The magician always knows
+
+def kruskal_count_generator(rng):
+    for n in islice(pyramid(1, 1, 1), 4000):
+        if n >= 52 and rng.randint(0, 99) < 40:
+            # One or more complete shuffled decks, as in the actual card trick.
+            decks = n // 52
+            cards = [rank for rank in range(1, 14) for _ in range(4 * decks)]
+            rng.shuffle(cards)
+        else:
+            cards = [rng.randint(1, 13) for _ in range(n)]
+        # Usually start among the first ten cards, as the spectator would.
+        if rng.randint(0, 99) < 70:
+            start = rng.randint(0, min(len(cards), 10) - 1)
+        else:
+            start = rng.randint(0, len(cards) - 1)
+        yield cards, start
+
+
+# Avalanche!
+
+def topple_generator(rng):
+    for n in islice(pyramid(1, 4, 1), 800):
+        if rng.randint(0, 99) < 15:
+            # The classic: a pile of sand dropped on the centre of an empty table.
+            h = w = 2 * (n // 2) + 1
+            rows = ["0" * w for _ in range(h)]
+            r = c = h // 2
+            grains = rng.randint(4, 4 + 2 * h * w)
+        else:
+            h, w = rng.randint(1, n), rng.randint(1, n)
+            # Configurations with many threes are the ones near criticality,
+            # where a single grain can set off a huge avalanche.
+            threes = rng.choice([0, 30, 60, 90, 100])
+            rows = []
+            for _ in range(h):
+                row = ""
+                for _ in range(w):
+                    row += "3" if rng.randint(0, 99) < threes else str(rng.randint(0, 2))
+                rows.append(row)
+            r, c = rng.randint(0, h - 1), rng.randint(0, w - 1)
+            grains = rng.randint(1, 4) if rng.randint(0, 99) < 50 else rng.randint(1, h * w + 4)
+        yield rows, r, c, grains
+
+
+# Ducci in a loop
+
+def ducci_generator(rng):
+    # Lengths whose cycles stay short enough. (For example, some tuples of
+    # length 29 enter a cycle of length 475107.) In particular, every length
+    # that is a power of two leads to all zeros.
+    lengths = list(range(1, 19)) + [20, 21, 24, 28, 30, 31, 32, 48, 64]
+    for k in islice(pyramid(1, 6, 1), 1500):
+        n = rng.choice(lengths[:k])
+        bits = rng.randint(1, 3 * k)
+        if rng.randint(0, 99) < 20:
+            # Only two distinct values, often the zero and some other value.
+            values = [0, rng.randint(1, 2 ** bits)]
+            if rng.randint(0, 99) < 50:
+                values[0] = rng.randint(1, 2 ** bits)
+            items = [rng.choice(values) for _ in range(n)]
+        else:
+            items = [rng.randint(0, 2 ** bits) for _ in range(n)]
+        yield items,
+
+
+# Engel's descent
+
+def engel_generator(rng):
+    # Some small fractions in order, so the first failures are easy to follow.
+    for den in range(1, 8):
+        for num in range(1, 2 * den + 1):
+            yield F(num, den),
+    for d in islice(pyramid(1, 5, 1), 2000):
+        den = rng.randint(1, 10 ** d)
+        roll = rng.randint(0, 99)
+        if roll < 10:
+            num = 1  # Unit fractions have the shortest possible expansion.
+        elif roll < 20:
+            num = rng.randint(den, 5 * den)  # Fractions larger than one.
+        else:
+            num = rng.randint(1, den)
+        yield F(num, den),
+
+
+# Mölkky madness
+
+def molkky_generator(rng):
+    for n in islice(pyramid(1, 3, 1), 2000):
+        players = rng.randint(2, 2 + min(n // 4, 6))
+        # Each player has their own skill level, so that some players get
+        # eliminated by their misses while others keep scoring.
+        miss_chance = [rng.choice([5, 15, 30, 60]) for _ in range(players)]
+        multi_chance = [rng.choice([10, 30, 50]) for _ in range(players)]
+        throws, turn = [], 0
+        for _ in range(rng.randint(1, 10 + 10 * n)):
+            p = turn % players
+            roll = rng.randint(0, 99)
+            if roll < miss_chance[p]:
+                pins = ()
+            elif rng.randint(0, 99) < multi_chance[p]:
+                pins = tuple(rng.sample(range(1, 13), rng.randint(2, 12)))
+            else:
+                pins = (rng.randint(1, 12),)
+            throws.append(pins)
+            turn += 1
+        yield players, throws
+
+
+# Deuce, deuce, baby
+
+def tennis_game_generator(rng):
+    # Every possible game up to six points long, in order.
+    for length in range(1, 7):
+        for bits in range(2 ** length):
+            points = "".join("S" if bits >> i & 1 else "R" for i in range(length))
+            if tennis_game_ok(points):
+                yield points,
+    # Then random games between players of varying relative strength.
+    for n in islice(pyramid(1, 10, 1), 3000):
+        p = rng.choice([50, 50, 50, 40, 60, 25, 75, 10, 90])
+        points, s, r = "", 0, 0
+        while not (max(s, r) >= 4 and abs(s - r) >= 2):
+            if rng.randint(0, 99) < p:
+                points, s = points + "S", s + 1
+            else:
+                points, r = points + "R", r + 1
+        # Usually stop at some random moment before the game is over.
+        if rng.randint(0, 99) < 70:
+            points = points[:rng.randint(1, len(points))]
+        yield points,
+
+
+def tennis_game_ok(points):
+    # Whether these points can be played without the game ending early.
+    s = r = 0
+    for (i, p) in enumerate(points):
+        if max(s, r) >= 4 and abs(s - r) >= 2:
+            return False
+        if p == "S":
+            s += 1
+        else:
+            r += 1
+    return True
+
+
+def max_product_distinct_prime_partition_generator(rng):
+    for n in range(7, 2000):
+        yield n,
+
+def square_machine_generator(rng):
+    def next_coeff(prev, step):
+        next_ = prev + rng.randint(0, step)
+        if next_ > 1 and next_ == isqrt(next_) ** 2:
+            next_ += rng.randint(1, 3)
+        return next_
+
+    for step, nn in islice(zip(pyramid(2, 3, 4), pyramid(2, 10, 10)), 110):
+        coeff = [next_coeff(1, step)]
+        for _ in range(3):
+            coeff.append(next_coeff(coeff[-1], step))
+        goal = random_int(rng, nn, 100)
+        yield (tuple(coeff), goal)
+
+
+def singleton_word_generator(rng):
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        wordlist = [w.strip() for w in f if 3 < len(w) < 6]
+    for n in islice(pyramid(2, 2, 2), 5000):
+        words = rng.sample(wordlist, n)
+        words = words + words
+        rng.shuffle(words)
+        i = rng.randint(0, 2 * n - 1)
+        words = words[:i] + words[i+1:]
+        yield words,
+
+
+def to_snowball_generator(rng):
+    yield from [(n,) for n in range(100)]
+    for n in islice(scale_random(12345, 4, 5), 1000):
+        yield 100 + n,
+
+
+def slap_sort_generator(rng):
+    for items in [[0], [0, 1], [1, 0], [0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]]:
+        yield items,
+    for n in islice(pyramid(4, 2, 2), 5000):
+        items = list(range(n))
+        rng.shuffle(items)
+        yield items,
+
+
+def next_distinct_digits_generator(rng):
+    for p, q in islice(zip(cycle([10, 40, 80]), cycle([50, 60, 70, 80])), 5000):
+        ns = rng.choice("123456789")
+        while len(ns) < 10 and rng.randint(0, 100) < q:
+            ns += rng.choice(ns) if rng.randint(0, 100) < p else rng.choice("0123456789")
+        n = int(ns)
+        if n < 9876543210:
+            yield n,
+
+
+def oulipo_generator(rng):
+    with open('words_sorted.txt', 'r', encoding='utf-8') as f:
+        wordlist = [w.strip() for w in f]
+    for text in schmalz_generator(rng):
+        yield text[0], [+1, -1], wordlist
+    def make_sentence(m):
+        sentence = ""
+        for i in range(m):
+            word = rng.choice(wordlist)
+            if i == 0:
+                word = word.capitalize()
+            sentence += word
+            sentence += rng.choice([" ", ", ", "; "] if i < m - 1 else ".!?")
+        return sentence
+    for n, m in islice(zip(pyramid(1, 4, 6), pyramid(3, 6, 8)), 1000):
+        text = ""
+        for i in range(n):
+            text += make_sentence(rng.randint(1, m))
+            if i < n - 1:
+                text += " "
+        offset = rng.choice([[-1, +1], [+1, 0, -1], [+1], [-1], [+5, 1, 4]])
+        yield text, offset, wordlist
+
+
+def triangular_triangle_generator(rng):
+    for k in islice(pyramid(2, 2, 3), 30):
+        n = (k * (k + 1)) // 2
+        first_row = rng.sample(range(1, n + 1), k)
+        yield first_row,
+
+
+def missing_integer_generator(rng):
+    for n in range(3, 135):
+        for _ in range(3):
+            missing = rng.randint(2, n)
+            nums = list(range(1, missing)) + list(range(missing + 1, n + 1))
+            rng.shuffle(nums)
+            yield n, "".join(str(x) for x in nums),
+
 
 def distance_from_land_generator(rng):
     for n in islice(pyramid(3, 3, 3), 3000):
@@ -3949,7 +5750,7 @@ def stepping_stones_generator(rng):
 
 
 def laser_aliens_generator(rng):
-    for n in islice(pyramid(3, 5, 1), 600):
+    for n in islice(pyramid(3, 5, 1), 1200):
         aliens = set()
         x = rng.randint(0, n - 1)
         y = rng.randint(0, n - 1)
@@ -6265,7 +8066,7 @@ testcases = [
     (
         "laser_aliens",
         laser_aliens_generator,
-        "64186671716042ed9238ea75d0104cbb932a0e37e0275303f83d953a95534693"
+        "7499e026ce7bad22f20225d3690e9cf0dc19ba575fc961f9a0e6fef3bb277f26"
     ),
     (
         "stepping_stones",
@@ -7578,7 +9379,559 @@ testcases = [
         "distance_from_land",
         distance_from_land_generator,
         "7f0c597828290c9c80b28cb2766e604ff947931faa4a4e1bb0d6d9b65726bae2"
-    )
+    ),
+
+    # Problems for the Fourth (Retirement) Problem Collection. Claude will now
+    # make these problems from me after this first bunch.
+
+    (
+        "missing_integer",
+        missing_integer_generator,
+        "f1345567f0fc5a5110ef592c882aac5fe9bb2c725063bad8183f1be5cce44ba4"
+    ),
+    (
+        "triangular_triangle",
+        triangular_triangle_generator,
+        "5de5563ff482bb056c9f2db6b90848dfc4f64b70432de8fb7e0c1eb7b28bc2f6"
+    ),
+    (
+        "oulipo",
+        oulipo_generator,
+        "2525be4bb03ba2e151edc5135dee0e47bc584d36b10fb28cd23b656e2bc36dbe"
+    ),
+    (
+        "next_distinct_digits",
+        next_distinct_digits_generator,
+        "8267260c317ea779d911f60a4406058df39581a8f2dda36cad9c3a2b9fbbee09"
+    ),
+    (
+        "slap_sort",
+        slap_sort_generator,
+        "6bb1c799f6fa0de144575bd41032855d7d2119d623302c813e98c5e692bd7a09"
+    ),
+    (
+        "to_snowball",
+        to_snowball_generator,
+        "5aa41e4053e4e38432351a0827d70558de0c60663b0db21b7b1a53e7f83c8494"
+    ),
+    (
+        "singleton_word",
+        singleton_word_generator,
+        "9a4b156963e7ae4b8a3dada138a0950dfccec989d82d072fd67c9b15a978b0e8"
+    ),
+    (
+        "square_machine",
+        square_machine_generator,
+        "57b6cf234cf102b4ff785caa3e6bc57c9e5347b2157855ee85f33b9d462d37a5"
+    ),
+
+    # New problems created by Claude after November 14, 2026.
+
+    (
+        "max_product_distinct_prime_partition",
+        max_product_distinct_prime_partition_generator,
+        "d984a8fb525dcc7f9170da2af8602995b8eea7bddc7e8145639829b11e772b83"
+    ),
+    (
+        "juggler",
+        juggler_generator,
+        "11c62e429fddca1f29374b152469f672962735755bbdef35ce71dd0a94887596"
+    ),
+    (
+        "kruskal_count",
+        kruskal_count_generator,
+        "72e2653214702e39d5c01ac84fcbd578b0c05418f14b77e24e58c9dd68bdbfe5"
+    ),
+    (
+        "topple",
+        topple_generator,
+        "324bea063458f769661e92e4d83f17d0fa652ceef4147a434a277d58639553a9"
+    ),
+    (
+        "ducci",
+        ducci_generator,
+        "127aad5ad68e03ce2827ae51c92f0ca0cb495b73b17719af85c7867f0a506ad6"
+    ),
+    (
+        "engel",
+        engel_generator,
+        "c18a043746881fde3773d50144843dee209ad3e289e264f85fd2712f1fbb36a3"
+    ),
+    (
+        "molkky",
+        molkky_generator,
+        "07972be54d8d5e5e738613398dc7e5ab5ca1d3b57af2fad704ef4fa680c06ac2"
+    ),
+    (
+        "tennis_game",
+        tennis_game_generator,
+        "955d32194fc5066ad94b31fdb91707d964b8de7bcc39b86fe799e661cc8d89c5"
+    ),
+    (
+        "soundex",
+        soundex_generator,
+        "d05f71fabe0e3f0c77987d438fd0d4054d97d632bf78d0ad0ade9b534f44194e"
+    ),
+    (
+        "look_and_say_parent",
+        look_and_say_parent_generator,
+        "7a7f70d76a2705ff652122453f54c6c4496c7ab759cb0c7daecaeaacc2c2ef52"
+    ),
+    (
+        "chord_name",
+        chord_name_generator,
+        "57d85219215fd3a0238f64eb626e31b4c8d2c3c1f1be19c5a9ed2db7fe92a660"
+    ),
+    (
+        "fair_pick",
+        fair_pick_generator,
+        "78707d2a9a8a288d962fea62f44379a02423974ad8bdcdd56e2fcad75e0c7a3d"
+    ),
+    (
+        "percolates",
+        percolates_generator,
+        "a08d87216c1d313371a96bb3b29cf9cbefcaee12469c89b514ca431068b409a2"
+    ),
+    (
+        "segment_toggles",
+        segment_toggles_generator,
+        "e3ba59f4d35b4d0dc5db6fc26760b4df4343c7046920edf7e2ce5e4efb50bd4c"
+    ),
+    (
+        "rail_fence_decrypt",
+        rail_fence_decrypt_generator,
+        "e62552d3841dfafa65dc1e932c5cbad69192e8620d34bbc6b14566efe2212dab"
+    ),
+    (
+        "golomb",
+        golomb_generator,
+        "1ea6a5af17d62ea276c12b988af876f5922b5d310e17c0b5a57f74b3ce543684"
+    ),
+    (
+        "best_scrabble_word",
+        best_scrabble_word_generator,
+        "3bd34e392ec7a9f8a612bd22ff2aed2857e196b8ed5f2a84928e8cd51c997480"
+    ),
+    (
+        "kaprekar",
+        kaprekar_generator,
+        "1e86318359aece89fa982acaf9ef747af96921c25f9fe87caaa507551a105acf"
+    ),
+    (
+        "patience_piles",
+        patience_piles_generator,
+        "3ba1ed2bc389ad1d04248cdff3b102b943013e84cb29486a5060636c88b2fa9d"
+    ),
+(
+        "deconstructive",
+        deconstructive_generator,
+        "94e2607b088548e4e139d22ba3fd0a17b21f1f4e7b27e463335ac8203700c364"
+    ),
+    (
+        "consecutive_mod",
+        consecutive_mod_generator,
+        "185a79b4fd397c54ecdba737fed122bde10faf7764b3c0e1aa04cb1af3c92901"
+    ),
+    (
+        "smarandache",
+        smarandache_generator,
+        "afaf57b80500527d79b9b46ff2d5337bd279fb7cc0539542854da6fcc018a299"
+    ),
+    (
+        "cribbage_hand",
+        cribbage_hand_generator,
+        "273e51deef808366a3abf0e3647e7e5247dea8842f55dc5ae69507076a5fb4fc"
+    ),
+    (
+        "elevator",
+        elevator_generator,
+        "dd08153986dbb431ce48391b166ba2f028b0fdb7b0bd1b64d2ecc041f6820eb9"
+    ),
+    (
+        "farey_neighbours",
+        farey_neighbours_generator,
+        "af490bdd64cedde995bcf7b30135422aaf586bc9e1eaf7dc0d6b1b54234de5a5"
+    ),
+    (
+        "nonogram_line",
+        nonogram_line_generator,
+        "7059de179cc75cdc21c08b8139e9fa2658b665a58d3354c456a07a037bccd324"
+    ),
+    (
+        "hackenbush_value",
+        hackenbush_value_generator,
+        "49e39df9272e5a8eacda941f93ac8018cc5fdb64e408fc40d5908384608a01a5"
+    ),
+    (
+        "upside_down",
+        upside_down_generator,
+        "d860a2497998d7fa1d6f2aa5e2c79b3369cf35c0225d9962f31ce7fefc60baa8"
+    ),
+    (
+        "renumber",
+        renumber_generator,
+        "f79e5814a4e5219bf268e778215898d5937bdabc449b23012be4cb5fc284aee9"
+    ),
+    (
+        "short_names",
+        short_names_generator,
+        "d6c420d1f276dbd5baea776789fe7696f80519a99719887e641611e6bb7dbd79"
+    ),
+    (
+        "ipd_tournament",
+        ipd_tournament_generator,
+        "24be6cf39d7165099b96ef7c730346fa3dd5e5294404e2de22aeba374385c4a3"
+    ),
+    (
+        "adventure_endings",
+        adventure_endings_generator,
+        "6a215d25166253662ea3f519148baa8c08ce6e208f6d4e8f03cf91075a00e00a"
+    ),
+    (
+        "tidy_tower",
+        tidy_tower_generator,
+        "63012e04fe4b3a283a545619708fb187f0d9fa4f0017914f9e6be5ec455e4dbe"
+    ),
+    (
+        "exclusivity_probes",
+        exclusivity_probes_generator,
+        "fcb290c3e9fe1f2b4ca54fb7e232215ceda02265c1053383f50819e84222cd15"
+    ),
+    (
+        "repetition_free",
+        repetition_free_generator,
+        "6ff8a342a55bae67fdbf3396d74d61eaad219326f871fc65d3df6f756d59abf7"
+    ),
+    (
+        "stack_the_deck",
+        stack_the_deck_generator,
+        "b062a66ce27d3d6abc85bec3b1da7ee3fc8404b9f4b7bb6bf9f2890f10911656"
+    ),
+    (
+        "stack_the_bottom",
+        stack_the_bottom_generator,
+        "ea469d066f1a23ed07bf12dbd207e1703a01134565948722fbfb3f3bd307ae00"
+    ),
+    (
+        "moessner",
+        moessner_generator,
+        "1768ecc41bb4ced2ae4db4dcbbbcbf5b330fdbaf7e9eee428ca56e526e53d4a2"
+    ),
+    (
+        "is_practical",
+        is_practical_generator,
+        "4c0820dd85c26706e7bf482c8a524a3a4f7fc79151f7883e54ef22f4bcd6ddbf"
+    ),
+    (
+        "is_weird",
+        is_weird_generator,
+        "aee944f1e496d422d3de7a2b13b7008a580ed62e2f084bcf7d8baa571c31e1c5"
+    ),
+    (
+        "vdw_colourings",
+        vdw_colourings_generator,
+        "32f232200c02e197459b41ff0bfd357190128b1022e85628d29d9d2d50b2eca9"
+    ),
+    (
+        "squared_rectangle",
+        squared_rectangle_generator,
+        "41e34d16ba16955deade5edfc5c669841dc8c86fb31072ae16b2daff336f6f5b"
+    ),
+    (
+        "ulam",
+        ulam_generator,
+        "37681c21ec1b6109c87ff43160e40d48cbebd70898d2c7c326591ffc2e6f3d3e"
+    ),
+    (
+        "deadfish",
+        deadfish_generator,
+        "2d947280a12b1a228fcdc975daf53eb9b2d0d77bc1192b6e9a75138aeff7c6f4"
+    ),
+    (
+        "tag_system",
+        tag_system_generator,
+        "b6f0cd662d75ab35feee105c4664df521e0a3cd18336b3f6be6234477d03eb61"
+    ),
+    (
+        "hall_of_mirrors",
+        hall_of_mirrors_generator,
+        "a7871238e6c9450e0a1f50b641c7ddf83c0ede8d89953a40b22d271ea72cc6d3"
+    ),
+    (
+        "die_agony",
+        die_agony_generator,
+        "8885c0c10b08362dac27503054af6e73ff0143cd4286f36ae5787c44455f67ba"
+    ),
+    (
+        "intercal",
+        intercal_generator,
+        "f0d5a1412bcc236c6c9f41334a549dd2d3c7b0958675700f2cb4fcf3fd2611e5"
+    ),
+    (
+        "slashes",
+        slashes_generator,
+        "b2e0dcafa6c3fcf9dce9e1c4e638ce5bba0ffaeb8737729576dd67f7a0cd5bb4"
+    ),
+    (
+        "pancake_flips",
+        pancake_flips_generator,
+        "305749252fd980c080afaba6c73f891f6669cf354a8c160f85c78171387cac26"
+    ),
+    (
+        "nicomachus",
+        nicomachus_generator,
+        "7f684e8b584616086e23358fb4c820a49b90289cb03f18e498fbd1d257750145"
+    ),
+    (
+        "even_wins",
+        even_wins_generator,
+        "05d6e04f96851a68ee1c56333399901becf5b8c328464a04caf152752489cc96"
+    ),
+    (
+        "chomp",
+        chomp_generator,
+        "1d167462f442d81a2ea25678cad07c5c33ab882cb24c77ea3c8bb94749110c13"
+    ),
+    (
+        "hexapawn",
+        hexapawn_generator,
+        "81f2f9261f35e3793b8611d3483dc2006e074a27e4618439b70353b837bd109c"
+    ),
+    (
+        "weekday",
+        weekday_generator,
+        "447084a684d5fcff44270fe34fe6e5e9cc91a186f7a828bfeeae81775e12afe9"
+    ),
+(
+        "smallest_group",
+        smallest_group_generator,
+        "bd6ec5ee5d501d2e3c0e10bbbfec5bf0641aea95519a78c3a9ec58202d976a4d"
+    ),
+    (
+        "fitch_cheney",
+        fitch_cheney_generator,
+        "2c5e47016f17fc2ed5e29cecdaa4700356ab34b798bcbff7efac550a88687e0d"
+    ),
+    (
+        "urinals",
+        urinals_generator,
+        "bd4b43127fbe43907090f23b62574d8b79844fdea45a9efd2af134a11e812577"
+    ),
+    (
+        "octal_grundy",
+        octal_grundy_generator,
+        "4625ce80258950a559628221892fbb2362e916b9c398f886e5cabca43b95b4f3"
+    ),
+    (
+        "lights_out",
+        lights_out_generator,
+        "3c55bf64dd057880e1db22aba52531f790beae0353bcc2fec61b1f096dfc4563"
+    ),
+    (
+        "knight_swap",
+        knight_swap_generator,
+        "3d0bc28036bf9c894a5d99ab8e0c556ff53c09fa306654d6804514bfee53c3bb"
+    ),
+    (
+        "hamming_decode",
+        hamming_decode_generator,
+        "8988269c61f1aa052d3d6988ec2352a6b10b7a9c462cfd5d669ea984a0c94c58"
+    ),
+    (
+        "gray_rank",
+        gray_rank_generator,
+        "53838c6306a704eb13adec44c417df4ff94c6da02fd75f9239808e24e6643dea"
+    ),
+    (
+        "ski_reduce",
+        ski_reduce_generator,
+        "2f85500602b1b84c322d7a52c3d1420caa003b75ba4cc5749a39dd3d0359e73a"
+    ),
+    (
+        "distinguish",
+        distinguish_generator,
+        "62a9e4c4f95e543a69a6dd1a69044b0ea8ff279e5e76be97d9ff6f638f6bc842"
+    ),
+    (
+        "wang_strip",
+        wang_strip_generator,
+        "3e4437b03819256f66d8854d0b5cc5428c4f5a36f8217af9f53bd58bf2664fbf"
+    ),
+    (
+        "hereditary_goodstein",
+        hereditary_goodstein_generator,
+        "3d83eb055a00eeafc4de2a32a1333b68d17b0b1b7f4ed97518317bddf90691d6"
+    ),
+    (
+        "tower_mod",
+        tower_mod_generator,
+        "330fe713eaa5b8ec95f9e155db844ddbb238a587976871a3a6b3289593e00380"
+    ),
+    (
+        "up_arrow",
+        up_arrow_generator,
+        "82363ee5d1cacfdd0686446a7637a5bd1f6be8ed71025a521632c28a0058142b"
+    ),
+    (
+        "friedman_good",
+        friedman_good_generator,
+        "f773faf1cdccbf25a2af90f6b12c593c8a73f445ad7aa468731b027ebe98317d"
+    ),
+    (
+        "determinant",
+        determinant_generator,
+        "7eaf9db8f0cfacb9fb5723909a26744c1754002a9d268956a5f52cfa0bee1296"
+    ),
+    (
+        "mat_power",
+        mat_power_generator,
+        "a64923697f9ec440e8d83482f7adf4d1d34468b32d369dee7d785f5238f7fed9"
+    ),
+    (
+        "count_asm",
+        count_asm_generator,
+        "4185dceb19d3fcce17cf6a618f76a2a330e5f070a9b2bc02cc7be30c53bfa8cf"
+    ),
+    (
+        "permanent",
+        permanent_generator,
+        "373458a806cd86f82daa72840af5767833e4fa31cf598b0c0f8bb17cb5530f98"
+    ),
+    (
+        "kronecker_power",
+        kronecker_power_generator,
+        "8eb6d0b92f4cf4d19dda8feb757311950aa6543a47eaa89571bdae0593de4ec6"
+    ),
+    (
+        "spanning_trees",
+        spanning_trees_generator,
+        "8163f732c850e885d3c2c18147c3f62f7eddd872cc471a2a97743eab349a930a"
+    ),
+    (
+        "eulerian_circuits",
+        eulerian_circuits_generator,
+        "36b256b8121220c22a24dba7f56d4ef16b547c788f2e7c4d65a30a027f26d9c8"
+    ),
+    (
+        "assignment",
+        assignment_generator,
+        "0ffb4452e98cd9e0b8cf7370c1c224d431afd52aaba9fcf396b606de296908c0"
+    ),
+    (
+        "penney_odds",
+        penney_odds_generator,
+        "da1cb78539d225e9df33d443e77b13c469b1eaeb38d2f1fe332181c898d648d3"
+    ),
+    (
+        "sorting_swaps",
+        sorting_swaps_generator,
+        "0df86fd23827095074675af45f825a314a110ef64e018f6e134b0e1df91a7486"
+    ),
+    (
+        "parasitic",
+        parasitic_generator,
+        "d2dc135f97be84fc1861756a711f885f091b82b62577d7e8c21299f6950c7d29"
+    ),
+    (
+        "ones_complexity",
+        ones_complexity_generator,
+        "42b9549cc55feebd6daf9e8fe278f7f5079fe1dde6170022fdf79b52abc376cf"
+    ),
+    (
+        "gear_speed",
+        gear_speed_generator,
+        "b376b22126120d355c4a2c9d62e5a3e45b18ef120b40c58ba5a8ef7de77319ec"
+    ),
+    (
+        "fizzbuzz_prefix",
+        fizzbuzz_prefix_generator,
+        "8ebee4f3a332ac74d443f7caf4f01aa950b3baa9d742e4f255411ef21e4922d3"
+    ),
+    (
+        "familiar_pairs",
+        familiar_pairs_generator,
+        "ea9f72f9b2ee6e190c00d5b9f00d29c404f6b6b104c6324a2ca4b5d2a7f2976b"
+    ),
+    (
+        "tired_monty",
+        tired_monty_generator,
+        "b49b4fd0ebda5d92106f0dd17662939ecd8f90e5aa82d3c2ba1a24e480a025f4"
+    ),
+    (
+        "stamp_ways",
+        stamp_ways_generator,
+        "5fa721cda0b2a00a66d2efaae9f94ccfba8dd136d20fe0079d8768d61fead4c2"
+    ),
+    (
+        "best_die",
+        best_die_generator,
+        "dd0611ead755d0e2e37dd1176859b270dd657aa52f47a12f6b5cc78d31ff6783"
+    ),
+    (
+        "setlists",
+        setlists_generator,
+        "06b3379dae3b3cc5587e4c0ea7a6141471dcfac725aca08b3eac6af6e11f8220"
+    ),
+    (
+        "shortest_cycles",
+        shortest_cycles_generator,
+        "e41bb49bf27d702a56fb0dd795ff17462a52ab72c005591600a47670e070a0bf"
+    ),
+    (
+        "sign_expectation",
+        sign_expectation_generator,
+        "3ee6033028c7f9ca0b45dba987ad2848573d567547fc9feb7e0e258b89d61465"
+    ),
+    (
+        "cash_total",
+        cash_total_generator,
+        "0b4e4949b3c78d2a171ea21ff8eceb173de933a76b871fa24542b7a3b2a2c38a"
+    ),
+    (
+        "quadrilateral",
+        quadrilateral_generator,
+        "fedd9b0c662add49a244586bc0a5433e62c903ac0df2d834fe870b5a0b80dd54"
+    ),
+    (
+        "is_hypercube",
+        is_hypercube_generator,
+        "36cbdd397ba724f00cc74e2ed255f4ede1bfc2c3bc13719d3381d435fb469a61"
+    ),
+    (
+        "subtree_counts",
+        subtree_counts_generator,
+        "b6bdbb769bdef06fc1c7862166fc5b07a44ed6985def3d4a2cbecebc8178d23f"
+    ),
+    (
+        "two_cliques",
+        two_cliques_generator,
+        "9199851fb76dc38ffec04de601d719ceb6b1fe6999d54539ddd545a64d81767f"
+    ),
+        (
+        "ladder_lottery",
+        ladder_lottery_generator,
+        "1b9369320ae8b0dda0425a1def39f708c9b00ea233422c32eb1eab6ab19ba818"
+    ),
+    (
+        "palindrome_substring",
+        palindrome_substring_generator,
+        "60a2a75a8fab617c49e1a9898077626a8bb1be9007aca4c01e710a409c54c5ce"
+    ),
+    (
+        "terrace_pairs",
+        terrace_pairs_generator,
+        "e0a36d95eb4cea58844c594bd37ffcfb4d50568af29c6dd9cb6fdba723ca37e7"
+    ),
+    (
+        "ball_l1_sum",
+        ball_l1_sum_generator,
+        "7505d850d90ead92bc6c8864bb35094d1e377544d8ebde684e237c7d953bc6e6"
+    ),
+    (
+        "wildcard_distance",
+        wildcard_distance_generator,
+        "59b5a57ad16ee8962d492784da142e53709185bbe4df45ef67ab762d2c2d7550"
+    ),
 ]
 
 # YYY
@@ -7666,8 +10019,8 @@ def discrepancy(teacher, student, test_generator, stop_at_first=False, print_all
                 shortest_args, disc_teacher, disc_student = current_args, result_teacher, result_student
             if print_all:
                 print(f"Current_args: {current_args}")
-                print(f"Student: {result_student}")
                 print(f"Teacher: {result_teacher}")
+                print(f"Student: {result_student}")
             if stop_at_first:
                 break
     if shortest_args is None:
@@ -7684,9 +10037,9 @@ def discrepancy(teacher, student, test_generator, stop_at_first=False, print_all
         print(f"Student: {repr(disc_student)}")
         return False
 
-
-run_all()
+if __name__ == "__main__":
+    run_all()
 
 
 # teacher student generator
-#discrepancy(labs109.pinch_moves, labs109.pinch_moves2, pinch_moves_generator(Random(fixed_seed)), print_all=False, stop_at_first=True)
+#discrepancy(labs109.triangular_triangle2, labs109.triangular_triangle, triangular_triangle_generator(Random(fixed_seed)), stop_at_first=True)
